@@ -98,7 +98,7 @@ class Rental(commands.Cog):
         ROW_INDEX = 2
         RENT_INDEX = 3
         PID_MAX_LEN = 7
-        LOGISTICS_CHNL_ID = 745044607871615049
+        LOGISTICS_CHNL_ID = 711296973512114226
         MAX_DAYS = 2
         REACTION_MAX = 1
         

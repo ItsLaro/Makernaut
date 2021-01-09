@@ -8,8 +8,6 @@ class BotContext(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.MOD_ROLE_ID = 743537238071181472
-        self.BOT_FRIENDLY_CHANNELS = [746081458564890654, 745044635604484217, 745044607871615049]
 
 
     #Events
@@ -23,7 +21,7 @@ class BotContext(commands.Cog):
         content = message.content
         channel = message.channel
 
-        if channel.id in self.BOT_FRIENDLY_CHANNELS:
+        if channel.id == 788810258544853052:
         
             if author.id == self.bot.user.id:
                 return
@@ -58,35 +56,6 @@ class BotContext(commands.Cog):
                     # maybe you dont have permission to do that
                     # we dont mind, so we can just ignore them
                     pass 
-
-    @commands.command()
-    async def purge(self, ctx, num_messages):
-        '''
-        Bot will delete number of messages specified (excluding the command) 
-        '''
-        user_roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MOD_ROLE_ID)
-
-        if mod_role not in user_roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only usable by moderator.')
-        else:
-            await ctx.channel.purge(limit=int(num_messages) + 1)
-            await ctx.channel.send('Woof, woof! Wiped!'.format(ctx))
-
-    @commands.command()
-    async def copy(self, ctx, id):
-        '''
-        Bot will send a copy of a specified message (by ID) 
-        '''
-        user_roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MOD_ROLE_ID)
-
-        if mod_role not in user_roles:
-            await ctx.send(f'{ctx.author.mention} this command is only usable by moderator.')
-        else:
-            message = await ctx.channel.fetch_message(id)
-            await ctx.send(message.content)
 
 def setup(bot):
     bot.add_cog(BotContext(bot)) 
