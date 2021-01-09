@@ -18,15 +18,15 @@ class BotContext(commands.Cog):
         '''
         # we do not want the bot to reply to itself
         author = message.author
-        content = message.content
+        content = message.content.lower()
         channel = message.channel
 
-        if channel.id == 788810258544853052:
+        if channel.id == 626183709372186635: 
         
             if author.id == self.bot.user.id:
                 return
 
-            if (('hello' in content) or ('hi' in content)) and "makernaut" in content.lower():
+            if (('hello' in content) or ('hi' in content)) and "makernaut" in content:
                 try:
                     print('Inside Bot Context: ' + message.content)
                     emoji = '\N{WHITE HEAVY CHECK MARK}'

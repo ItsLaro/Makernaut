@@ -8,6 +8,7 @@ class Roles(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
+        self.MODERATOR_ROLE_ID = 399551100799418370
 
         #Channels
         self.BOT_LOGS_CHANNEL_ID = 789520898356412477
@@ -140,6 +141,38 @@ class Roles(commands.Cog):
                 #Prints to console and notifies bot-log channel
                 print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
                 await self.log_channel.send(f'{self.emojis_upe[str(desired_user_role)]} {reacting_user.mention} is interested in {desired_user_role}!')
+
+    @commands.command()
+    async def substitute_role(self, ctx, *args):
+
+        old_role = None
+        new_role = None
+
+        if not args:
+            await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+        else:
+            roles = " ".join(args)
+            roles_list = roles.split("|")
+
+        if len(roles_list) < 2:
+            await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+        else: 
+            print(roles_list[0].strip())
+            old_role = discord.utils.get(ctx.guild.roles, name=roles_list[0].strip())
+            new_role = discord.utils.get(ctx.guild.roles, name=roles_list[1].strip())
+
+        if not old_role and not new_role:
+            await ctx.send("Roles couldn't not be found... Verify and try again!")
+        else:
+            for member in ctx.guild.members:
+                print(member)
+                for role in member.roles: 
+                    print(role)
+                    if role == old_role: 
+                        await member.add_roles(new_role)
+                        await member.remove_roles(old_role)
+
+            await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead")
 
 def setup(bot):
     bot.add_cog(Roles(bot)) 

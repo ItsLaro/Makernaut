@@ -7,7 +7,8 @@ load_dotenv()
 secret_key = os.getenv("BOT_KEY")
 
 command_prefix = '!'
-bot = commands.Bot(command_prefix)
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix, intents=intents)
 
 @bot.event
 async def on_ready():
