@@ -9,6 +9,7 @@ class Utilities(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.MODERATOR_ROLE_ID = 399551100799418370
 
     #Events
     # @commands.Cog.listener()
@@ -23,16 +24,14 @@ class Utilities(commands.Cog):
     # Deletes as many messages as passed in parameter
     @commands.command()
     async def purge(self, ctx, num_messages):
-        # roles = ctx.author.roles
-        # admin = ctx.guild.get_role(admin_id)
+        roles = ctx.author.roles
+        admin = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
-        # if admin not in roles:
-        #     await ctx.send(
-        #         f'{ctx.author.mention} this command is only usable by organizers.')
-        # else:
-        await ctx.channel.purge(limit=int(num_messages) + 1)
-        #@commands.command()
-        #async def clear(self, ctx, amount):
+        if admin not in roles:
+            await ctx.send(
+                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+        else:
+            await ctx.channel.purge(limit=int(num_messages) + 1)
 
 def setup(bot):
     bot.add_cog(Utilities(bot)) 
