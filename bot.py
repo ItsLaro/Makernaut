@@ -10,6 +10,8 @@ command_prefix = '!'
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix, intents=intents)
 
+MODERATOR_ROLE_ID = 399551100799418370
+
 @bot.event
 async def on_ready():
     
@@ -32,27 +34,48 @@ async def on_disconnect():
 
 @bot.command()
 async def load(ctx, extension):
-    bot.load_extension(f'cogs.{extension}')
-    await ctx.send(f'{extension.title()} cog has been loaded')
+    roles = ctx.author.roles
+    mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)
+
+    if mod_role not in roles:
+        await ctx.send(
+            f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+    else:
+        bot.load_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension.title()} cog has been loaded')
 
 @bot.command()
 async def unload(ctx, extension):
-    bot.unload_extension(f'cogs.{extension}')
-    await ctx.send(f'{extension.title()} cog was unloaded')
+    roles = ctx.author.roles
+    mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)
+
+    if mod_role not in roles:
+        await ctx.send(
+            f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+    else:
+        bot.unload_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension.title()} cog was unloaded')
 
 @bot.command()
 async def reload(ctx):
-    try:
-        for filename in os.listdir('./cogs'):
-            if filename.endswith('.py'):
-                bot.unload_extension(f'cogs.{filename[:-3]}')
-                bot.load_extension(f'cogs.{filename[:-3]}')
-                print(f'- {(filename[:-3]).title()} commands reloaded')
-        await ctx.send(f'Cogs reloaded succesfully')
-        print(f'Cogs reloaded succesfully\n')
-    except Exception:
-        await ctx.send(f"Something's not right...")
-        print(Exception)
+    roles = ctx.author.roles
+    mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)
+
+    if mod_role not in roles:
+        await ctx.send(
+            f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+    else:
+        try:
+            for filename in os.listdir('./cogs'):
+                if filename.endswith('.py'):
+                    bot.unload_extension(f'cogs.{filename[:-3]}')
+                    bot.load_extension(f'cogs.{filename[:-3]}')
+                    print(f'- {(filename[:-3]).title()} commands reloaded')
+            await ctx.send(f'Cogs reloaded succesfully')
+            print(f'Cogs reloaded succesfully\n')
+        except Exception:
+            await ctx.send(f"Something's not right...")
+            print(Exception)
 
 if __name__ == "__main__":
     bot.run(secret_key)

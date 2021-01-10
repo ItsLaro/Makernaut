@@ -25,9 +25,9 @@ class Utilities(commands.Cog):
     @commands.command()
     async def purge(self, ctx, num_messages):
         roles = ctx.author.roles
-        admin = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
-        if admin not in roles:
+        if mod_role not in roles:
             await ctx.send(
                 f'{ctx.author.mention} this command is only meant to be used by Moderators.')
         else:

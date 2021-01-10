@@ -4,11 +4,13 @@ from discord.ext import commands
 class Roles(commands.Cog):
 
     '''
-    Handles user verification by reacting to the roles and assignment of other roles via reactions
+    Handles role-related commands and events. Allows user verification by reactions and assignment of other other roles via reactions.
+    Handles commnds to manually give or substitute roles.
     '''
     def __init__(self, bot):
         self.bot = bot
         self.MODERATOR_ROLE_ID = 399551100799418370
+        self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
 
         #Channels
         self.BOT_LOGS_CHANNEL_ID = 789520898356412477
@@ -144,52 +146,67 @@ class Roles(commands.Cog):
 
     @commands.command()
     async def substitute_role(self, ctx, *args):
+        
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
-        old_role = None
-        new_role = None
-
-        if not args:
-            await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+        if mod_role not in roles:
+            await ctx.send(
+                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
         else:
-            roles_name = " ".join(args)
-            roles_name_list = roles_name.split("|")
+            old_role = None
+            new_role = None
 
-        if len(roles_name_list) < 2:
-            await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
-        else: 
-            old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
-            new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
+            if not args:
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+            else:
+                roles_name = " ".join(args)
+                roles_name_list = roles_name.split("|")
 
-        if not old_role and not new_role:
-            await ctx.send("Roles couldn't not be found... Verify and try again!")
-        else:
-            for member in ctx.guild.members:
-                for role in member.roles: 
-                    if role == old_role: 
-                        await member.add_roles(new_role)
-                        await member.remove_roles(old_role)
+            if len(roles_name_list) < 2:
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+            else: 
+                old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
+                new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
 
-            await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead")
+            if not old_role and not new_role:
+                await ctx.send("Roles couldn't not be found... Verify and try again!")
+            else:
+                for member in ctx.guild.members:
+                    for role in member.roles: 
+                        if role == old_role: 
+                            await member.add_roles(new_role)
+                            await member.remove_roles(old_role)
+
+                await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead")
 
     @commands.command()
     async def give_role(self, ctx, target_user: discord.Member, *args):
+        
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
 
-        desired_role = None
-
-        print(f"Mention: {target_user}")
-        if len(args) == 0:
-            await ctx.send("You must mention the user followed by the name of the role")
-        elif not isinstance(target_user, discord.Member):
-            await ctx.send("You must mention the target user with `@` ")
+        if whisperer_role not in roles or mod_role not in roles:
+            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
+                
         else:
-            desired_role_name = (" ".join(args)).strip()
-            desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+            desired_role = None
 
-        if not desired_role:
-            await ctx.send("Role couldn't not be found... Verify and try again!")
-        else:
-            await target_user.add_roles(desired_role)
-            await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
+            print(f"Mention: {target_user}")
+            if len(args) == 0:
+                await ctx.send("You must mention the user followed by the name of the role")
+            elif not isinstance(target_user, discord.Member):
+                await ctx.send("You must mention the target user with `@` ")
+            else:
+                desired_role_name = (" ".join(args)).strip()
+                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+
+            if not desired_role:
+                await ctx.send("Role couldn't not be found... Verify and try again!")
+            else:
+                await target_user.add_roles(desired_role)
+                await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
 
 def setup(bot):
     bot.add_cog(Roles(bot)) 
