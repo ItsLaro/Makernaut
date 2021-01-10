@@ -18,15 +18,15 @@ class BotContext(commands.Cog):
         '''
         # we do not want the bot to reply to itself
         author = message.author
-        content = message.content
+        content = message.content.lower()
         channel = message.channel
 
-        if str(channel) == 'bot-spam':
+        if channel.id == 626183709372186635: 
         
             if author.id == self.bot.user.id:
                 return
 
-            if (('hello' in content) or ('hi' in content)) and "makernaut" in content.lower():
+            if (('hello' in content) or ('hi' in content)) and "makernaut" in content:
                 try:
                     print('Inside Bot Context: ' + message.content)
                     emoji = '\N{WHITE HEAVY CHECK MARK}'
@@ -56,7 +56,6 @@ class BotContext(commands.Cog):
                     # maybe you dont have permission to do that
                     # we dont mind, so we can just ignore them
                     pass 
-
 
 def setup(bot):
     bot.add_cog(BotContext(bot)) 
