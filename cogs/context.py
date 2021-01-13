@@ -21,7 +21,7 @@ class BotContext(commands.Cog):
         content = message.content.lower()
         channel = message.channel
 
-        if channel.id == 789520848049537055: 
+        if channel.id == 626183709372186635: 
         
             if author.id == self.bot.user.id:
                 return

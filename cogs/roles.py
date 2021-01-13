@@ -145,7 +145,90 @@ class Roles(commands.Cog):
                 await self.log_channel.send(f'{self.emojis_upe[str(desired_user_role)]} {reacting_user.mention} is interested in {desired_user_role}!')
 
     @commands.command()
-    async def substitute_role(self, ctx, *args):
+    async def give_role(self, ctx, target_user: discord.Member, *args):
+        
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
+
+        if mod_role not in roles:
+            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
+                
+        else:
+            desired_role = None
+
+            if len(args) == 0:
+                await ctx.send("You must include the full tag of the user followed by the name of the role")
+            elif not isinstance(target_user, discord.Member):
+                await ctx.send("You must include the full tag of the user (Ex. User#0000)")
+            else:
+                desired_role_name = (" ".join(args)).strip()
+                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+
+            if not desired_role:
+                await ctx.send("Role couldn't not be found... Verify and try again!")
+            else:
+                await target_user.add_roles(desired_role)
+                await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
+    
+    @commands.command()
+    async def take_role(self, ctx, target_user: discord.Member, *args):
+        
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
+
+        if mod_role not in roles:
+            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
+                
+        else:
+            desired_role = None
+
+            if len(args) == 0:
+                await ctx.send("You must mention the user followed by the name of the role")
+            elif not isinstance(target_user, discord.Member):
+                await ctx.send("You must mention the target user with `@` ")
+            else:
+                desired_role_name = (" ".join(args)).strip()
+                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+
+            if not desired_role:
+                await ctx.send("Role couldn't not be found... Verify and try again!")
+            else:
+                await target_user.remove_roles(desired_role)
+                await ctx.send(f"the {desired_role} role has been removed from {target_user.mention}")
+
+    @commands.command()
+    async def purge_role(self, ctx, *args):
+        
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+
+        if mod_role not in roles:
+            await ctx.send(
+                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+        else:
+            old_role = None
+
+            if not args:
+                await ctx.send("You must include the role name to be purged")
+            else:
+                role_name = " ".join(args)
+                old_role = discord.utils.get(ctx.guild.roles, name=role_name)
+
+            if not old_role:
+                await ctx.send("Role couldn't not be found... Verify and try again!")
+            else:
+                await ctx.send(f"Attempting to purge the {old_role} from all members...")
+
+                for member in ctx.guild.members:
+                    if old_role in member.roles:
+                        await member.remove_roles(old_role)
+
+                await ctx.send(f"The {old_role} has been purged!")
+
+    @commands.command()
+    async def replace_role(self, ctx, *args):
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
@@ -172,41 +255,14 @@ class Roles(commands.Cog):
             if not old_role and not new_role:
                 await ctx.send("Roles couldn't not be found... Verify and try again!")
             else:
+                await ctx.send(f"Attempting to give members with the {old_role} role the {new_role} role instead...")
+
                 for member in ctx.guild.members:
-                    for role in member.roles: 
-                        if role == old_role: 
-                            await member.add_roles(new_role)
-                            await member.remove_roles(old_role)
+                    if old_role in member.roles:
+                        await member.add_roles(new_role)
+                        await member.remove_roles(old_role)
 
-                await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead")
-
-    @commands.command()
-    async def give_role(self, ctx, target_user: discord.Member, *args):
-        
-        roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
-        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
-
-        if whisperer_role not in roles or mod_role not in roles:
-            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
-                
-        else:
-            desired_role = None
-
-            print(f"Mention: {target_user}")
-            if len(args) == 0:
-                await ctx.send("You must mention the user followed by the name of the role")
-            elif not isinstance(target_user, discord.Member):
-                await ctx.send("You must mention the target user with `@` ")
-            else:
-                desired_role_name = (" ".join(args)).strip()
-                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
-
-            if not desired_role:
-                await ctx.send("Role couldn't not be found... Verify and try again!")
-            else:
-                await target_user.add_roles(desired_role)
-                await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
+                await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead!")
 
 def setup(bot):
     bot.add_cog(Roles(bot)) 
