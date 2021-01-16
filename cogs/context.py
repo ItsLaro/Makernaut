@@ -8,7 +8,8 @@ class BotContext(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-
+        self.EBOARD_BOTSPAM_CHANNEL_ID = 626183709372186635
+        self.GENERAL_BOTSPAM_CHANNEL_ID = 401577290863083531
 
     #Events
     @commands.Cog.listener()
@@ -16,17 +17,20 @@ class BotContext(commands.Cog):
         '''
         Allows bot to reply to social messages 
         '''
-        # we do not want the bot to reply to itself
+
+        allowed_channel_ids = [self.EBOARD_BOTSPAM_CHANNEL_ID, self.GENERAL_BOTSPAM_CHANNEL_ID]
+
         author = message.author
         content = message.content.lower()
         channel = message.channel
 
-        if channel.id == 626183709372186635: 
-        
+        if channel.id in allowed_channel_ids: 
+            
+            # we do not want the bot to reply to itself
             if author.id == self.bot.user.id:
                 return
 
-            if (('hello' in content) or ('hi' in content)) and "makernaut" in content:
+            if (('hello' in content) or ('hi' in content) or ('hey' in content)) and (("makernaut" in content) or ("makernaut!" in content)):
                 try:
                     print('Inside Bot Context: ' + message.content)
                     emoji = '\N{WHITE HEAVY CHECK MARK}'
