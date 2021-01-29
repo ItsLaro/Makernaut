@@ -17,11 +17,14 @@ class Roles(commands.Cog):
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
 
         #Messages
-        self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID = 0 #For future events like Global Game Jam, PantherHacks and ShellHacks!
+        self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID = 804521393840324608 ##CHANGE THIS FOR EVENTS. (like Global Game Jam, PantherHacks and ShellHacks!)
         self.ROLE_UPE_ASSIGNMENT_MESSAGE_ID = 798334433957773343
         self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID = 798334792349384714
         
         #Roles
+        self.EVENT_NAME = "Global Game Jam 2021"
+        self.EVENT_ROLE_NAME = "GGJ Jammer" #CHANGE THIS FOR EVENTS.
+
         self.CODE_ROLE_NAME = "Code"
         self.MAKE_ROLE_NAME = "Make"
         self.INFOTECH_ROLE_NAME = "InfoTech"
@@ -42,7 +45,7 @@ class Roles(commands.Cog):
         self.TAMAGOTCHI_ROLE_NAME = "Gacha Addicts"
 
         #Emojis
-        self.emoji_event = '\N{WHITE HEAVY CHECK MARK}'
+        self.emoji_event = '<:GGJ21:804515872449232896>'
         self.emojis_upe = {
             self.CODE_ROLE_NAME : "<:upecode:753692446738612384>",
             self.MAKE_ROLE_NAME : "<:upemake:753692447044927518>",
@@ -73,18 +76,18 @@ class Roles(commands.Cog):
 
         ### EVENT ROLE ASSIGNMENT
     
-        # User added reaction to the Rules Acceptance Message in #welcome
+        # User added reaction to the Event Message in #welcome
         if payload.message_id == self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID:
-
+            
             # User reacted with the appropiate emoji
-            if payload.emoji.name == self.emoji_event:
+            if str(payload.emoji) == self.emoji_event:
                 # Sets the verified 'User' role
-                verified_user_role = discord.utils.get(reacting_user.guild.roles, name="User")
-                await reacting_user.add_roles(verified_user_role) 
+                event_user_role = discord.utils.get(reacting_user.guild.roles, name=self.EVENT_ROLE_NAME)
+                await reacting_user.add_roles(event_user_role) 
 
                 #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + " has read and accepted the rules!")
-                await self.log_channel.send(f'{reacting_user.mention} has read and accepted the rules!')
+                print("User " + reacting_user.name + " has entered the event!")
+                await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} is attending {self.EVENT_NAME}!')
 
         ### UPE ROLES ASSIGNMENT
 
@@ -220,14 +223,15 @@ class Roles(commands.Cog):
         if payload.message_id == self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID:
 
             # User reacted with the appropiate emoji
-            if payload.emoji.name == self.emoji_event:
+            if str(payload.emoji) == self.emoji_event:
                 # Sets the verified 'User' role
-                verified_user_role = discord.utils.get(reacting_user.guild.roles, name="User")
-                await reacting_user.remove_roles(verified_user_role) 
+                event_user_role = discord.utils.get(reacting_user.guild.roles, name=self.EVENT_ROLE_NAME)
+                await reacting_user.remove_roles(event_user_role) 
 
                 #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + " has read and accepted the rules!")
-                await self.log_channel.send(f'{reacting_user.mention} has read and accepted the rules!')
+                print("User " + reacting_user.name + " has exited the event!")                
+                await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} has *left* {self.EVENT_NAME}!')
+
 
         ### UPE ROLES ASSIGNMENT
 
