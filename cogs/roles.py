@@ -17,7 +17,7 @@ class Roles(commands.Cog):
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
 
         #Messages
-        self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID = 804521393840324608 ##CHANGE THIS FOR EVENTS. (like Global Game Jam, PantherHacks and ShellHacks!)
+        self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID = 804525065420668958 ##CHANGE THIS FOR EVENTS. (like Global Game Jam, PantherHacks and ShellHacks!)
         self.ROLE_UPE_ASSIGNMENT_MESSAGE_ID = 798334433957773343
         self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID = 798334792349384714
         
