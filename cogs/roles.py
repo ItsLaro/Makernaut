@@ -9,7 +9,7 @@ class Roles(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.MODERATOR_ROLE_ID = 788930867593871381 #Current: Test; Main: 399551100799418370
+        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
         self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
 
         #Channels
