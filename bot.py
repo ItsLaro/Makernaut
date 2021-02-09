@@ -8,7 +8,7 @@ secret_key = os.getenv("BOT_KEY")
 
 command_prefix = '$'
 intents = discord.Intents().all()
-bot = commands.Bot(command_prefix, intents=intents)
+bot = commands.Bot(command_prefix, intents=intents, help_command=None)
 
 MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
 

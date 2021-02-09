@@ -4,8 +4,8 @@ from discord.ext import commands
 class Roles(commands.Cog):
 
     '''
-    Handles role-related commands and events. Allows user verification by reactions and assignment of other other roles via reactions.
-    Handles commnds to manually give or substitute roles.
+    Handles role-related commands and events. Allows  assignment of other other roles via reactions.
+    Handles commands to manually manipulate roles.
     '''
     def __init__(self, bot):
         self.bot = bot
@@ -360,7 +360,7 @@ class Roles(commands.Cog):
                 print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
 
     @commands.command()
-    async def give_role(self, ctx, target_user: discord.Member, *args):
+    async def giverole(self, ctx, target_user: discord.Member, *args):
 
         '''
         Used to assign a role to a user.\nEx: $give_role @Laro#0001 Code Member
@@ -391,7 +391,7 @@ class Roles(commands.Cog):
                 await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
     
     @commands.command()
-    async def take_role(self, ctx, target_user: discord.Member, *args):
+    async def takerole(self, ctx, target_user: discord.Member, *args):
 
         '''
         Used to remove a role to a user.\nEx: $take_role @Laro#0001 InfoTech Member
@@ -422,7 +422,7 @@ class Roles(commands.Cog):
                 await ctx.send(f"The {desired_role} role has been removed from {target_user.mention}")
 
     @commands.command()
-    async def purge_role(self, ctx, *args):
+    async def purgerole(self, ctx, *args):
 
         '''
         Removes the specified role from ALL users.\nEx: $purge_role SparkDev Member
@@ -455,7 +455,7 @@ class Roles(commands.Cog):
                 await ctx.send(f"The {old_role} has been purged!")
 
     @commands.command()
-    async def mass_add(self, ctx, *args):
+    async def massgiverole(self, ctx, *args):
 
         '''
         Used to add the same role to multiple users.\nEx: $mass_add Design Member $ @Laro#0001 @JohnDoe#1234 @Mudae#0807
@@ -534,7 +534,7 @@ class Roles(commands.Cog):
                 await ctx.send(embed=embed_response)
 
     @commands.command()
-    async def replace_role(self, ctx, *args):
+    async def replacerole(self, ctx, *args):
 
         '''
         Used to replace a role for another on every user.\nEx: $replace_role ShellHacks Hacker $ ShellHacks 2018 Hacker
