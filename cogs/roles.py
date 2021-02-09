@@ -68,6 +68,12 @@ class Roles(commands.Cog):
             self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>"
         }
 
+        #Colors HEX
+
+        self.GREEN_HEX = 0x238823 
+        self.YELLOW_HEX = 0xFFBF00  
+        self.RED_HEX = 0xD2222D
+
     #Events
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -494,13 +500,13 @@ class Roles(commands.Cog):
 
                 if not has_failed_users:
                     response_title = "Done!"
-                    embed_color = 0x238823 
+                    embed_color = self.GREEN_HEX
                 elif len(succesful_users) > len(failed_users):
                     response_title = "Partially Done."
-                    embed_color = 0xFFBF00  
+                    embed_color = self.YELLOW_HEX 
                 else:
                     response_title = "Please Review."
-                    embed_color = 0xD2222D
+                    embed_color = self.RED_HEX
 
                 embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
                 if has_succesful_users:
