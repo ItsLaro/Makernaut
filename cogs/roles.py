@@ -363,7 +363,7 @@ class Roles(commands.Cog):
     async def giverole(self, ctx, target_user: discord.Member, *args):
 
         '''
-        Used to assign a role to a user.\nEx: $give_role @Laro#0001 Code Member
+        Used to assign a role to a user.\nEx: ?give_role @Laro#0001 Code Member
         '''
         
         roles = ctx.author.roles
@@ -394,7 +394,7 @@ class Roles(commands.Cog):
     async def takerole(self, ctx, target_user: discord.Member, *args):
 
         '''
-        Used to remove a role to a user.\nEx: $take_role @Laro#0001 InfoTech Member
+        Used to remove a role to a user.\nEx: ?take_role @Laro#0001 InfoTech Member
         '''
         
         roles = ctx.author.roles
@@ -425,7 +425,7 @@ class Roles(commands.Cog):
     async def purgerole(self, ctx, *args):
 
         '''
-        Removes the specified role from ALL users.\nEx: $purge_role SparkDev Member
+        Removes the specified role from ALL users.\nEx: ?purge_role SparkDev Member
         '''
         
         roles = ctx.author.roles
@@ -458,7 +458,7 @@ class Roles(commands.Cog):
     async def massgiverole(self, ctx, *args):
 
         '''
-        Used to add the same role to multiple users.\nEx: $mass_add Design Member $ @Laro#0001 @JohnDoe#1234 @Mudae#0807
+        Used to add the same role to multiple users.\nEx: ?mass_add Design Member | @Laro#0001 @JohnDoe#1234 @Mudae#0807
         '''
 
         roles = ctx.author.roles
@@ -486,7 +486,7 @@ class Roles(commands.Cog):
                     if is_mention_argument:
                         pass
                     else:
-                        if arg != '$':
+                        if arg != '|':
                             role_name_words.append(arg)
                         else:
                             is_mention_argument = True #indicates the next args are users
@@ -496,7 +496,7 @@ class Roles(commands.Cog):
                 role = discord.utils.get(ctx.guild.roles, name=role_name)
 
             if not role:
-                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using `$` between the role and the users")
+                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using `|` between the role and the users")
             else:
                 response_description += f"{str(role)}"
                 for member_name in args[num_role_args:]:
@@ -537,7 +537,7 @@ class Roles(commands.Cog):
     async def replacerole(self, ctx, *args):
 
         '''
-        Used to replace a role for another on every user.\nEx: $replace_role ShellHacks Hacker $ ShellHacks 2018 Hacker
+        Used to replace a role for another on every user.\nEx: ?replace_role ShellHacks Hacker | ShellHacks 2018 Hacker
         '''
         
         roles = ctx.author.roles
@@ -551,13 +551,13 @@ class Roles(commands.Cog):
             new_role = None
 
             if not args:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
             else:
                 roles_name = " ".join(args)
-                roles_name_list = roles_name.split("$")
+                roles_name_list = roles_name.split("|")
 
             if len(roles_name_list) < 2:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
             else: 
                 old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
                 new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
