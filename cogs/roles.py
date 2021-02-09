@@ -361,6 +361,10 @@ class Roles(commands.Cog):
 
     @commands.command()
     async def give_role(self, ctx, target_user: discord.Member, *args):
+
+        '''
+        Used to assign a role to a user.\nEx: $give_role @Laro#0001 Code Member
+        '''
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
@@ -388,6 +392,10 @@ class Roles(commands.Cog):
     
     @commands.command()
     async def take_role(self, ctx, target_user: discord.Member, *args):
+
+        '''
+        Used to remove a role to a user.\nEx: $take_role @Laro#0001 InfoTech Member
+        '''
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
@@ -411,10 +419,14 @@ class Roles(commands.Cog):
                 await ctx.send("Role couldn't not be found... Verify and try again!")
             else:
                 await target_user.remove_roles(desired_role)
-                await ctx.send(f"the {desired_role} role has been removed from {target_user.mention}")
+                await ctx.send(f"The {desired_role} role has been removed from {target_user.mention}")
 
     @commands.command()
     async def purge_role(self, ctx, *args):
+
+        '''
+        Removes the specified role from ALL users.\nEx: $purge_role SparkDev Member
+        '''
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
@@ -444,6 +456,11 @@ class Roles(commands.Cog):
 
     @commands.command()
     async def mass_add(self, ctx, *args):
+
+        '''
+        Used to add the same role to multiple users.\nEx: $mass_add Design Member $ @Laro#0001 @JohnDoe#1234 @Mudae#0807
+        '''
+
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
@@ -518,6 +535,10 @@ class Roles(commands.Cog):
 
     @commands.command()
     async def replace_role(self, ctx, *args):
+
+        '''
+        Used to replace a role for another on every user.\nEx: $replace_role ShellHacks Hacker $ ShellHacks 2018 Hacker
+        '''
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
