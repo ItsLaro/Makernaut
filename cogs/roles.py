@@ -9,7 +9,7 @@ class Roles(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.MODERATOR_ROLE_ID = 399551100799418370 #Current: Main; Test: 788930867593871381
+        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
         self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
 
         #Channels
@@ -68,6 +68,12 @@ class Roles(commands.Cog):
             self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>"
         }
 
+        #Colors HEX
+        self.BLUE_HEX = 0x3895D3
+        self.GREEN_HEX = 0x238823 
+        self.YELLOW_HEX = 0xFFBF00  
+        self.RED_HEX = 0xD2222D
+        
     #Events
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -379,66 +385,6 @@ class Roles(commands.Cog):
             else:
                 await target_user.add_roles(desired_role)
                 await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
-
-    @commands.command()
-    async def mass_add(self, ctx, *args):
-        roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
-
-        response_description = "Add Role: +"
-        succesful_users = [] #List to hold the name of users who now have the role.
-        failed_users = [] #List to hold the name of users who failed to acquire the role.
-
-        if mod_role not in roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
-        else:
-            role = None
-
-            if len(args) < 2:
-                await ctx.send("You must include the name of the role and mention all the users")
-            else:
-                role_name = args[0]
-                role = discord.utils.get(ctx.guild.roles, name=role_name)
-
-            if not role:
-                await ctx.send("Role couldn't not be found... Verify and try again!")
-            else:
-                response_description += f"{str(role)}"
-                for member_name in args[1:]:
-                    print(member_name)
-                    try:
-                        member = await commands.MemberConverter().convert(ctx, member_name)
-                    except commands.BadArgument:
-                        print(f"{member_name} is not a valid member or member ID.")
-                        failed_users.append(member_name)
-                    else:
-                        await member.add_roles(role)
-                        succesful_users.append(member.mention)
-
-                response_succesful_users = ", ".join(succesful_users)
-                response_failed_users = ", ".join(failed_users)
-                has_failed_users = bool(failed_users)
-                has_succesful_users = bool(succesful_users)
-
-                if not has_failed_users:
-                    response_title = "Done!"
-                    embed_color = 0x238823 
-                elif len(succesful_users) > len(failed_users):
-                    response_title = "Partially Done."
-                    embed_color = 0xFFBF00  
-                else:
-                    response_title = "Please Review."
-                    embed_color = 0xD2222D
-
-                embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
-                if has_succesful_users:
-                    embed_response.add_field(name="Succesful on:", value=response_succesful_users, inline=False)
-                if has_failed_users:
-                    embed_response.add_field(name="Failed on:", value=response_failed_users, inline=False)
-
-                await ctx.send(embed=embed_response)
-
     
     @commands.command()
     async def take_role(self, ctx, target_user: discord.Member, *args):
@@ -497,6 +443,80 @@ class Roles(commands.Cog):
                 await ctx.send(f"The {old_role} has been purged!")
 
     @commands.command()
+    async def mass_add(self, ctx, *args):
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+
+        role_name_words = []
+        is_mention_argument = False
+        num_role_args = 0
+
+        response_description = "Add Role: +"
+        succesful_users = [] #List to hold the name of users who now have the role.
+        failed_users = [] #List to hold the name of users who failed to acquire the role.
+
+        if mod_role not in roles:
+            await ctx.send(
+                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+        else:
+            role = None
+
+            if len(args) < 2:
+                await ctx.send("You must include the name of the role and mention all the users")
+            else:
+
+                for arg in args:
+                    if is_mention_argument:
+                        pass
+                    else:
+                        if arg != '$':
+                            role_name_words.append(arg)
+                        else:
+                            is_mention_argument = True #indicates the next args are users
+                        num_role_args += 1
+
+                role_name = " ".join(role_name_words)
+                role = discord.utils.get(ctx.guild.roles, name=role_name)
+
+            if not role:
+                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using `$` between the role and the users")
+            else:
+                response_description += f"{str(role)}"
+                for member_name in args[num_role_args:]:
+                    print(member_name)
+                    try:
+                        member = await commands.MemberConverter().convert(ctx, member_name)
+                    except commands.BadArgument:
+                        print(f"{member_name} is not a valid member or member ID.")
+                        failed_users.append(member_name)
+                    else:
+                        await member.add_roles(role)
+                        succesful_users.append(member.mention)
+
+                response_succesful_users = ", ".join(succesful_users)
+                response_failed_users = ", ".join(failed_users)
+                has_failed_users = bool(failed_users)
+                has_succesful_users = bool(succesful_users)
+
+                if not has_failed_users:
+                    response_title = "Done!"
+                    embed_color = self.GREEN_HEX
+                elif has_succesful_users:
+                    response_title = "Done. Please Review."
+                    embed_color = self.YELLOW_HEX 
+                else:
+                    response_title = "Failed..."
+                    embed_color = self.RED_HEX
+
+                embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+                if has_succesful_users:
+                    embed_response.add_field(name="Succesful on:", value=response_succesful_users, inline=False)
+                if has_failed_users:
+                    embed_response.add_field(name="Failed on:", value=response_failed_users, inline=False)
+
+                await ctx.send(embed=embed_response)
+
+    @commands.command()
     async def replace_role(self, ctx, *args):
         
         roles = ctx.author.roles
@@ -510,13 +530,13 @@ class Roles(commands.Cog):
             new_role = None
 
             if not args:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
             else:
                 roles_name = " ".join(args)
-                roles_name_list = roles_name.split("|")
+                roles_name_list = roles_name.split("$")
 
             if len(roles_name_list) < 2:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
             else: 
                 old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
                 new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
