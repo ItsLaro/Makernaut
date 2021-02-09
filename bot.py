@@ -10,7 +10,7 @@ command_prefix = '?'
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix, intents=intents)
 
-MODERATOR_ROLE_ID = 788930867593871381 #Current: Test; Main: 399551100799418370
+MODERATOR_ROLE_ID = 399551100799418370 #Current: Main; Test: 788930867593871381
 
 @bot.event
 async def on_ready():
