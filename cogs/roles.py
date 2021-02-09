@@ -69,11 +69,11 @@ class Roles(commands.Cog):
         }
 
         #Colors HEX
-
+        self.BLUE_HEX = 0x3895D3
         self.GREEN_HEX = 0x238823 
         self.YELLOW_HEX = 0xFFBF00  
         self.RED_HEX = 0xD2222D
-
+        
     #Events
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -479,7 +479,7 @@ class Roles(commands.Cog):
                 role = discord.utils.get(ctx.guild.roles, name=role_name)
 
             if not role:
-                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using '$' between the role and the users")
+                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using `$` between the role and the users")
             else:
                 response_description += f"{str(role)}"
                 for member_name in args[num_role_args:]:
@@ -501,11 +501,11 @@ class Roles(commands.Cog):
                 if not has_failed_users:
                     response_title = "Done!"
                     embed_color = self.GREEN_HEX
-                elif len(succesful_users) > len(failed_users):
-                    response_title = "Partially Done."
+                elif has_succesful_users:
+                    response_title = "Done. Please Review."
                     embed_color = self.YELLOW_HEX 
                 else:
-                    response_title = "Please Review."
+                    response_title = "Failed..."
                     embed_color = self.RED_HEX
 
                 embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
@@ -530,13 +530,13 @@ class Roles(commands.Cog):
             new_role = None
 
             if not args:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
             else:
                 roles_name = " ".join(args)
                 roles_name_list = roles_name.split("$")
 
             if len(roles_name_list) < 2:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `$` )")
             else: 
                 old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
                 new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
