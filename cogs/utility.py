@@ -19,11 +19,17 @@ class Utilities(commands.Cog):
     #Commands
     @commands.command()
     async def ping(self, ctx):
+        '''
+        Check bot latency.
+        '''        
         await ctx.send(f'--Pong! That took {round(self.bot.latency * 1000)}ms')
 
     # Deletes as many messages as passed in parameter
     @commands.command()
     async def purge(self, ctx, num_messages):
+        '''
+        Deletes multiple messages.\nThe number corresponds to the number of messages to delete from bottom to top\nEx: $purge 10 
+        '''  
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
