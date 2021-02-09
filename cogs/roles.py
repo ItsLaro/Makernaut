@@ -383,7 +383,7 @@ class Roles(commands.Cog):
     @commands.command()
     async def mass_add(self, ctx, *args):
         roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
         response_description = "Add Role: +"
         succesful_users = [] #List to hold the name of users who now have the role.
