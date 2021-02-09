@@ -6,11 +6,11 @@ from discord.ext import commands
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
 
-command_prefix = '~'
+command_prefix = '?'
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix, intents=intents)
 
-MODERATOR_ROLE_ID = 399551100799418370
+MODERATOR_ROLE_ID = 788930867593871381 #Current: Test; Main: 399551100799418370
 
 @bot.event
 async def on_ready():
@@ -59,7 +59,7 @@ async def unload(ctx, extension):
 @bot.command()
 async def reload(ctx):
     roles = ctx.author.roles
-    mod_role = ctx.guild.get_role(788930867593871381)
+    mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)
 
     if mod_role not in roles:
         await ctx.send(
