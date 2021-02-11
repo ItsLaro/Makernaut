@@ -472,6 +472,10 @@ class Roles(commands.Cog):
         succesful_users = [] #List to hold the name of users who now have the role.
         failed_users = [] #List to hold the name of users who failed to acquire the role.
 
+        word_count = len(" ".join(args))
+        if  word_count > 824:
+            await ctx.send(
+                f'{ctx.author.mention}, your request surpassed the word limit: {word_count}/824.')
         if mod_role not in roles:
             await ctx.send(
                 f'{ctx.author.mention} this command is only meant to be used by Moderators.')
