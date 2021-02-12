@@ -360,12 +360,15 @@ class Roles(commands.Cog):
                 print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
 
     @commands.command()
-    async def giverole(self, ctx, target_user: discord.Member, *args):
+    async def giverole(self, ctx, member_name=None, *args):
 
         '''
         Used to assign a role to a user.\nEx: ?give_role @Laro#0001 Code Member
         '''
-        
+        is_success = False
+        response_description = f"<a:utilfailure:809713365088993291> "
+        embed_color = self.RED_HEX
+
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
         whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
@@ -376,27 +379,42 @@ class Roles(commands.Cog):
         else:
             desired_role = None
 
-            if len(args) == 0:
-                await ctx.send("You must include the full tag of the user followed by the name of the role")
-            elif not isinstance(target_user, discord.Member):
-                await ctx.send("You must include the full tag of the user (Ex. User#0000)")
+            try:
+                target_user = await commands.MemberConverter().convert(ctx, member_name)
+            except commands.BadArgument:
+                response_description += f'"{member_name}" is not a valid member or member ID.\nYou must include the full tag of the user (Ex. @User#0000)'
+            except commands.MemberNotFound:
+                response_description += f'"{member_name}" is not a user in this server'
             else:
-                desired_role_name = (" ".join(args)).strip()
-                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+                if len(args) == 0:
+                    response_description += "You must include the name of the role after the user"
+                else:
+                    desired_role_name = (" ".join(args)).strip()
+                    desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
 
-            if not desired_role:
-                await ctx.send("Role couldn't not be found... Verify and try again!")
-            else:
-                await target_user.add_roles(desired_role)
-                await ctx.send(f"{target_user.mention} has been assigned the {desired_role} role")
+                    if not desired_role:
+                        response_description += f'Role "{desired_role_name}"could not be found... Verify and try again!'
+                    else:
+                        await target_user.add_roles(desired_role)
+                        is_success = True
+
+        if is_success:
+            response_description = f"<a:verified:798786443903631360> Added Role: + {str(desired_role)} to {target_user.mention}"
+            embed_color = self.GREEN_HEX
+            
+        embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
+        await ctx.send(embed=embed_response)
     
     @commands.command()
-    async def takerole(self, ctx, target_user: discord.Member, *args):
+    async def takerole(self, ctx, member_name, *args):
 
         '''
         Used to remove a role to a user.\nEx: ?take_role @Laro#0001 InfoTech Member
         '''
-        
+        is_success = False
+        response_description = f"<a:utilfailure:809713365088993291> "
+        embed_color = self.RED_HEX
+
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
         whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
@@ -407,19 +425,31 @@ class Roles(commands.Cog):
         else:
             desired_role = None
 
-            if len(args) == 0:
-                await ctx.send("You must mention the user followed by the name of the role")
-            elif not isinstance(target_user, discord.Member):
-                await ctx.send("You must mention the target user with `@` ")
+            try:
+                target_user = await commands.MemberConverter().convert(ctx, member_name)
+            except commands.BadArgument:
+                response_description += f'"{member_name}" is not a valid member or member ID.\nYou must include the full tag of the user (Ex. @User#0000)'
+            except commands.MemberNotFound:
+                response_description += f'"{member_name}" is not a user in this server'
             else:
-                desired_role_name = (" ".join(args)).strip()
-                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+                if len(args) == 0:
+                    response_description += "You must include the name of the role after the user"
+                else:
+                    desired_role_name = (" ".join(args)).strip()
+                    desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
 
-            if not desired_role:
-                await ctx.send("Role couldn't not be found... Verify and try again!")
-            else:
-                await target_user.remove_roles(desired_role)
-                await ctx.send(f"The {desired_role} role has been removed from {target_user.mention}")
+                    if not desired_role:
+                        response_description += f'Role "{desired_role_name}"could not be found... Verify and try again!'
+                    else:
+                        await target_user.remove_roles(desired_role)
+                        is_success = True
+
+        if is_success:
+            response_description = f"<a:verified:798786443903631360> Removed Role: - {str(desired_role)} from {target_user.mention}"
+            embed_color = self.GREEN_HEX
+            
+        embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
+        await ctx.send(embed=embed_response)
 
     @commands.command()
     async def purgerole(self, ctx, *args):
@@ -446,13 +476,17 @@ class Roles(commands.Cog):
             if not old_role:
                 await ctx.send("Role couldn't not be found... Verify and try again!")
             else:
-                await ctx.send(f"Attempting to purge the {old_role} from all members...")
+                response_description = f"Attempting to purge the {old_role} from all members..."
+                embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
+                await ctx.send(embed=embed_response)
 
                 for member in ctx.guild.members:
                     if old_role in member.roles:
                         await member.remove_roles(old_role)
 
-                await ctx.send(f"The {old_role} has been purged!")
+                response_description = f"The {old_role} has been purged from all members..."
+                embed_response = discord.Embed(title="<a:verified:798786443903631360> Done!", description=response_description, color=self.GREEN_HEX)
+                await ctx.send(embed=embed_response)
 
     @commands.command()
     async def massgiverole(self, ctx, *args):
@@ -468,7 +502,7 @@ class Roles(commands.Cog):
         is_mention_argument = False
         num_role_args = 0
 
-        response_description = "Add Role: +"
+        response_description = "Added Role: +"
         succesful_users = [] #List to hold the name of users who now have the role.
         failed_users = [] #List to hold the name of users who failed to acquire the role.
 
@@ -510,23 +544,28 @@ class Roles(commands.Cog):
                     except commands.BadArgument:
                         print(f"{member_name} is not a valid member or member ID.")
                         failed_users.append(member_name)
+                    except commands.MemberNotFound:
+                        print(f"{member_name} is not a user in this server")
+                        failed_users.append(member_name)
                     else:
                         await member.add_roles(role)
                         succesful_users.append(member.mention)
 
+
+                #Response 
                 response_succesful_users = ", ".join(succesful_users)
                 response_failed_users = ", ".join(failed_users)
                 has_failed_users = bool(failed_users)
                 has_succesful_users = bool(succesful_users)
-
+                
                 if not has_failed_users:
-                    response_title = "Done!"
+                    response_title = "<a:verified:798786443903631360> Done!"
                     embed_color = self.GREEN_HEX
                 elif has_succesful_users:
-                    response_title = "Done. Please Review."
+                    response_title = "<a:verified:798786443903631360> Done. Please Review."
                     embed_color = self.YELLOW_HEX 
                 else:
-                    response_title = "Failed..."
+                    response_title = "<a:utilfailure:809713365088993291> Failed..."
                     embed_color = self.RED_HEX
 
                 embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
@@ -569,14 +608,18 @@ class Roles(commands.Cog):
             if not old_role and not new_role:
                 await ctx.send("Roles couldn't not be found... Verify and try again!")
             else:
-                await ctx.send(f"Attempting to give members with the {old_role} role the {new_role} role instead...")
+                response_description = f"Attempting to give members with the {old_role} role the {new_role} role instead..."
+                embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
+                await ctx.send(embed=embed_response)
 
                 for member in ctx.guild.members:
                     if old_role in member.roles:
                         await member.add_roles(new_role)
                         await member.remove_roles(old_role)
 
-                await ctx.send(f"Members that had the {old_role} role now have the {new_role} role instead!")
+                response_description = f"Replaced Role: {old_role} :arrow_right: {new_role}"
+                embed_response = discord.Embed(title="<a:verified:798786443903631360> Done!", description=response_description, color=self.GREEN_HEX)
+                await ctx.send(embed=embed_response)
 
 def setup(bot):
     bot.add_cog(Roles(bot)) 
