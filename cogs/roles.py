@@ -360,10 +360,59 @@ class Roles(commands.Cog):
                 print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
 
     @commands.command()
-    async def giverole(self, ctx, member_name=None, *args):
+    async def seerole(self, ctx, *args):
 
         '''
-        Used to assign a role to a user.\nEx: ?give_role @Laro#0001 Code Member
+        Used to acquire information about a role.\nEx: ?seerole Code Member
+        '''
+        is_success = False
+        response_title = None
+        response_description = f"<a:utilfailure:809713365088993291> "
+        response_users = "N/A"
+        embed_color = self.RED_HEX
+
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
+
+        role_members = []
+        role_members_count = 0
+        
+        if (mod_role not in roles) and (whisperer_role not in roles):
+            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers'
+        else:
+            desired_role = None
+            if len(args) == 0:
+                response_description += "You must include the name of the role to see"
+            else:
+                desired_role_name = (" ".join(args)).strip()
+                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+
+                if not desired_role:
+                    response_description += f'Role "{desired_role_name}"could not be found... Verify and try again!'
+                else:
+                    for member in ctx.guild.members:
+                        if desired_role in member.roles:
+                            role_members.append(str(member))
+                            role_members_count += 1
+                    
+                    role_members.append("───────")
+                    is_success = True
+
+        if is_success:
+            response_title = "Role Info"
+            response_description = f"**Name:** *{str(desired_role)}*\n**Position:** {desired_role.position}\n**Hoisted:** {desired_role.hoist}\n**Mentionable:** {desired_role.mentionable}\n**ID:** {desired_role.id}\n**Creation Date:** {desired_role.created_at.date()}"
+            response_users = "\n".join(role_members[:10])
+            embed_color = desired_role.color
+            
+        embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+        embed_response.add_field(name=f"Users: ({role_members_count})", value=response_users, inline=False)
+        await ctx.send(embed=embed_response)
+
+    @commands.command()
+    async def giverole(self, ctx, member_name=None, *args):
+        '''
+        Used to assign a role to a user.\nEx: ?giverole @Laro#0001 Code Member
         '''
         is_success = False
         response_description = f"<a:utilfailure:809713365088993291> "
@@ -374,8 +423,7 @@ class Roles(commands.Cog):
         whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
 
         if (mod_role not in roles) and (whisperer_role not in roles):
-            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
-
+            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers'
         else:
             desired_role = None
 
@@ -409,7 +457,7 @@ class Roles(commands.Cog):
     async def takerole(self, ctx, member_name, *args):
 
         '''
-        Used to remove a role to a user.\nEx: ?take_role @Laro#0001 InfoTech Member
+        Used to remove a role to a user.\nEx: ?takerole @Laro#0001 InfoTech Member
         '''
         is_success = False
         response_description = f"<a:utilfailure:809713365088993291> "
@@ -420,7 +468,7 @@ class Roles(commands.Cog):
         whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
 
         if (mod_role not in roles) and (whisperer_role not in roles):
-            await ctx.send(f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers.')
+            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers'
       
         else:
             desired_role = None
@@ -432,6 +480,7 @@ class Roles(commands.Cog):
             except commands.MemberNotFound:
                 response_description += f'"{member_name}" is not a user in this server'
             else:
+
                 if len(args) == 0:
                     response_description += "You must include the name of the role after the user"
                 else:
@@ -441,8 +490,12 @@ class Roles(commands.Cog):
                     if not desired_role:
                         response_description += f'Role "{desired_role_name}"could not be found... Verify and try again!'
                     else:
-                        await target_user.remove_roles(desired_role)
-                        is_success = True
+                        
+                        if desired_role not in target_user.roles:
+                            response_description += f"User {target_user} did not have the {desired_role} role."
+                        else:
+                            await target_user.remove_roles(desired_role)
+                            is_success = True
 
         if is_success:
             response_description = f"<a:verified:798786443903631360> Removed Role: - {str(desired_role)} from {target_user.mention}"
@@ -455,44 +508,52 @@ class Roles(commands.Cog):
     async def purgerole(self, ctx, *args):
 
         '''
-        Removes the specified role from ALL users.\nEx: ?purge_role SparkDev Member
+        Removes the specified role from ALL users.\nEx: ?purgerole SparkDev Member
         '''
         
+        is_success = False
+        response_description = f"<a:utilfailure:809713365088993291> "
+        embed_color = self.RED_HEX
+
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
         if mod_role not in roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators'
         else:
             old_role = None
 
             if not args:
-                await ctx.send("You must include the role name to be purged")
+                response_description += "You must include the name of the role to be purged"
             else:
                 role_name = " ".join(args)
                 old_role = discord.utils.get(ctx.guild.roles, name=role_name)
 
-            if not old_role:
-                await ctx.send("Role couldn't not be found... Verify and try again!")
-            else:
-                response_description = f"Attempting to purge the {old_role} from all members..."
-                embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
-                await ctx.send(embed=embed_response)
+                if not old_role:
+                    response_description += f"Role {role_name} couldn't not be found... Verify and try again!"
+                else:
+                    response_description = f"Attempting to purge the {old_role} from all members..."
+                    embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
+                    await ctx.send(embed=embed_response)
 
-                for member in ctx.guild.members:
-                    if old_role in member.roles:
-                        await member.remove_roles(old_role)
+                    for member in ctx.guild.members:
+                        if old_role in member.roles:
+                            await member.remove_roles(old_role)
 
-                response_description = f"The {old_role} has been purged from all members..."
-                embed_response = discord.Embed(title="<a:verified:798786443903631360> Done!", description=response_description, color=self.GREEN_HEX)
-                await ctx.send(embed=embed_response)
+                    is_success = True
+        
+        if is_success:
+            response_description = f"<a:verified:798786443903631360> Purged Role: :toilet: {str(old_role)} from **All Users**"
+            embed_color = self.GREEN_HEX
+                
+        embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
+        await ctx.send(embed=embed_response)
 
     @commands.command()
     async def massgiverole(self, ctx, *args):
 
         '''
-        Used to add the same role to multiple users.\nEx: ?mass_add Design Member | @Laro#0001 @JohnDoe#1234 @Mudae#0807
+        Used to add the same role to multiple users.\nEx: ?massgiverole Design Member | @Laro#0001 @JohnDoe#1234 @Mudae#0807
         '''
 
         roles = ctx.author.roles
@@ -580,7 +641,7 @@ class Roles(commands.Cog):
     async def replacerole(self, ctx, *args):
 
         '''
-        Used to replace a role for another on every user.\nEx: ?replace_role ShellHacks Hacker | ShellHacks 2018 Hacker
+        Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker
         '''
         
         roles = ctx.author.roles
