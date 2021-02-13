@@ -9,7 +9,7 @@ class Roles(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.MODERATOR_ROLE_ID = 788930867593871381 #399551100799418370  #Current: Main; Test: 788930867593871381
+        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
         self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
 
         #Channels
@@ -389,7 +389,7 @@ class Roles(commands.Cog):
         if is_success:
             response_title = "Role Info"
             response_description = f"**Name:** *{str(desired_role)}*\n**Position:** {desired_role.position}\n**Hoisted:** {desired_role.hoist}\n**Mentionable:** {desired_role.mentionable}\n**ID:** {desired_role.id}\n**Creation Date:** {desired_role.created_at.date()}"
-            response_users = "\n".join(role_members[:10])
+            response_users = "\n".join(role_members[:15]) #TODO: Implement Pagination with Discord Reactions. 
             embed_color = desired_role.color
             
         embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
