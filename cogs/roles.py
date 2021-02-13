@@ -9,7 +9,7 @@ class Roles(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
+        self.MODERATOR_ROLE_ID = 788930867593871381 #399551100799418370  #Current: Main; Test: 788930867593871381
         self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
 
         #Channels
@@ -92,7 +92,6 @@ class Roles(commands.Cog):
                 await reacting_user.add_roles(event_user_role) 
 
                 #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + " has entered the event!")
                 await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} is attending {self.EVENT_NAME}!')
 
         ### UPE ROLES ASSIGNMENT
@@ -159,7 +158,6 @@ class Roles(commands.Cog):
             if desired_user_role is not None:
                 await reacting_user.add_roles(desired_user_role) 
                 #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
                 await self.log_channel.send(f'{self.emojis_upe[str(desired_user_role)]} {reacting_user.mention} is interested in {desired_user_role}!')
 
         ### MISC ROLES ASSIGNMENT
@@ -169,17 +167,13 @@ class Roles(commands.Cog):
             
             desired_user_role = None
 
-            print(f"{payload.emoji} vs {self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]}")
-
             #Reaction is for Opportunity Seekers:
             if str(payload.emoji) == self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]:
-                print("Opportunity")
                 # Sets the verified 'Interested' role 
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.OPPORTUNITY_ROLE_NAME)
             
             #Reaction is for Women In Tech:
             elif str(payload.emoji) == self.emojis_misc[self.WOMENINTECH_ROLE_NAME]:
-                print("WIT")
                 # Sets the verified 'Interested' role 
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.WOMENINTECH_ROLE_NAME)
             
@@ -214,7 +208,6 @@ class Roles(commands.Cog):
             
             if desired_user_role is not None:
                 await reacting_user.add_roles(desired_user_role) 
-                print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
 
     #Events
     @commands.Cog.listener()
@@ -303,7 +296,6 @@ class Roles(commands.Cog):
             if desired_user_role is not None:
                 await reacting_user.remove_roles(desired_user_role) 
                 #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + f" is NO longer interested in {desired_user_role}!")
 
         ### MISC ROLES ASSIGNMENT
 
@@ -312,17 +304,13 @@ class Roles(commands.Cog):
             
             desired_user_role = None
 
-            print(f"{payload.emoji} vs {self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]}")
-
             #Reaction is for Opportunity Seekers:
             if str(payload.emoji) == self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]:
-                print("Opportunity")
                 # Sets the verified 'Interested' role 
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.OPPORTUNITY_ROLE_NAME)
             
             #Reaction is for Women In Tech:
             elif str(payload.emoji) == self.emojis_misc[self.WOMENINTECH_ROLE_NAME]:
-                print("WIT")
                 # Sets the verified 'Interested' role 
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.WOMENINTECH_ROLE_NAME)
             
@@ -357,7 +345,6 @@ class Roles(commands.Cog):
             
             if desired_user_role is not None:
                 await reacting_user.remove_roles(desired_user_role) 
-                print("User " + reacting_user.name + f" is interested in {desired_user_role}!")
 
     @commands.command()
     async def seerole(self, ctx, *args):
@@ -534,7 +521,7 @@ class Roles(commands.Cog):
                 else:
                     response_description = f"Attempting to purge the {old_role} from all members..."
                     embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
-                    await ctx.send(embed=embed_response)
+                    response = await ctx.send(embed=embed_response)
 
                     for member in ctx.guild.members:
                         if old_role in member.roles:
@@ -545,9 +532,11 @@ class Roles(commands.Cog):
         if is_success:
             response_description = f"<a:verified:798786443903631360> Purged Role: :toilet: {str(old_role)} from **All Users**"
             embed_color = self.GREEN_HEX
-                
-        embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
-        await ctx.send(embed=embed_response)
+            embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
+            await response.edit(embed=embed_response)
+        else:   
+            embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
+            await ctx.send(embed=embed_response)
 
     @commands.command()
     async def massgiverole(self, ctx, *args):
@@ -555,32 +544,32 @@ class Roles(commands.Cog):
         '''
         Used to add the same role to multiple users.\nEx: ?massgiverole Design Member | @Laro#0001 @JohnDoe#1234 @Mudae#0807
         '''
+        is_success = False
+        response_title = None
+        response_description = f"<a:utilfailure:809713365088993291> "
+        has_succesful_users = False
+        has_failed_users = False
+        embed_color = self.RED_HEX
 
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
 
         role_name_words = []
         is_mention_argument = False
         num_role_args = 0
 
-        response_description = "Added Role: +"
-        succesful_users = [] #List to hold the name of users who now have the role.
-        failed_users = [] #List to hold the name of users who failed to acquire the role.
-
         word_count = len(" ".join(args))
-        if  word_count > 824:
-            await ctx.send(
-                f'{ctx.author.mention}, your request surpassed the word limit: {word_count}/824.')
-        if mod_role not in roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+        if (mod_role not in roles) and (whisperer_role not in roles):
+            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators and Program Organizers.'
+        elif  word_count > 800:
+            response_description += f'{ctx.author.mention}, your request surpassed the word limit: {word_count}/800.'
         else:
             role = None
 
-            if len(args) < 2:
-                await ctx.send("You must include the name of the role and mention all the users")
+            if len(args) < 3:
+                response_description += "You must include the name of the role and mention all the users"
             else:
-
                 for arg in args:
                     if is_mention_argument:
                         pass
@@ -594,93 +583,112 @@ class Roles(commands.Cog):
                 role_name = " ".join(role_name_words)
                 role = discord.utils.get(ctx.guild.roles, name=role_name)
 
-            if not role:
-                await ctx.send("Role couldn't not be found... Verify and try again!\nMake sure you're using `|` between the role and the users")
-            else:
-                response_description += f"{str(role)}"
-                for member_name in args[num_role_args:]:
-                    print(member_name)
-                    try:
-                        member = await commands.MemberConverter().convert(ctx, member_name)
-                    except commands.BadArgument:
-                        print(f"{member_name} is not a valid member or member ID.")
-                        failed_users.append(member_name)
-                    except commands.MemberNotFound:
-                        print(f"{member_name} is not a user in this server")
-                        failed_users.append(member_name)
-                    else:
-                        await member.add_roles(role)
-                        succesful_users.append(member.mention)
-
-
-                #Response 
-                response_succesful_users = ", ".join(succesful_users)
-                response_failed_users = ", ".join(failed_users)
-                has_failed_users = bool(failed_users)
-                has_succesful_users = bool(succesful_users)
-                
-                if not has_failed_users:
-                    response_title = "<a:verified:798786443903631360> Done!"
-                    embed_color = self.GREEN_HEX
-                elif has_succesful_users:
-                    response_title = "<a:verified:798786443903631360> Done. Please Review."
-                    embed_color = self.YELLOW_HEX 
+                if not role:
+                    response_description += "Role couldn't not be found... Verify and try again!\nMake sure you're using `|` between the role and the users"
                 else:
-                    response_title = "<a:utilfailure:809713365088993291> Failed..."
-                    embed_color = self.RED_HEX
+                    response_description = f"Attempting to assign the {str(role)} role to multiple users"
+                    embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
+                    response = await ctx.send(embed=embed_response)
 
-                embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
-                if has_succesful_users:
-                    embed_response.add_field(name="Succesful on:", value=response_succesful_users, inline=False)
-                if has_failed_users:
-                    embed_response.add_field(name="Failed on:", value=response_failed_users, inline=False)
+                    succesful_users = [] #List to hold the name of users who now have the role.
+                    failed_users = [] #List to hold the name of users who failed to acquire the role.
 
-                await ctx.send(embed=embed_response)
+                    for member_name in args[num_role_args:]:
+                        try:
+                            member = await commands.MemberConverter().convert(ctx, member_name)
+                        except commands.BadArgument:
+                            failed_users.append(member_name)
+                        except commands.MemberNotFound:
+                            failed_users.append(member_name)
+                        else:
+                            await member.add_roles(role)
+                            succesful_users.append(member.mention)
+
+                    is_success = True
+
+                    #Final Response 
+                    response_description = f"Added Role: +{str(role)}"
+                    response_succesful_users = ", ".join(succesful_users)
+                    response_failed_users = ", ".join(failed_users)
+                    has_failed_users = bool(failed_users)
+                    has_succesful_users = bool(succesful_users)
+                    
+                    if not has_failed_users:
+                        response_title = "<a:verified:798786443903631360> Done!"
+                        embed_color = self.GREEN_HEX
+                    elif has_succesful_users:
+                        response_title = "<a:verified:798786443903631360> Done. Please Review."
+                        embed_color = self.YELLOW_HEX 
+                    else:
+                        response_title = "<a:utilfailure:809713365088993291> Failed..."
+                        embed_color = self.RED_HEX
+
+        if is_success:
+            embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+            if has_succesful_users:
+                embed_response.add_field(name="Succesful on:", value=response_succesful_users, inline=False)
+            if has_failed_users:
+                embed_response.add_field(name="Failed on:", value=response_failed_users, inline=False)
+            await response.edit(embed=embed_response)
+        else:
+            embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+            await ctx.send(embed=embed_response)
 
     @commands.command()
     async def replacerole(self, ctx, *args):
-
         '''
         Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker
         '''
+        is_success = False
+        response_title = None
+        response_description = f"<a:utilfailure:809713365088993291> "
+        embed_color = self.RED_HEX
         
         roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
 
         if mod_role not in roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
+                response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators.'
         else:
             old_role = None
             new_role = None
 
             if not args:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
+                response_description += "You must include the current role name,\n followed by the new role name ( Separated by a `|` )"
             else:
                 roles_name = " ".join(args)
                 roles_name_list = roles_name.split("|")
 
-            if len(roles_name_list) < 2:
-                await ctx.send("You must include the current role name, followed by the new role name ( Separated by a `|` )")
-            else: 
-                old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
-                new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
+                if len(roles_name_list) < 2:
+                    response_description += "You must include the current role name,\n followed by the new role name ( Separated by a `|` )"
+                else: 
+                    old_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[0].strip())
+                    new_role = discord.utils.get(ctx.guild.roles, name=roles_name_list[1].strip())
 
-            if not old_role and not new_role:
-                await ctx.send("Roles couldn't not be found... Verify and try again!")
-            else:
-                response_description = f"Attempting to give members with the {old_role} role the {new_role} role instead..."
-                embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
-                await ctx.send(embed=embed_response)
+                    if not old_role:
+                        response_description += "Current role couldn't not be found... Verify and try again!"
+                    elif not new_role:
+                        response_description += "New role couldn't not be found... Verify and try again!"
+                    else:
+                        response_description = f"Attempting to give members with the {old_role} role the {new_role} role instead..."
+                        embed_response = discord.Embed(title="<a:utilloading:809712534961389649> In Progress...", description=response_description, color=self.YELLOW_HEX)
+                        response = await ctx.send(embed=embed_response)
 
-                for member in ctx.guild.members:
-                    if old_role in member.roles:
-                        await member.add_roles(new_role)
-                        await member.remove_roles(old_role)
+                        for member in ctx.guild.members:
+                            if old_role in member.roles:
+                                await member.add_roles(new_role)
+                                await member.remove_roles(old_role)
+                        is_success = True
 
-                response_description = f"Replaced Role: {old_role} :arrow_right: {new_role}"
-                embed_response = discord.Embed(title="<a:verified:798786443903631360> Done!", description=response_description, color=self.GREEN_HEX)
-                await ctx.send(embed=embed_response)
+        if is_success:
+            response_title = "<a:verified:798786443903631360> Done!"
+            response_description = f"Replaced Role: {old_role} :arrow_right: {new_role}"
+            embed_color = self.GREEN_HEX
+            embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+            await response.edit(embed=embed_response)
+        else:
+            embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
+            await ctx.send(embed=embed_response)
 
 def setup(bot):
     bot.add_cog(Roles(bot)) 
