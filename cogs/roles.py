@@ -43,6 +43,7 @@ class Roles(commands.Cog):
         self.GACHA_ROLE_NAME = "Tamagotchi Tamers"
         self.POKE_ROLE_NAME = "Pokemon Trainers"
         self.TAMAGOTCHI_ROLE_NAME = "Gacha Addicts"
+        self.ANIME_ROLE_NAME = "Anime Bingers"
 
         #Emojis
         self.emoji_event = '<:GGJ21:804515872449232896>'
@@ -65,7 +66,8 @@ class Roles(commands.Cog):
             self.AMONGUS_ROLE_NAME : "<:blobimposter:797536765052977152>",
             self.GACHA_ROLE_NAME : "<:blobtama:797536764554248214>",
             self.POKE_ROLE_NAME : "<:blobpoke:797536764700131338>",
-            self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>"
+            self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>",
+            self.ANIME_ROLE_NAME : "<:blobpopcorn:797958181081841664>"
         }
 
         #Colors HEX
@@ -202,6 +204,11 @@ class Roles(commands.Cog):
                 # Sets the verified 'Interested' role (placeholder)
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.GACHA_ROLE_NAME)
 
+            #Reaction is for Anime Bingers:
+            elif str(payload.emoji) == self.emojis_misc[self.ANIME_ROLE_NAME]:
+                # Sets the verified 'Interested' role (placeholder)
+                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ANIME_ROLE_NAME)
+
             #Invalid reaction (unreachable condition)
             else:
                 print("Unknown Reaction Added. Verify channel permissions.")
@@ -232,7 +239,7 @@ class Roles(commands.Cog):
                 await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} has *left* {self.EVENT_NAME}!')
 
 
-        ### UPE ROLES ASSIGNMENT
+        ### UPE ROLES UNASSIGNMENT
 
         # User added reaction to the UPE Program Roles Message in #programs
         if payload.message_id == self.ROLE_UPE_ASSIGNMENT_MESSAGE_ID:
@@ -297,7 +304,7 @@ class Roles(commands.Cog):
                 await reacting_user.remove_roles(desired_user_role) 
                 #Prints to console and notifies bot-log channel
 
-        ### MISC ROLES ASSIGNMENT
+        ### MISC ROLES UNASSIGNMENT
 
         # User added reaction to the UPE Misc Roles Message in #additional-roles
         if payload.message_id == self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID:
@@ -339,9 +346,14 @@ class Roles(commands.Cog):
                 # Sets the verified 'Interested' role (placeholder)
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.GACHA_ROLE_NAME)
 
+            #Reaction is for Anime Bingers:
+            elif str(payload.emoji) == self.emojis_misc[self.ANIME_ROLE_NAME]:
+                # Sets the verified 'Interested' role (placeholder)
+                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ANIME_ROLE_NAME)
+
             #Invalid reaction (unreachable condition)
             else:
-                print("Unknown Reaction Added. Verify channel permissions.")
+                print("Unknown Reaction Removed. Verify channel permissions.")
             
             if desired_user_role is not None:
                 await reacting_user.remove_roles(desired_user_role) 
