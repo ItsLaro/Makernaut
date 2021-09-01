@@ -1,8 +1,8 @@
 # Makernaut
-Discord bot to handle inventory and logistics for the <a href=https://upe.cs.fiu.edu/> Upsilon Pi Epsilon </a> Chapter at Florida International University and their Makerspace. 
+Discord bot to assist in the <a href=https://discord.com/invite/upefiu/> Official Partnered Discord server </a> of <a href=https://upe.cs.fiu.edu/> Upsilon Pi Epsilon </a> Chapter at Florida International University. 
 <p align="center">
-  <img src=https://i.imgur.com/6KQ4JR1.jpg width="600">
-  <p align="center"> Art by (<a href = https://www.instagram.com/hkxdesign/?hl=en>HangKwong x Design.</a>)</p>
+  <img src=assets\Gui_Banner.png width="1000">
+  <p align="center"> Gui, the official UPE Mascot, is the face of this bot. </p>
 </p>
   
 ## Gettting started
