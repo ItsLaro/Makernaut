@@ -136,11 +136,6 @@ class Roles(commands.Cog):
                 # Sets the verified 'Interested' role (placeholder)
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SPARKDEV_ROLE_NAME)
 
-            #Reaction is for Mentor:
-            elif str(payload.emoji) == self.emojis_upe[self.MENTOR_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.MENTOR_ROLE_NAME)
-
             #Reaction is for ShellHacks:
             elif str(payload.emoji) == self.emojis_upe[self.SHELLHACKS_ROLE_NAME]:
                 # Sets the verified 'Interested' role (placeholder)
@@ -278,11 +273,6 @@ class Roles(commands.Cog):
             elif str(payload.emoji) == self.emojis_upe[self.SPARKDEV_ROLE_NAME]:
                 # Sets the verified 'Interested' role (placeholder)
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SPARKDEV_ROLE_NAME)
-
-            #Reaction is for Mentor:
-            elif str(payload.emoji) == self.emojis_upe[self.MENTOR_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.MENTOR_ROLE_NAME)
 
             #Reaction is for ShellHacks:
             elif str(payload.emoji) == self.emojis_upe[self.SHELLHACKS_ROLE_NAME]:
