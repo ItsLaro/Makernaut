@@ -29,10 +29,9 @@ class Roles(commands.Cog):
         self.MAKE_ROLE_NAME = "Make"
         self.INFOTECH_ROLE_NAME = "InfoTech"
         self.DESIGN_ROLE_NAME = "Design"
-        self.ADVANCE_ROLE_NAME = "Advance"
+        self.LEAP_ROLE_NAME = "Leap"
         self.IGNITE_ROLE_NAME = "Ignite"
         self.SPARKDEV_ROLE_NAME = "SparkDev"
-        self.MENTOR_ROLE_NAME = "Mentor"
         self.SHELLHACKS_ROLE_NAME = "ShellHacks"
         self.DISCOVER_ROLE_NAME = "Discover"
 
@@ -52,10 +51,9 @@ class Roles(commands.Cog):
             self.MAKE_ROLE_NAME : "<:upemake:753692447044927518>",
             self.INFOTECH_ROLE_NAME :"<:upeinfotech:753692446726029388>",
             self.DESIGN_ROLE_NAME : "<:upedesign:797531069951770674>",
-            self.ADVANCE_ROLE_NAME : "<:upeadvance:753692446776361126>",
+            self.LEAP_ROLE_NAME : "<:upeleap:882407121923227648>",
             self.IGNITE_ROLE_NAME : "<:upeignite:753692446801789039>",
             self.SPARKDEV_ROLE_NAME : "<:upesparkdev:753692446784880760>",
-            self.MENTOR_ROLE_NAME : "<:upementor:753692446776623284>",
             self.SHELLHACKS_ROLE_NAME : "<:upeshellhacks:753692446621433927>",
             self.DISCOVER_ROLE_NAME : "<:upediscover:753692446524702782>"
         }
@@ -124,9 +122,9 @@ class Roles(commands.Cog):
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DESIGN_ROLE_NAME)
 
             #Reaction is for Advance:
-            elif str(payload.emoji) == self.emojis_upe[self.ADVANCE_ROLE_NAME]:
+            elif str(payload.emoji) == self.emojis_upe[self.LEAP_ROLE_NAME]:
                 # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ADVANCE_ROLE_NAME)
+                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.LEAP_ROLE_NAME)
 
             #Reaction is for Ignite:
             elif str(payload.emoji) == self.emojis_upe[self.IGNITE_ROLE_NAME]:
@@ -267,9 +265,9 @@ class Roles(commands.Cog):
                 desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DESIGN_ROLE_NAME)
 
             #Reaction is for Advance:
-            elif str(payload.emoji) == self.emojis_upe[self.ADVANCE_ROLE_NAME]:
+            elif str(payload.emoji) == self.emojis_upe[self.LEAP_ROLE_NAME]:
                 # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ADVANCE_ROLE_NAME)
+                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.LEAP_ROLE_NAME)
 
             #Reaction is for Ignite:
             elif str(payload.emoji) == self.emojis_upe[self.IGNITE_ROLE_NAME]:
