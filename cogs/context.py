@@ -11,12 +11,20 @@ class BotContext(commands.Cog):
         self.EBOARD_BOTSPAM_CHANNEL_ID = 626183709372186635
         self.GENERAL_BOTSPAM_CHANNEL_ID = 401577290863083531
 
+        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
+
+
     #Commands
     @commands.command()
     async def speak(self, ctx, *args):
         '''
         Gui will repeat after you.Ex: ?speak Hello World!\nYou can also specify the channel after a `|`.\nEx: ?speak Hello users in another channel! | 808635094373761064
-        '''        
+        '''     
+        roles = ctx.author.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+
+        if (mod_role not in roles):
+            return
         if len(args) != 0:
             payload = " ".join(args)
             payload_arguments = payload.split("|")
