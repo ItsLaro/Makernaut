@@ -33,7 +33,10 @@ class SparkDev(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, payload):
         if payload.channel == self.checkin_channel:
-            await payload.delete()
+            if payload.author.id == self.bot.user.id:
+                return
+            else:
+                await payload.delete()
 
     @commands.command()
     async def teamup(self, ctx, email=None):
