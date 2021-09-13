@@ -11,6 +11,29 @@ class BotContext(commands.Cog):
         self.EBOARD_BOTSPAM_CHANNEL_ID = 626183709372186635
         self.GENERAL_BOTSPAM_CHANNEL_ID = 401577290863083531
 
+    #Commands
+    @commands.command()
+    async def speak(self, ctx, *args):
+        '''
+        Gui will repeat after you.Ex: ?speak Hello World!\nYou can also specify the channel after a `|`.\nEx: ?speak Hello users in another channel! | 808635094373761064
+        '''        
+        if len(args) != 0:
+            payload = " ".join(args)
+            payload_arguments = payload.split("|")
+            if len(payload_arguments) < 2:
+                message = payload_arguments [0]
+                await ctx.send(message)
+                await ctx.message.delete()
+            else: 
+                message = payload_arguments [0]
+                channel_name = payload_arguments[1]
+                try:
+                    channel = self.bot.get_channel(int(channel_name))
+                except ValueError:
+                    channel = self.bot.get_channel(int(channel_name.strip()[2:][:-1]))
+                if channel != None:
+                    await channel.send(message)
+
     #Events
     @commands.Cog.listener()
     async def on_message(self, message):
