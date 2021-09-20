@@ -74,7 +74,7 @@ class ShellHacks(commands.Cog):
                         is_checkedin = False
 
                     if is_accepted and is_confirmed and not is_checkedin:
-                        initial_reply = "Thank you, I've verified your confirmed application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`"
+                        initial_reply = "Thank you, I've verified your confirmed application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
                         send_initial_reply = await member.send(initial_reply)
 
                         result = None
