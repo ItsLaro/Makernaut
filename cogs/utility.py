@@ -47,36 +47,36 @@ class Utilities(commands.Cog):
 
         try:
             if not cog:
-                halp=discord.Embed(title='Command Categories',
+                help=discord.Embed(title='Command Categories',
                                 description='Use `$help Category` to learn more about them!\n(Category Name Must Be in Title Case, Just Like this Sentence.)')
                 cogs_desc = ''
                 for x in self.bot.cogs:
                     cogs_desc += ('{} - {}'.format(x,self.bot.cogs[x].__doc__)+'\n')
-                halp.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
+                help.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
                 cmds_desc = ''
                 for y in self.bot.walk_commands():
                     if not y.cog_name and not y.hidden:
                         cmds_desc += ('{} - {}'.format(y.name,y.help)+'\n')
-                await ctx.send('',embed=halp)
+                await ctx.send('',embed=help)
             else:
                 if len(cog) > 1:
-                    halp = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
-                    await ctx.send('',embed=halp)
+                    help = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
+                    await ctx.send('',embed=help)
                 else:
                     found = False
                     for x in self.bot.cogs:
                         for y in cog:
                             if x == y:
-                                halp=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
+                                help=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
                                 for c in self.bot.get_cog(y).get_commands():
                                     if not c.hidden:
-                                        halp.add_field(name=c.name,value=c.help,inline=False)
+                                        help.add_field(name=c.name,value=c.help,inline=False)
                                 found = True
                     if not found:
-                        halp = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
+                        help = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
                     else:
                         pass
-                    await ctx.send('',embed=halp)
+                    await ctx.send('',embed=help)
         except:
             pass
 
@@ -88,37 +88,37 @@ class Utilities(commands.Cog):
 
         try:
             if not cog:
-                halp=discord.Embed(title='Command Categories',
+                help=discord.Embed(title='Command Categories',
                                 description='Use `$help Category` to learn more about them!\n(Category Name Must Be in Title Case, Just Like this Sentence.)')
                 cogs_desc = ''
                 for x in self.bot.cogs:
                     cogs_desc += ('{} - {}'.format(x,self.bot.cogs[x].__doc__)+'\n')
-                halp.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
+                help.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
                 cmds_desc = ''
                 for y in self.bot.walk_commands():
                     if not y.cog_name and not y.hidden:
                         cmds_desc += ('{} - {}'.format(y.name,y.help)+'\n')
                 await ctx.message.add_reaction(emoji='✉')
-                await ctx.message.author.send('',embed=halp)
+                await ctx.message.author.send('',embed=help)
             else:
                 if len(cog) > 1:
-                    halp = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
-                    await ctx.message.author.send('',embed=halp)
+                    help = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
+                    await ctx.message.author.send('',embed=help)
                 else:
                     found = False
                     for x in self.bot.cogs:
                         for y in cog:
                             if x == y:
-                                halp=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
+                                help=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
                                 for c in self.bot.get_cog(y).get_commands():
                                     if not c.hidden:
-                                        halp.add_field(name=c.name,value=c.help,inline=False)
+                                        help.add_field(name=c.name,value=c.help,inline=False)
                                 found = True
                     if not found:
-                        halp = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
+                        help = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
                     else:
                         await ctx.message.add_reaction(emoji='✉')
-                    await ctx.message.author.send('',embed=halp)
+                    await ctx.message.author.send('',embed=help)
         except:
             pass
 
