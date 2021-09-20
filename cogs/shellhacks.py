@@ -18,17 +18,22 @@ class ShellHacks(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+        #Roles/Identities
         self.MODERATOR_ROLE_ID = 399551100799418370 
         self.ORGANIZER_ROLE_ID = 762734503294664706 
         self.GUI_USER_ID = 675403234172731393
+        self.HACKER_ROLE_NAME = "ShellHacks Hacker"
 
+        #Channels
         self.CHECKING_MESSAGE_ID = 889331203788914781
         self.CHECKIN_CHANNEL_ID = 888987697442590740
         self.MENTOR_CHANNEL_ID = 888969040641540146
         self.TEMPLATE_CHANNEL_ID = 888979710435029022
+        self.BOT_LOGS_CHANNEL_ID = 626541886533795850
+        self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
 
-        self.HACKER_ROLE_NAME = "ShellHacks Hacker"
-
+        #Airtable
         self.database = Table(airtable_api_key, shellhacks_base_id, '2021 Application')
 
         #Colors HEX
@@ -40,47 +45,71 @@ class ShellHacks(commands.Cog):
         if payload.message_id == self.CHECKING_MESSAGE_ID:
             guild = self.bot.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
-            response = None
+            result = None
 
             initial_message = 'Please provide me with the email address you used in your application.'
             send_initial_message = await member.send(initial_message)
             
-            while response == None:
+            while result == None:
                 message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
                 email = message_response.content
 
                 by_email = match({"E-mail Address": email})
-                response = self.database.first(formula=by_email)
-                if response != None:
-                    hacker_record = response["fields"]
-                    if hacker_record['Acceptance Status'] == 'Accepted' and hacker_record['Confirmed'] == True:
-                        initial_reply = "Thank you, I've verified your confirmed application!"
+                result = self.database.first(formula=by_email)
+
+                if result != None:
+                    hacker_record = result["fields"]
+
+                    try:
+                        is_accepted = hacker_record['Acceptance Status'] == 'Accepted'
+                    except KeyError:
+                        is_accepted = False
+                    try:
+                        is_confirmed = hacker_record['Confirmed']
+                    except KeyError:
+                        is_confirmed = False
+                    try:
+                        is_checkedin = hacker_record['Checked In']
+                    except:
+                        is_checkedin = False
+
+                    if is_accepted and is_confirmed and not is_checkedin:
+                        initial_reply = "Thank you, I've verified your confirmed application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`"
                         send_initial_reply = await member.send(initial_reply)
 
-                        followup_reply = "One more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`"
-                        send_followup_reply = await member.send(followup_reply)
+                        result = None
 
-                        response = None
-                        while response == None:
+                        while result == None:
                             message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
                             record_id = message_response.content
                             by_email_and_id = match({"Application ID": record_id, "E-mail Address": email})
-                            response = self.database.first(formula=by_email_and_id)
-                            if response != None:
+                            result = self.database.first(formula=by_email_and_id)
+                            
+                            if result != None:
                                 hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
                                 await member.add_roles(hacker_role) 
-                                final_reply = "You're all set! Happy Hacking~!"
-                                send_final_reply = await member.send(final_reply)
-                            else:
-                                followup_reply = "I couldn't verify your identity. Make sure the ID is correct and try again. (Tip: try copy/pasting it)"
-                                send_followup_reply = await member.send(followup_reply)
 
-                    elif hacker_record['Status'] == 'Accepted' and hacker_record['Confirmed'] == False:
-                        initial_reply = "Thank you! Please try again after you confirm your acceptance."
+                                self.database.update(record_id, {"Checked In": True, "Discord": str(member)})
+                                
+                                final_reply = "You're all set! Happy Hacking~! <:upeshellhacks:753692446621433927>"
+                                send_final_reply = await member.send(final_reply)
+
+                                await self.log_channel.send(f'<:upeshellhacks:753692446621433927> {member.mention} has **checked-in** to ShellHacks 2021!')
+
+                            else:
+                                final_reply = "I couldn't verify your identity. Make sure the ID is correct and try again. (Tip: try copy/pasting it)"
+                                send_final_reply = await member.send(final_reply)
+
+                    elif is_accepted and not is_confirmed:
+                        initial_reply = "Thank you! Please try again after you confirm your acceptance.\n You can try again by unreacting and reacting again in the #check-in channel"
                         send_initial_reply = await member.send(initial_reply)
+                    elif is_checkedin:
+                        initial_reply = "It seems you've already checked in! If you believe this is a mistake, please contact an organizer."
+                        send_initial_reply = await member.send(initial_reply)                        
                     else:
                         initial_reply = "It seems like your application is still pending. If you believe this is a mistake, please contact an organizer."
                         send_initial_reply = await member.send(initial_reply)
+
                 else:
                     initial_reply = "I wasn't able to find a matching email address. Make sure to provide the same one you used in your application."
                     send_initial_reply = await member.send(initial_reply)
