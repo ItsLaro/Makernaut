@@ -102,7 +102,7 @@ class ShellHacks(commands.Cog):
                         if is_mentor:
                             initial_reply = "Thank you, I've verified your confirmed **mentor** status!\nWe just need one more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and it looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
                         else:
-                            initial_reply = "Thank you, I've verified your confirmed **hacker** status!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
+                            initial_reply = "Thank you, I've verified your confirmed **hacker** status!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png\nIf you've lost your acceptance email, do not fret! We'll be sending check-in instruction emails very soon with this ID."
                         send_initial_reply = await member.send(initial_reply)
 
                         result = None
@@ -327,7 +327,7 @@ class ShellHacks(commands.Cog):
     async def edit_checkin(self, ctx, new_message):  
         if not self.is_allowed(ctx, ctx.author): 
             return  
-            
+
         channel = self.bot.get_channel(self.CHECKIN_CHANNEL_ID)
         original_message = await channel.fetch_message(self.CHECKING_MESSAGE_ID)
         await original_message.edit(content=new_message)
