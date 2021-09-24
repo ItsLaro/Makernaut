@@ -317,7 +317,7 @@ class ShellHacks(commands.Cog):
     async def edit_checkin(self, ctx, new_message):  
         if not self.is_allowed(ctx, ctx.author): 
             return  
-        channel = self.bot.get_channel(self.CHECKING_CHANNEL_ID)
+        channel = self.bot.get_channel(self.CHECKIN_CHANNEL_ID)
         original_message = await channel.fetch_message(self.CHECKING_MESSAGE_ID)
         await original_message.edit(content=new_message)
 
