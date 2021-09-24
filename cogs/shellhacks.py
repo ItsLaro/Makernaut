@@ -21,9 +21,16 @@ class ShellHacks(commands.Cog):
 
         #Roles/Identities
         self.MODERATOR_ROLE_ID = 399551100799418370 
-        self.ORGANIZER_ROLE_ID = 762734503294664706 
+        self.ORGANIZER_ROLE_ID = 888960305693069402 
+        self.EBOARD_ROLE_ID = 399558426511802368
+        self.SHELL_COMMITTEE_ROLE_ID = 523306918727385088
         self.GUI_USER_ID = 675403234172731393
         self.HACKER_ROLE_NAME = "ShellHacks Hacker"
+        self.MENTOR_ROLE_NAME = "ShellHacks Mentor"
+        self.SPONSOR_ROLE_NAME = "ShellHacks Sponsor"
+        self.HACKER_ROLE_ID = 888957354417192960
+        self.MENTOR_ROLE_ID = 888959725037846578
+        self.SPONSOR_ROLE_ID = 758159745872953374
 
         #Channels
         self.CHECKING_MESSAGE_ID = 889331203788914781
@@ -34,11 +41,20 @@ class ShellHacks(commands.Cog):
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
 
         #Airtable
-        self.database = Table(airtable_api_key, shellhacks_base_id, '2021 Application')
-
-        #Colors HEX
+        self.hacker_database = Table(airtable_api_key, shellhacks_base_id, '2021 Application')
+        self.company_database = Table(airtable_api_key, shellhacks_base_id, '2021 Logistics Forms')
+        #Colors HEX and Emojis
         self.GREEN_HEX = 0x238823 
         self.RED_HEX = 0xD2222D
+        self.SHELL_EMOJI = "<:upeshellhacks:753692446621433927>"
+
+        #Strings & URLS
+        self.HACKER_GUIDE_SHORTENED_URL = "https://go.fiu.edu/hackerguide"
+        self.HACKER_GUIDE_URL = "https://dynamic-tugboat-eb7.notion.site/ShellHacks-Hacker-Guide-53b2a4fe104645bc85b92aa13f608cae"
+        self.HACKER_PRIMER = f"Welcome to ShellHacks 2021. I highly encourage you to go over the hacker guide found here: {self.HACKER_GUIDE_URL}\nIt contains answers to frequently asked questions and essential information so you can get most out of the event!'"
+        self.MENTOR_PRIMER = f"This is a primer for a mentor! Feel free to hang around or ask questions in the #mentors-lounge channel. When you see a #ticket channel appears, feel free to take it by messaging in it to help the hacker in need"
+        self.SPONSOR_PRIMER = f"This is a primer for sponsor!"
+        self.GENERIC_PRIMER = f'Remember to check-in to ShellHacks 2021! Go to the #check-in channel in the ShellHacks category (you can click this link too: https://discord.com/channels/245393533391863808/888987697442590740/889331203788914781)\nand react to the message by clicking on the ShellHacks {self.SHELL_EMOJI} emoji'
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -55,13 +71,20 @@ class ShellHacks(commands.Cog):
                 email = message_response.content
 
                 by_email = match({"E-mail Address": email})
-                result = self.database.first(formula=by_email)
+                result = self.hacker_database.first(formula=by_email)
 
                 if result != None:
                     hacker_record = result["fields"]
-
+                    is_mentor = False
                     try:
-                        is_accepted = hacker_record['Acceptance Status'] == 'Accepted'
+                        if hacker_record['Acceptance Status'] == 'Accepted':
+                            is_accepted = True
+                        elif hacker_record['Acceptance Status'] == 'Mentor Accepted':
+                            is_accepted = True
+                            is_mentor = True
+                        else:
+                            is_accepted = False
+
                     except KeyError:
                         is_accepted = False
                     try:
@@ -74,7 +97,10 @@ class ShellHacks(commands.Cog):
                         is_checkedin = False
 
                     if is_accepted and is_confirmed and not is_checkedin:
-                        initial_reply = "Thank you, I've verified your confirmed application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
+                        if is_mentor:
+                            initial_reply = "Thank you, I've verified your confirmed **mentor** application!\nWe just need one more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
+                        else:
+                            initial_reply = "Thank you, I've verified your confirmed **hacker** application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
                         send_initial_reply = await member.send(initial_reply)
 
                         result = None
@@ -83,18 +109,28 @@ class ShellHacks(commands.Cog):
                             message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
                             record_id = message_response.content
                             by_email_and_id = match({"Application ID": record_id, "E-mail Address": email})
-                            result = self.database.first(formula=by_email_and_id)
+                            result = self.hacker_database.first(formula=by_email_and_id)
                             
                             if result != None:
-                                hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
-                                await member.add_roles(hacker_role) 
-
-                                self.database.update(record_id, {"Checked In": True, "Discord": str(member)})
+                                if is_mentor:
+                                    mentor_role = discord.utils.get(guild.roles, name=self.MENTOR_ROLE_NAME)
+                                    await member.add_roles(mentor_role) 
+                                    self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
                                 
-                                final_reply = "You're all set! Happy Hacking~! <:upeshellhacks:753692446621433927>"
-                                send_final_reply = await member.send(final_reply)
+                                    final_reply = f"You're all set for mentoring! Thank you for being here~! {self.SHELL_EMOJI}"
+                                    send_final_reply = await member.send(final_reply)
 
-                                await self.log_channel.send(f'<:upeshellhacks:753692446621433927> {member.mention} has **checked-in** to ShellHacks 2021!')
+                                    await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** as a **mentor** for ShellHacks 2021!')
+                                else:
+                                    hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
+                                    await member.add_roles(hacker_role) 
+                                    self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
+
+                                    final_reply += self.HACKER_PRIMER
+                                    final_reply += f"You're all set! Happy Hacking~! {self.SHELL_EMOJI}\n"
+                                    send_final_reply = await member.send(final_reply)
+
+                                    await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** to ShellHacks 2021!')
 
                             else:
                                 final_reply = "I couldn't verify your identity. Make sure the ID is correct and try again. (Tip: try copy/pasting it)"
@@ -148,6 +184,9 @@ class ShellHacks(commands.Cog):
         '''
         Used to fetch a hacker record based on email address from Shell DB.\nEx: ?gethacker roary@fiu.edu
         '''
+        if not is_allowed(ctx, ctx.author): 
+            return
+
         author_roles = ctx.author.roles
         mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
         organizer_role = ctx.guild.get_role(self.ORGANIZER_ROLE_ID)
@@ -160,7 +199,7 @@ class ShellHacks(commands.Cog):
             response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Shell Directors'
         else:
             by_email = match({"E-mail Address": hacker_email})
-            response = self.database.first(formula=by_email)
+            response = self.hacker_database.first(formula=by_email)
             if(response != None):
                 success = True
                 hacker_record = response["fields"]
@@ -185,6 +224,89 @@ class ShellHacks(commands.Cog):
             
         await ctx.send(embed=embed_response)
 
+    @commands.command()    
+    async def guide(self, ctx):
+        '''
+        Used to peek into the hacker guide for ShellHacks 2021.\nEx: ?guide
+        '''
+        await ctx.message.delete()
+        await ctx.channel.send(self.HACKER_GUIDE_SHORTENED_URL)
+
+    @commands.command()    
+    async def scan_sponsors(self, ctx):
+        '''
+        Used to scan server for ShellHacks 2021 sponsors and assign them the appropiate roles and nicknames.\nEx: ?sponsors
+        '''  
+        if not self.is_allowed(ctx, ctx.author): 
+            return
+
+        sponsor_role = discord.utils.get(ctx.guild.roles, name=self.SPONSOR_ROLE_NAME)
+
+        with_discord = match({"Type": "Discord Username"})
+        response = self.company_database.all(formula=with_discord)
+
+        for sponsor_record in response:
+            user = ctx.guild.get_member_named(sponsor_record["fields"]["Discord Username"])
+            if user:
+                try:
+                    full_name = sponsor_record["fields"]["Full Name"]
+                    company = sponsor_record["fields"]["Company"]
+                    await user.edit(nick = full_name + " | " + company)
+                    await user.add_roles(sponsor_role)
+                    self.company_database.update(sponsor_record["id"], {"In Server": True})
+                    print(f"Sponsor located: {user}")
+                    await self.log_channel.send(f'{self.SHELL_EMOJI} A wild **sponsor** appeared! {user.mention} from {company} is here for ShellHacks 2021!')
+                except:
+                    print(f"Missing Permissios for: {user}")
+            else: 
+                print("Sponsor not found...")
+
+    @commands.command()    
+    async def scan_organizers(self, ctx):
+        '''
+        Used to scan server for ShellHacks 2021 sponsors and assign them the appropiate roles and nicknames.\nEx: ?sponsors
+        '''  
+        if not is_allowed(ctx, ctx.author): 
+            return
+        eboard_role = ctx.guild.get_role(self.EBOARD_ROLE_ID)
+        committee_role = ctx.guild.get_role(self.SHELL_COMMITTEE_ROLE_ID)
+        organizer_role = ctx.guild.get_role(self.ORGANIZER_ROLE_ID)
+        for member in ctx.guild.members:
+            if eboard_role in member.roles or committee_role in member.roles:
+                await member.add_roles(organizer_role) 
+
+    @commands.command()    
+    async def primer(self, ctx, user: discord.Member = None):
+        '''
+        Used to send a primer to the passed user relevant to their ShellHacks role.\nEx: ?primer @roary#0001
+        '''  
+        if not self.is_allowed(ctx, ctx.author): 
+            return
+        if user == None:
+            user = ctx.author
+
+        roles = user.roles
+        hacker_role = ctx.guild.get_role(self.HACKER_ROLE_ID)
+        mentor_role = ctx.guild.get_role(self.MENTOR_ROLE_ID)
+        sponsor_role = ctx.guild.get_role(self.SPONSOR_ROLE_ID)
+
+        if hacker_role in roles:
+            primer_message = f'Hi {user.mention}!\n' + self.HACKER_PRIMER
+        elif mentor_role in roles:
+            primer_message = f'Hi {user.mention}!\n' + self.MENTOR_PRIMER
+        elif sponsor_role in roles:
+            primer_message = f'Hi {user.mention}!\n' + self.SPONSOR_PRIMER
+        else:
+            primer_message = f'Hi {user.mention}!\n' + self.GENERIC_PRIMER 
+        
+        send_initial_message = await user.send(primer_message)
+
+    def is_allowed(self, ctx, user: discord.Member):
+        roles = user.roles
+        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        organizer_role = ctx.guild.get_role(self.ORGANIZER_ROLE_ID)
+
+        return True if organizer_role in roles or mod_role in roles else False
 
 # auxiliary function for the message_check function to make a string sequence of the given parameter
 def make_sequence(seq):

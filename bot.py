@@ -6,7 +6,7 @@ from discord.ext import commands
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
 
-command_prefix = '?'
+command_prefix = '~'
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix, intents=intents, help_command=None)
 
