@@ -127,7 +127,7 @@ class ShellHacks(commands.Cog):
                                     await member.add_roles(hacker_role) 
                                     self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
 
-                                    final_reply += self.HACKER_PRIMER
+                                    final_reply = self.HACKER_PRIMER
                                     final_reply += f"You're all set! Happy Hacking~! {self.SHELL_EMOJI}\n"
                                     send_final_reply = await member.send(final_reply)
 
@@ -141,7 +141,7 @@ class ShellHacks(commands.Cog):
                         initial_reply = f"Thank you! It seems you haven't confirmed you attendace. Please try again after you do so.\nYou can try again by unreacting and reacting to {self.SHELL_EMOJI} in the #check-in channel"
                         send_initial_reply = await member.send(initial_reply)
                     elif is_checkedin:
-                        initial_reply = f"It seems you've already checked in!\n{self.HACKER_PRIMER}\nIf you believe this is a mistake, please contact an organizer.\n"
+                        initial_reply = f"It seems you've already checked in!\nIf you believe this is a mistake, please contact an organizer.\n"
                         send_initial_reply = await member.send(initial_reply)                        
                     else:
                         initial_reply = "It seems like your application is still pending. If you believe this is a mistake, please contact an organizer."
