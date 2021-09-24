@@ -240,15 +240,13 @@ class ShellHacks(commands.Cog):
         '''
         Used to peek into the hacker guide for ShellHacks 2021.\nEx: ?guide
         '''
-        await ctx.message.delete()
         await ctx.channel.send(self.HACKER_GUIDE_SHORTENED_URL)
 
     @commands.command()    
     async def schedule(self, ctx):
         '''
-        Used to peek into the hacker guide for ShellHacks 2021.\nEx: ?guide
+        Used to peek into the schedule for ShellHacks 2021.\nEx: ?guide
         '''
-        await ctx.message.delete()
         await ctx.channel.send(self.SCHEDULE_SHORTENED_URL)
 
     @commands.command()    
@@ -290,6 +288,7 @@ class ShellHacks(commands.Cog):
         '''  
         if not self.is_allowed(ctx, ctx.author): 
             return
+
         eboard_role = ctx.guild.get_role(self.EBOARD_ROLE_ID)
         committee_role = ctx.guild.get_role(self.SHELL_COMMITTEE_ROLE_ID)
         organizer_role = ctx.guild.get_role(self.ORGANIZER_ROLE_ID)
@@ -304,6 +303,7 @@ class ShellHacks(commands.Cog):
         '''  
         if not self.is_allowed(ctx, ctx.author): 
             return
+
         if user == None:
             user = ctx.author
 
@@ -327,6 +327,7 @@ class ShellHacks(commands.Cog):
     async def edit_checkin(self, ctx, new_message):  
         if not self.is_allowed(ctx, ctx.author): 
             return  
+            
         channel = self.bot.get_channel(self.CHECKIN_CHANNEL_ID)
         original_message = await channel.fetch_message(self.CHECKING_MESSAGE_ID)
         await original_message.edit(content=new_message)
