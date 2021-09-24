@@ -72,7 +72,7 @@ class ShellHacks(commands.Cog):
                 message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
                 email = message_response.content
 
-                by_email = match({"E-mail Address": email})
+                by_email = match({"lowercase-emails": email.strip().lower()})
                 result = self.hacker_database.first(formula=by_email)
 
                 if result != None:
@@ -110,7 +110,7 @@ class ShellHacks(commands.Cog):
                         while result == None:
                             message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
                             record_id = message_response.content
-                            by_email_and_id = match({"Application ID": record_id, "E-mail Address": email})
+                            by_email_and_id = match({"Application ID": record_id, "lowercase-emails": email.strip().lower()})
                             result = self.hacker_database.first(formula=by_email_and_id)
                             
                             if result != None:
@@ -209,7 +209,7 @@ class ShellHacks(commands.Cog):
         if (mod_role not in author_roles) and (organizer_role not in author_roles):
             response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Shell Directors'
         else:
-            by_email = match({"E-mail Address": hacker_email})
+            by_email = match({"lowercase-emails": hacker_email.strip().lower()})
             response = self.hacker_database.first(formula=by_email)
             if(response != None):
                 success = True
