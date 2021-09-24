@@ -126,9 +126,10 @@ class ShellHacks(commands.Cog):
                                     hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
                                     await member.add_roles(hacker_role) 
                                     self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
-
-                                    final_reply = self.HACKER_PRIMER
-                                    final_reply += f"You're all set! Happy Hacking~! {self.SHELL_EMOJI}\n"
+                                    
+                                    final_reply = "You're all set!\n"
+                                    final_reply += self.HACKER_PRIMER
+                                    final_reply += f"\nHappy Hacking~! {self.SHELL_EMOJI}"
                                     send_final_reply = await member.send(final_reply)
 
                                     await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** to ShellHacks 2021!')
