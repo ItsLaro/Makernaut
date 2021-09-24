@@ -35,6 +35,7 @@ class ShellHacks(commands.Cog):
         #Channels
         self.CHECKING_MESSAGE_ID = 889331203788914781
         self.CHECKIN_CHANNEL_ID = 888987697442590740
+        self.CHECKING_MESSAGE_ID = 889331203788914781
         self.MENTOR_CHANNEL_ID = 888969040641540146
         self.TEMPLATE_CHANNEL_ID = 888979710435029022
         self.BOT_LOGS_CHANNEL_ID = 626541886533795850
@@ -277,7 +278,7 @@ class ShellHacks(commands.Cog):
         '''
         Used to scan server for ShellHacks 2021 sponsors and assign them the appropiate roles and nicknames.\nEx: ?sponsors
         '''  
-        if not is_allowed(ctx, ctx.author): 
+        if not self.is_allowed(ctx, ctx.author): 
             return
         eboard_role = ctx.guild.get_role(self.EBOARD_ROLE_ID)
         committee_role = ctx.guild.get_role(self.SHELL_COMMITTEE_ROLE_ID)
@@ -311,6 +312,15 @@ class ShellHacks(commands.Cog):
             primer_message = f'Hi {user.mention}!\n' + self.GENERIC_PRIMER 
         
         send_initial_message = await user.send(primer_message)
+    
+    @commands.command()    
+    async def edit_checkin(self, ctx, new_message):  
+        if not self.is_allowed(ctx, ctx.author): 
+            return  
+        channel = self.bot.get_channel(self.CHECKING_CHANNEL_ID)
+        original_message = await channel.fetch_message(self.CHECKING_MESSAGE_ID)
+        await original_message.edit(content=new_message)
+
 
     def is_allowed(self, ctx, user: discord.Member):
         roles = user.roles
