@@ -160,6 +160,10 @@ class ShellHacks(commands.Cog):
 
     @commands.command()    
     async def ticket(self, ctx):
+        '''
+        Creates a #ticket channel for the author where they can recieve dedicated attention. Ex: ?ticket
+        Only works in the #mentor-help channel.
+        '''
         create_ticket_channel = self.bot.get_channel(self.MENTOR_CHANNEL_ID)
         if ctx.channel != create_ticket_channel:
             return
@@ -173,6 +177,10 @@ class ShellHacks(commands.Cog):
 
     @commands.command()    
     async def close(self, ctx):
+        '''
+        Closes a #ticket channel Ex: ?ticket
+        Only works inside #ticket channels.
+        '''
         if 'ticket' in ctx.channel.name and ctx.channel.id != self.MENTOR_CHANNEL_ID and ctx.channel.id != self.TEMPLATE_CHANNEL_ID:
             await ctx.channel.delete()
             print("Channel closed.")
@@ -249,13 +257,16 @@ class ShellHacks(commands.Cog):
             user = ctx.guild.get_member_named(sponsor_record["fields"]["Discord Username"])
             if user:
                 try:
-                    full_name = sponsor_record["fields"]["Full Name"]
-                    company = sponsor_record["fields"]["Company"]
-                    await user.edit(nick = full_name + " | " + company)
-                    await user.add_roles(sponsor_role)
-                    self.company_database.update(sponsor_record["id"], {"In Server": True})
-                    print(f"Sponsor located: {user}")
-                    await self.log_channel.send(f'{self.SHELL_EMOJI} A wild **sponsor** appeared! {user.mention} from {company} is here for ShellHacks 2021!')
+                    if sponsor_role not in user.roles:
+                        full_name = sponsor_record["fields"]["Full Name"]
+                        company = sponsor_record["fields"]["Company"]
+                        await user.edit(nick = full_name + " | " + company)
+                        await user.add_roles(sponsor_role)
+                        self.company_database.update(sponsor_record["id"], {"In Server": True})
+                        print(f"New sponsor located: {user}")
+                        await self.log_channel.send(f'{self.SHELL_EMOJI} A wild **sponsor** appeared! {user.mention} from {company} is here for ShellHacks 2021!')
+                    else:
+                        print(f"Previously located sponsor: {user}")
                 except:
                     print(f"Missing Permissios for: {user}")
             else: 
