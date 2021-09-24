@@ -52,10 +52,10 @@ class ShellHacks(commands.Cog):
         #Strings & URLS
         self.HACKER_GUIDE_SHORTENED_URL = "https://go.fiu.edu/hackerguide"
         self.HACKER_GUIDE_URL = "https://dynamic-tugboat-eb7.notion.site/ShellHacks-Hacker-Guide-53b2a4fe104645bc85b92aa13f608cae"
-        self.HACKER_PRIMER = f"Welcome to ShellHacks 2021. I highly encourage you to go over the hacker guide found here: {self.HACKER_GUIDE_URL}\nIt contains answers to frequently asked questions and essential information so you can get most out of the event!'"
-        self.MENTOR_PRIMER = f"This is a primer for a mentor! Feel free to hang around or ask questions in the #mentors-lounge channel. When you see a #ticket channel appears, feel free to take it by messaging in it to help the hacker in need"
-        self.SPONSOR_PRIMER = f"This is a primer for sponsor!"
-        self.GENERIC_PRIMER = f'Remember to check-in to ShellHacks 2021! Go to the #check-in channel in the ShellHacks category (you can click this link too: https://discord.com/channels/245393533391863808/888987697442590740/889331203788914781)\nand react to the message by clicking on the ShellHacks {self.SHELL_EMOJI} emoji'
+        self.HACKER_PRIMER = f"Welcome to ShellHacks 2021! We highly recommend you check out the hacker guide at {self.HACKER_GUIDE_URL}\nIt contains answers to frequently asked questions and essential information to help make the most of your experience at ShellHacks!"
+        self.MENTOR_PRIMER = f"Welcome ShellHacks! Feel free to hang out and ask questions in the #mentors-lounge channel.\nWhenever a hacker is in need of help, __a new #ticket channel__ will appear at the bottom of the ShellHacks category.\nWe encourage you to resolve the ticket by replying in that ticket's channel"
+        self.SPONSOR_PRIMER = f"Welcome to ShellHacks! Feel free to have a conversation with our other sponsors and ask our organizers questions at the #sponsor-lounge channel.\n__There are also channels for each company__ where our hackers can ask questions about your company, or your products!"
+        self.GENERIC_PRIMER = f'Welcome to UPE, and welcome to ShellHacks!\nIf you have confirmed your attendance and are here for ShellHacks, remember to check-in by going to the #check-in channel in the ShellHacks category.\nYou can also click on this link: https://discord.com/channels/245393533391863808/888987697442590740/889331203788914781 to be directed to the #check-in channel!\nTo check-in, make sure you __react to the message by clicking on the ShellHacks {self.SHELL_EMOJI} emoji__ !'
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -64,7 +64,7 @@ class ShellHacks(commands.Cog):
             member = guild.get_member(payload.user_id)
             result = None
 
-            initial_message = 'Please provide me with the email address you used in your application.'
+            initial_message = f'Welcome to ShellHacks 2021! {self.SHELL_EMOJI}\nPlease provide me with the email address you used in your application to start the check-in.'
             send_initial_message = await member.send(initial_message)
             
             while result == None:
@@ -99,9 +99,9 @@ class ShellHacks(commands.Cog):
 
                     if is_accepted and is_confirmed and not is_checkedin:
                         if is_mentor:
-                            initial_reply = "Thank you, I've verified your confirmed **mentor** application!\nWe just need one more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
+                            initial_reply = "Thank you, I've verified your confirmed **mentor** status!\nWe just need one more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and it looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
                         else:
-                            initial_reply = "Thank you, I've verified your confirmed **hacker** application!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
+                            initial_reply = "Thank you, I've verified your confirmed **hacker** status!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
                         send_initial_reply = await member.send(initial_reply)
 
                         result = None
@@ -118,7 +118,7 @@ class ShellHacks(commands.Cog):
                                     await member.add_roles(mentor_role) 
                                     self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
                                 
-                                    final_reply = f"You're all set for mentoring! Thank you for being here~! {self.SHELL_EMOJI}"
+                                    final_reply = f"You're all set for mentoring! Thank you for being here~!"
                                     send_final_reply = await member.send(final_reply)
 
                                     await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** as a **mentor** for ShellHacks 2021!')
@@ -138,10 +138,10 @@ class ShellHacks(commands.Cog):
                                 send_final_reply = await member.send(final_reply)
 
                     elif is_accepted and not is_confirmed:
-                        initial_reply = "Thank you! Please try again after you confirm your acceptance.\n You can try again by unreacting and reacting again in the #check-in channel"
+                        initial_reply = f"Thank you! It seems you haven't confirmed you attendace. Please try again after you do so.\nYou can try again by unreacting and reacting to {self.SHELL_EMOJI} in the #check-in channel"
                         send_initial_reply = await member.send(initial_reply)
                     elif is_checkedin:
-                        initial_reply = "It seems you've already checked in! If you believe this is a mistake, please contact an organizer."
+                        initial_reply = f"It seems you've already checked in!\n{self.HACKER_PRIMER}\nIf you believe this is a mistake, please contact an organizer.\n"
                         send_initial_reply = await member.send(initial_reply)                        
                     else:
                         initial_reply = "It seems like your application is still pending. If you believe this is a mistake, please contact an organizer."
@@ -173,7 +173,7 @@ class ShellHacks(commands.Cog):
         name = ctx.author.name.replace(' ', '-')
         ticket_channel = await template_channel.clone(name='📑│ticket-' + name)
         await ticket_channel.set_permissions(target=ctx.author, read_messages=True, send_messages=True, read_message_history=True)
-        await ticket_channel.send(ctx.author.mention + ' you can ask the mentors questions in this channel, please close it using `?close` here when you\'re satisfied with the help you\'ve received.')
+        await ticket_channel.send(ctx.author.mention + ', howdy! Thank you for making a new ticket, a mentor will be with you shortly. Once your concern has been resolved, you can close this ticket by using the `?close` command!')
         await ctx.message.delete()
 
     @commands.command()    
