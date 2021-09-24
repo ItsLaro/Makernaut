@@ -52,6 +52,7 @@ class ShellHacks(commands.Cog):
         #Strings & URLS
         self.HACKER_GUIDE_SHORTENED_URL = "https://go.fiu.edu/hackerguide"
         self.HACKER_GUIDE_URL = "https://dynamic-tugboat-eb7.notion.site/ShellHacks-Hacker-Guide-53b2a4fe104645bc85b92aa13f608cae"
+        self.SCHEDULE_SHORTENED_URL = "https://go.fiu.edu/shellhacksschedule"
         self.HACKER_PRIMER = f"Welcome to ShellHacks 2021! We highly recommend you check out the hacker guide at {self.HACKER_GUIDE_URL}\nIt contains answers to frequently asked questions and essential information to help make the most of your experience at ShellHacks!"
         self.MENTOR_PRIMER = f"Welcome ShellHacks! Feel free to hang out and ask questions in the #mentors-lounge channel.\nWhenever a hacker is in need of help, __a new #ticket channel__ will appear at the bottom of the ShellHacks category.\nWe encourage you to resolve the ticket by replying in that ticket's channel"
         self.SPONSOR_PRIMER = f"Welcome to ShellHacks! Feel free to have a conversation with our other sponsors and ask our organizers questions at the #sponsor-lounge channel.\n__There are also channels for each company__ where our hackers can ask questions about your company, or your products!"
@@ -241,6 +242,14 @@ class ShellHacks(commands.Cog):
         '''
         await ctx.message.delete()
         await ctx.channel.send(self.HACKER_GUIDE_SHORTENED_URL)
+
+    @commands.command()    
+    async def schedule(self, ctx):
+        '''
+        Used to peek into the hacker guide for ShellHacks 2021.\nEx: ?guide
+        '''
+        await ctx.message.delete()
+        await ctx.channel.send(self.SCHEDULE_SHORTENED_URL)
 
     @commands.command()    
     async def scan_sponsors(self, ctx):
