@@ -37,9 +37,11 @@ class ShellHacks(commands.Cog):
         self.CHECKIN_CHANNEL_ID = 888987697442590740
         self.CHECKING_MESSAGE_ID = 889331203788914781
         self.MENTOR_CHANNEL_ID = 888969040641540146
-        self.TEMPLATE_CHANNEL_ID = 888979710435029022
+        self.TEXT_TEMPLATE_CHANNEL_ID = 888979710435029022
+        self.VOICE_TEMPLATE_CHANNEL_ID = 891129451658760222
         self.BOT_LOGS_CHANNEL_ID = 626541886533795850
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
+        self.channels_dict = {}
 
         #Airtable
         self.hacker_database = Table(airtable_api_key, shellhacks_base_id, '2021 Application')
@@ -171,11 +173,19 @@ class ShellHacks(commands.Cog):
         if ctx.channel != create_ticket_channel:
             return
         guild = ctx.guild
-        template_channel = guild.get_channel(self.TEMPLATE_CHANNEL_ID)
+        text_template_channel = guild.get_channel(self.TEXT_TEMPLATE_CHANNEL_ID)
+        voice_template_channel = guild.get_channel(self.VOICE_TEMPLATE_CHANNEL_ID)
+
         name = ctx.author.name.replace(' ', '-')
-        ticket_channel = await template_channel.clone(name='📑│ticket-' + name)
+        ticket_channel = await text_template_channel.clone(name='📑│ticket-' + name)
+        voice_ticket_channel = await voice_template_channel.clone(name='💡│ticket-' + name)
+
+        self.channels_dict[ticket_channel.id] = voice_ticket_channel.id
+
         await ticket_channel.set_permissions(target=ctx.author, read_messages=True, send_messages=True, read_message_history=True)
-        await ticket_channel.send(ctx.author.mention + ', howdy! Thank you for making a new ticket, a mentor will be with you shortly. Once your concern has been resolved, you can close this ticket by using the `?close` command!')
+        await voice_ticket_channel.set_permissions(target=ctx.author, connect=True, speak=True, view_channel=True)
+
+        await ticket_channel.send(ctx.author.mention + ', howdy! Thank you for making a new ticket, **type below what you need help with** and a mentor will be with you shortly. Once your concern has been resolved, you can close this ticket by using the `?close` command!')
         await ctx.message.delete()
 
     @commands.command()    
@@ -184,8 +194,11 @@ class ShellHacks(commands.Cog):
         Closes a #ticket channel Ex: ?ticket
         Only works inside #ticket channels.
         '''
-        if 'ticket' in ctx.channel.name and ctx.channel.id != self.MENTOR_CHANNEL_ID and ctx.channel.id != self.TEMPLATE_CHANNEL_ID:
+        if 'ticket' in ctx.channel.name and ctx.channel.id != self.MENTOR_CHANNEL_ID and ctx.channel.id != self.TEXT_TEMPLATE_CHANNEL_ID:
+            voice_ticket_channel = ctx.guild.get_channel(self.channels_dict[ctx.channel.id])
+            self.channels_dict.pop(ctx.channel.id)
             await ctx.channel.delete()
+            await voice_ticket_channel.delete()
             print("Channel closed.")
         else:
             await ctx.send("Sorry, this command only works for ticket channels")
