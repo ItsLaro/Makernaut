@@ -162,6 +162,23 @@ class ShellHacks(commands.Cog):
                 return
             else:
                 await payload.delete()
+                
+        if payload.author.id == self.bot.user.id:
+            return
+        if not payload.guild:
+            try:
+                if payload.content == "<:pineappleemoji:798036434320621579>":
+                    await payload.channel.send("Ding ding ding!")
+                    await payload.channel.send("<a:blobcookie:799276646586646528>") 
+                    await payload.channel.send("I was just feeling lonely and a tiny bit bored.")
+                    await payload.channel.send("I'm glad you reached it out however!")
+                    await payload.channel.send("I've logged your completion of my little challenge...")
+                    await payload.channel.send("<a:blobdance:430822490747437056>")
+                    await self.log_channel.send(f'{self.SHELL_EMOJI} {payload.author.mention} has completed the **Finding Gui Challenge**')
+            except discord.errors.Forbidden:
+                pass
+        else:
+            pass
 
     @commands.command()    
     async def ticket(self, ctx):
