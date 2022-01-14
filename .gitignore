@@ -4,7 +4,10 @@ __pycache__/
 *$py.class
 
 # Keys
+credentials.json
 secret_key.json
+token.json
 
 # Environments
 .env
+/env
