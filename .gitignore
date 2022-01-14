@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-# Keys
-secret_key.json
-
-# Environments
 .env
-=======
-.env
+env
+cogs/__pycache__
+token.json
 secret_key.json
->>>>>>> user_registration_and_equipment_rental
+credentials.json
+.DS_Store
