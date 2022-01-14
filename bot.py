@@ -22,7 +22,7 @@ async def on_ready():
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
             bot.load_extension(f'cogs.{filename[:-3]}')
-            print(f'- {(filename[:-3]).title()} commands loaded')
+            print(f'- {(filename[:-3]).title()} functionality loaded')
     
     #Set status
     await bot.change_presence(status = discord.Status.online, activity=discord.Game("Ready to Help!"))
@@ -70,7 +70,7 @@ async def reload(ctx):
                 if filename.endswith('.py'):
                     bot.unload_extension(f'cogs.{filename[:-3]}')
                     bot.load_extension(f'cogs.{filename[:-3]}')
-                    print(f'- {(filename[:-3]).title()} commands reloaded')
+                    print(f'- {(filename[:-3]).title()} functionality reloaded')
             await ctx.send(f'Cogs reloaded succesfully')
             print(f'Cogs reloaded succesfully\n')
         except Exception:

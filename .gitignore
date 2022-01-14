@@ -1,10 +1,14 @@
-<<<<<<< HEAD
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Keys
+credentials.json
 secret_key.json
+token.json
 
 # Environments
 .env
-=======
-.env
-secret_key.json
->>>>>>> user_registration_and_equipment_rental
+/env
+.DS_Store
