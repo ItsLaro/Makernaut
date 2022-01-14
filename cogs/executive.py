@@ -41,16 +41,16 @@ class Executive(commands.Cog):
                 for message in messages:
                     if message.created_at.day == datetime.now().day:
                         good_members.append(message.author)
-                response = f'Eboard members with **PENDING** standups today:\n'
+                response = f':warning: Eboard members with **PENDING** standups today:\n'
 
                 for member in self.eboard_member:
                     if member not in good_members:
                         are_all_to_date = False
                         response += member.mention + '\n'
-                response += "Please send you updates before the end of the day. If you have nothing to report send a message here saying: `No Updates`\n Thank you! <a:utilsparkle:918949131639197716>"
+                response += "Please send you updates before the end of the day. If you have nothing to report send a message here saying: `No Updates`\nThank you! <a:utilsparkle:918949131639197716>"
 
                 if are_all_to_date:
-                    response = "Everyone seems to have submitted their bidaily standups today.\nWoohoo~! Great job!"
+                    response = "Everyone seems to have submitted their bidaily standups today.\nWoohoo~! Great job! <a:utilsuccess:809713352061354016>"
 
                 await self.standup_channel.send(response)
 
