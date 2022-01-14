@@ -70,7 +70,7 @@ async def reload(ctx):
                 if filename.endswith('.py'):
                     bot.unload_extension(f'cogs.{filename[:-3]}')
                     bot.load_extension(f'cogs.{filename[:-3]}')
-                    print(f'- {(filename[:-3]).title()} commands reloaded')
+                    print(f'- {(filename[:-3]).title()} functionality reloaded')
             await ctx.send(f'Cogs reloaded succesfully')
             print(f'Cogs reloaded succesfully\n')
         except Exception:
