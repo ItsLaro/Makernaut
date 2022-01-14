@@ -31,8 +31,14 @@ class Executive(commands.Cog):
 
     @tasks.loop(minutes=60.0)
     async def standup(self):
-        if datetime.now().hour == 22: #5PM EST. Server uses UTC. 
-            if datetime.today().weekday() in [0, 2, 4]:
+        if datetime.today().weekday() in [0, 2, 4]:
+
+            if datetime.now().hour == 11: #6AM EST. Server uses UTC. 
+                response = "Good morning eboard! <a:utilsparkle:918949131639197716>\nQuick reminder that standups are due today. Make sure you answer the following questions in a single message:\n\n"
+                response += "**How you feel today?**\n**What did you do since your last update?**\n**What are you gonna work on today?**\n**Anything blocking your progress?**\n\n"
+                response += "Hope you all have an wonderful day!! <:blobheart:799276766069522432>"
+
+            if datetime.now().hour == 22: #5PM EST. Server uses UTC. 
                 messages = await self.standup_channel.history(limit=100).flatten()
                 good_members = [] 
                 late_members = []
@@ -51,8 +57,9 @@ class Executive(commands.Cog):
 
                 if are_all_to_date:
                     response = "Everyone seems to have submitted their bidaily standups today.\nWoohoo~! Great job! <a:utilsuccess:809713352061354016>"
+            
+            await self.standup_channel.send(response)
 
-                await self.standup_channel.send(response)
 
     @commands.command()
     async def debug_eboard(self, ctx):
