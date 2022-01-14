@@ -1,7 +1,14 @@
-.env
-env
-cogs/__pycache__
-token.json
-secret_key.json
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Keys
 credentials.json
+secret_key.json
+token.json
+
+# Environments
+.env
+/env
 .DS_Store
