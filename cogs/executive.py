@@ -31,7 +31,7 @@ class Executive(commands.Cog):
 
     @tasks.loop(minutes=60.0)
     async def standup(self):
-        if datetime.now().hour == 12:
+        if datetime.now().hour == 22: #5PM EST. Server uses UTC. 
             if datetime.today().weekday() in [0, 2, 4]:
                 messages = await self.standup_channel.history(limit=100).flatten()
                 good_members = [] 
@@ -47,7 +47,7 @@ class Executive(commands.Cog):
                     if member not in good_members:
                         are_all_to_date = False
                         response += member.mention + '\n'
-                response += "Please send you updates before the end of the day. If you have nothing to report send a message here saying: `No Updates`\nThank you! <a:utilsparkle:918949131639197716>"
+                response += "Please send your updates before the end of the day. If you have no tasks assigned, send a message here saying: `No Tasks Assigned`\nThank you! <a:utilsparkle:918949131639197716>"
 
                 if are_all_to_date:
                     response = "Everyone seems to have submitted their bidaily standups today.\nWoohoo~! Great job! <a:utilsuccess:809713352061354016>"
