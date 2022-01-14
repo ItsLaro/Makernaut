@@ -11,3 +11,4 @@ token.json
 # Environments
 .env
 /env
+.DS_Store
