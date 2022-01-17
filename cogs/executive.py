@@ -35,8 +35,8 @@ class Executive(commands.Cog):
 
             if datetime.now().hour == 11: #6AM EST. Server uses UTC. 
                 response = "Good morning eboard! <a:utilsparkle:918949131639197716>\nQuick reminder that standups are due today. Make sure you answer the following questions in a single message:\n\n"
-                response += "**How you feel today?**\n**What did you do since your last update?**\n**What are you gonna work on today?**\n**Anything blocking your progress?**\n\n"
-                response += "Hope you all have an wonderful day!! <:blobheart:799276766069522432>"
+                response += "**How do you feel today?**\n**What did you do since your last update?**\n**What are you gonna work on today?**\n**Anything blocking your progress?**\n\n"
+                response += "Hope you all have a wonderful day!! <:blobheart:799276766069522432>"
                 await self.standup_channel.send(response)
 
             if datetime.now().hour == 22: #5PM EST. Server uses UTC. 
