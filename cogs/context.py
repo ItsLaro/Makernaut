@@ -10,10 +10,52 @@ class BotContext(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
+        self.UPE_GUILD_ID = 245393533391863808
+        self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
+
         self.MODERATOR_ROLE_ID = 399551100799418370
         self.BOT_LOGS_CHANNEL_ID = 626541886533795850
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
         self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
+
+        self.EVERYONE_ROLE_ID = 245393533391863808
+        self.CODE_INTEREST_ROLE_ID = 798068011667161128
+        self.MAKE_INTEREST_ROLE_ID = 798068011667161128
+        self.INFOTECH_INTEREST_ROLE_ID = 798068011667161128
+        self.DESIGN_INTEREST_ROLE_ID = 798068011667161128
+        self.LEAP_INTEREST_ROLE_ID = 798068011667161128
+        self.IGNITE_INTEREST_ROLE_ID = 798068011667161128
+        self.SPARKDEV_INTEREST_ROLE_ID = 798068011667161128
+        self.SHELLHACKS_INTEREST_ROLE_ID = 798068011667161128
+        self.DISCOVER_INTEREST_ROLE_ID = 798068011667161128
+
+        self.ALUMNI_ROLE_ID = 523310392030658573
+        self.PAST_SPARKDEV_ROLE_ID = 797573229493354616
+        self.SHELLHACKS_2022_ROLE_ID = 933128149938626661
+        self.SHELLHACKS_2021_ROLE_ID = 888957354417192960
+        self.SHELLHACKS_2020_ROLE_ID = 523306020538286080
+    
+        self.UNPROTECTED_ROLES_IDS = [ 
+            self.EVERYONE_ROLE_ID,
+            self.CODE_INTEREST_ROLE_ID, 
+            self.MAKE_INTEREST_ROLE_ID, 
+            self.INFOTECH_INTEREST_ROLE_ID, 
+            self.DESIGN_INTEREST_ROLE_ID, 
+            self.LEAP_INTEREST_ROLE_ID, 
+            self.IGNITE_INTEREST_ROLE_ID, 
+            self.SPARKDEV_INTEREST_ROLE_ID, 
+            self.SHELLHACKS_INTEREST_ROLE_ID, 
+            self.DISCOVER_INTEREST_ROLE_ID,
+            self.ALUMNI_ROLE_ID, 
+            self.PAST_SPARKDEV_ROLE_ID,
+            self.SHELLHACKS_2022_ROLE_ID,
+            self.SHELLHACKS_2021_ROLE_ID,
+            self.SHELLHACKS_2020_ROLE_ID,
+        ]
+
+        self.UNPROTECTED_ROLES = []
+        for role_id in self.UNPROTECTED_ROLES_IDS:
+            self.UNPROTECTED_ROLES.append(self.upe_guild.get_role(role_id))
 
     #Commands
     @commands.command()
@@ -141,23 +183,41 @@ class BotContext(commands.Cog):
         matching_real_nitro = re.findall(pattern=real_nitro_pattern, string=content) 
 
         if matching_url:
+
             if matching_real_nitro:
                 pass # Real Discord link
+
             elif matching_sus_nitro:
+
                 if (matching_gifs):
                     pass # Kinda sus, but just media
+
                 else: 
                     # Most likely a scam
+                    await message.delete()
+
                     SPAM_REPORT_TITLE = "Pontential Spam Removed"
-                    SPAM_REPORT_DESCRIPTION = f"<@&{self.MODERATOR_ROLE_ID}>" #tags moderators
+                    SPAM_REPORT_DESCRIPTION = f"" #tags moderators
                     RED_HEX = 0xD2222D  
                     embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=RED_HEX)
-                    embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)
-                    embed_response.add_field(name="Resolution", value= "Message deleted! Member banned!", inline=False)
+                    embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
+                    embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)                     
+                    
+                    isProtected = False
+                    for role in author.roles:
+                        if role in self.UNPROTECTED_ROLES:
+                            pass
+                        else:
+                            isProtected = True
 
-                    await message.delete()
-                    await author.ban(reason = f"Automated Ban: Potential Nitro Scam\nMessage:\n {message.content}")
+                    if isProtected:
+                        embed_response.add_field(name="Resolution", value= "Message **deleted**!", inline=False)
+                    else:
+                        embed_response.add_field(name="Resolution", value= "Message **deleted** and member **banned**!", inline=False)
+                        await author.ban(reason = f"Automated Ban: Potential Nitro Scam\nMessage:\n {message.content}")
+                    await self.log_channel.send(f"<@&{self.MODERATOR_ROLE_ID}>")
                     await self.log_channel.send(embed=embed_response)
+
             else:
                 pass # Random URL
 
