@@ -102,7 +102,7 @@ class BotContext(commands.Cog):
         )'''
         self.gifs_pattern = r'^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$|\W*(tenor.com)\W*|\W*(gfycat.com)\W*|\W*(imgur.com)\W*|\W*(giphy.com)\W*'
         self.mentions_nitro_pattern = r'\W*(discord)\W*|\W*(nitro)\W*'
-        self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discord.gg)\W*|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.com)\W*|\W*\b(https:\/\/discord.gg)\W*|\W*\b(https:\/\/discordapp.com)\W*'
+        self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discord.gg)\W*|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
 
     #Commands
     @commands.command()
