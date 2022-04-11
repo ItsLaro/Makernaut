@@ -20,6 +20,8 @@ class Executive(commands.Cog):
         self.standup_channel = self.bot.get_channel(self.STANDUP_CHANNEL_ID)
         self.BOT_LOGS_CHANNEL_ID = 626541886533795850
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
+        self.ANNOUNCEMENT_CHANNEL_ID = 399553386984243220
+        self.announcement_channel = self.bot.get_channel(self.ANNOUNCEMENT_CHANNEL_ID)
 
         for member in self.standup_channel.members:
             if self.eboard_role in member.roles:
@@ -33,10 +35,13 @@ class Executive(commands.Cog):
     async def standup(self):
         if datetime.today().weekday() in [2, 4]:
 
+            announcements = await self.announcement_channel.history(limit=10).flatten()
+            latestAnnouncementURL = announcements[0].jump_url
+
             if datetime.now().hour == 11: #6AM EST. Server uses UTC. 
-                response = "Good morning eboard! <a:utilsparkle:918949131639197716>\nQuick reminder that standups are due today. Make sure you answer the following questions in a single message:\n\n"
-                response += "**How do you feel today?**\n**What have you done since your last update?**\n**What are you going to be working on today?**\n**Is anything blocking your progress?**\n\n"
-                response += "Hope you all have a wonderful day!! <:blobheart:799276766069522432>"
+                response = "Good morning <@&399558426511802368>! <a:utilsparkle:918949131639197716>\nQuick reminder that standups are due today. Make sure you answer the following questions in a single message:\n\n"
+                response += f"**1. What's the progress on your Click Up tasks? (___No Tasks Assigned___ if none).**\n**2. What have you done since your last update?**\n**3. What are you going to be working on today?**\n**4. Is anything blocking your progress?**\n**5. Have you reacted to the most recent Discord announcement:\n**{latestAnnouncementURL}\n**and engaged with our latest social media posts:**\nhttps://www.instagram.com/upefiu/ **?**\n\n" 
+                response += "Thank you! Hope you all have a wonderful day!! <:blobheart:799276766069522432>"
                 await self.standup_channel.send(response)
 
             if datetime.now().hour == 22: #5PM EST. Server uses UTC. 
