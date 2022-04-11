@@ -201,15 +201,14 @@ class BotContext(commands.Cog):
 
                 else: 
                     # Most likely a scam
-                    await message.delete()
 
                     SPAM_REPORT_TITLE = "Pontential Spam Removed"
                     SPAM_REPORT_DESCRIPTION = f"" #tags moderators
                     RED_HEX = 0xD2222D  
                     embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=RED_HEX)
                     embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
-                    embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)                     
-                    
+                    embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)
+                    embed_response.add_field(name="Channel", value=f'{message.channel.mention}', inline=False)                        
                     isProtected = False
                     for role in author.roles:
                         if role in self.UNPROTECTED_ROLES:
@@ -218,9 +217,10 @@ class BotContext(commands.Cog):
                             isProtected = True
 
                     if isProtected:
-                        embed_response.add_field(name="Resolution", value= "Message **deleted**!", inline=False)
+                        embed_response.add_field(name="Resolution", value= "Nothing! Please Review", inline=False)
                     else:
                         embed_response.add_field(name="Resolution", value= "Message **deleted** and member **banned**!", inline=False)
+                        await message.delete()
                         await author.ban(reason = f"Automated Ban: Potential Nitro Scam\nMessage:\n {message.content}")
                     await self.log_channel.send(f"<@&{self.MODERATOR_ROLE_ID}>")
                     await self.log_channel.send(embed=embed_response)
