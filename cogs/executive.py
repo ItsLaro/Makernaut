@@ -59,7 +59,7 @@ class Executive(commands.Cog):
                     if member not in good_members:
                         are_all_to_date = False
                         response += member.mention + '\n'
-                response += "Please send your updates before the end of the day. If you have no tasks assigned, send a message here saying: `No Tasks Assigned`\nThank you! <a:utilsparkle:918949131639197716>"
+                response += "Please send your updates before the end of the day or you will be marked as _MIA_\nThank you! <a:utilsparkle:918949131639197716>"
 
                 if are_all_to_date:
                     response = "Everyone seems to have submitted their bidaily standups today.\nWoohoo~! Great job! <a:utilsuccess:809713352061354016>"
