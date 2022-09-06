@@ -5,10 +5,14 @@ from discord.ext import commands
 from pyairtable import Table
 from pyairtable.formulas import match
 from collections.abc import Sequence
+import firebase_admin
+from firebase_admin import db
+from firebase_admin import credentials
 
 load_dotenv()
 airtable_api_key = os.environ["AIRTABLE_API_KEY"]
 shellhacks_base_id = os.environ["SHELLHACKS_BASE_ID"]
+shellhacks_firebase_key = os.environ["SHELLHACKS_FIREBASE_KEY"]
 
 class ShellHacks(commands.Cog):
 
@@ -18,6 +22,16 @@ class ShellHacks(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+        #Firebase
+        cred = credentials.Certificate({    
+            "projectId": "shellhacks2022",
+            "clientEmail": "firebase-adminsdk-fz1lg@shellhacks2022.iam.gserviceaccount.com",
+            "privateKey": shellhacks_firebase_key
+        })
+        firebase_admin.initialize_app(cred, {
+            'databaseURL' : 'https://shellhacks2022-default-rtdb.firebaseio.com'
+        })
 
         #Roles/Identities
         self.MODERATOR_ROLE_ID = 399551100799418370 
@@ -52,10 +66,11 @@ class ShellHacks(commands.Cog):
         self.SHELL_EMOJI = "<:upeshellhacks:753692446621433927>"
 
         #Strings & URLS
-        self.HACKER_GUIDE_SHORTENED_URL = "https://go.fiu.edu/hackerguide"
-        self.HACKER_GUIDE_URL = "https://dynamic-tugboat-eb7.notion.site/ShellHacks-Hacker-Guide-53b2a4fe104645bc85b92aa13f608cae"
+        self.HACKER_GUIDE_SHORTENED_URL = "https://go.fiu.edu/Shell2022HackerGuide"
+        self.HACKER_GUIDE_URL = "https://upefiu.notion.site/ShellHacks-2022-Hacker-Guide-eca293e75b8d432baf7f410129547dac"
         self.SCHEDULE_SHORTENED_URL = "https://go.fiu.edu/shellhacksschedule"
-        self.HACKER_PRIMER = f"Welcome to ShellHacks 2021! We highly recommend you check out the hacker guide at {self.HACKER_GUIDE_URL}\nIt contains answers to frequently asked questions and essential information to help make the most of your experience at ShellHacks!"
+        self.SHELLHACKS_DASHBOARD_URL = "https://www.shellhacks.net/dashboard"
+        self.HACKER_PRIMER = f"Welcome to ShellHacks 2022! We highly recommend you check out the hacker guide at {self.HACKER_GUIDE_SHORTENED_URL}\nIt contains answers to frequently asked questions and essential information to help make the most of your experience at ShellHacks!"
         self.MENTOR_PRIMER = f"Welcome ShellHacks! Feel free to hang out and ask questions in the #mentors-lounge channel.\nWhenever a hacker is in need of help, __a new #ticket channel__ will appear at the bottom of the ShellHacks category.\nWe encourage you to resolve the ticket by replying in that ticket's channel"
         self.SPONSOR_PRIMER = f"Welcome to ShellHacks! Feel free to have a conversation with our other sponsors and ask our organizers questions at the #sponsor-lounge channel.\n__There are also channels for each company__ where our hackers can ask questions about your company, or your products!"
         self.GENERIC_PRIMER = f'Welcome to UPE, and welcome to ShellHacks!\nIf you have confirmed your attendance and are here for ShellHacks, remember to check-in by going to the #check-in channel in the ShellHacks category.\nYou can also click on this link: https://discord.com/channels/245393533391863808/888987697442590740/889331203788914781 to be directed to the #check-in channel!\nTo check-in, make sure you __react to the message by clicking on the ShellHacks {self.SHELL_EMOJI} emoji__ !'
@@ -65,94 +80,80 @@ class ShellHacks(commands.Cog):
         if payload.message_id == self.CHECKING_MESSAGE_ID:
             guild = self.bot.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
-            result = None
+            found = False
 
-            initial_message = f'Welcome to ShellHacks 2021! {self.SHELL_EMOJI}\nPlease provide me with the email address you used in your application to start the check-in.'
+            initial_message = f'Welcome to ShellHacks 2022! {self.SHELL_EMOJI}\nPlease provide me with the code on your ShellHacks profile dashboard at {self.SHELLHACKS_DASHBOARD_URL}.'
             send_initial_message = await member.send(initial_message)
             
-            while result == None:
+            while not found:
                 message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
-                email = message_response.content
+                code = message_response.content
 
-                by_email = match({"lowercase-emails": email.strip().lower()})
-                result = self.hacker_database.first(formula=by_email)
+                ref = db.collection('hackers').document({code.strip()})
+                snapshot = ref.get()
 
-                if result != None:
-                    hacker_record = result["fields"]
-                    is_mentor = False
+                if snapshot.exists:
+                    found = True
+                    data = snapshot.to_dict()
+
                     try:
-                        if hacker_record['Acceptance Status'] == 'Accepted':
-                            is_accepted = True
-                        elif hacker_record['Acceptance Status'] == 'Mentor Accepted':
-                            is_accepted = True
-                            is_mentor = True
-                        else:
-                            is_accepted = False
+                        if data['isAccepted'] == True:
+                            if data['isConfirmed' == True]:
+                                if data['acceptedAttendance'] == 'In-Person':
+                                    if data['isCheckedIn'] == True:
+                                        if data.has_key('discord') and data['discord'] != '':
+                                            # Send message letting them know they should have roles
+                                            initial_reply = "The hacker tied to the given code has already received the appropriate roles. If this was not you, please visit the registration table to sort out this issue."
+                                            send_initial_reply = await member.send(initial_reply)
+                                        else:
+                                            # Give Hacker role
+                                            hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
+                                            await member.add_roles(hacker_role)
+                                            # Give In-Person role
 
-                    except KeyError:
-                        is_accepted = False
-                    try:
-                        is_confirmed = hacker_record['Confirmed']
-                    except KeyError:
-                        is_confirmed = False
-                    try:
-                        is_checkedin = hacker_record['Checked In']
-                    except:
-                        is_checkedin = False
+                                            # Store Discord user ID (to track down who got the roles in case of identity theft >:( )
+                                            ref.update({'discord': member.id})
+                                            # Send message letting them know it succeeded
+                                            final_reply = "You're all set!\n"
+                                            final_reply += self.HACKER_PRIMER
+                                            final_reply += f"\nHappy Hacking~! {self.SHELL_EMOJI}"
+                                            send_final_reply = await member.send(final_reply)
 
-                    if is_accepted and is_confirmed and not is_checkedin:
-                        if is_mentor:
-                            initial_reply = "Thank you, I've verified your confirmed **mentor** status!\nWe just need one more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and it looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png"
-                        else:
-                            initial_reply = "Thank you, I've verified your confirmed **hacker** status!\nOne more step to help us verify your identity. Please provide your Hacker ID.\nYou can find this ID in your acceptance email and looks like this: `rec##############`\nhttps://i.imgur.com/j2z933x.png\nIf you've lost your acceptance email, do not fret! We'll be sending check-in instruction emails very soon with this ID."
-                        send_initial_reply = await member.send(initial_reply)
-
-                        result = None
-
-                        while result == None:
-                            message_response = await self.bot.wait_for('message', check=message_check(channel=member.dm_channel))
-                            record_id = message_response.content
-                            by_email_and_id = match({"Application ID": record_id, "lowercase-emails": email.strip().lower()})
-                            result = self.hacker_database.first(formula=by_email_and_id)
-                            
-                            if result != None:
-                                if is_mentor:
-                                    mentor_role = discord.utils.get(guild.roles, name=self.MENTOR_ROLE_NAME)
-                                    await member.add_roles(mentor_role) 
-                                    self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
-                                
-                                    final_reply = f"You're all set for mentoring! Thank you for being here~!"
-                                    send_final_reply = await member.send(final_reply)
-
-                                    await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** as a **mentor** for ShellHacks 2021!')
+                                            await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** to ShellHacks 2022!')
+                                    else:
+                                        initial_reply = "You have not been checked-in in-person. Please do so at the registration table"
+                                        send_initial_reply = await member.send(initial_reply)
                                 else:
-                                    hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
-                                    await member.add_roles(hacker_role) 
-                                    self.hacker_database.update(record_id, {"Checked In": True, "Discord": str(member)})
-                                    
-                                    final_reply = "You're all set!\n"
-                                    final_reply += self.HACKER_PRIMER
-                                    final_reply += f"\nHappy Hacking~! {self.SHELL_EMOJI}"
-                                    send_final_reply = await member.send(final_reply)
+                                    if data['isCheckedIn'] == True:
+                                        initial_reply = "You have already checked in as a virtual hacker."
+                                        send_initial_reply = await member.send(initial_reply)    
+                                    else:
+                                        # Check-In update
+                                        ref.update({'isCheckedIn': True})
+                                        # Give Hacker role
+                                        hacker_role = discord.utils.get(guild.roles, name=self.HACKER_ROLE_NAME)
+                                        await member.add_roles(hacker_role) 
+                                        #Give Remote role
 
-                                    await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** to ShellHacks 2021!')
+                                        # Send message letting them know it succeeded
+                                        final_reply = "You're all set!\n"
+                                        final_reply += self.HACKER_PRIMER
+                                        final_reply += f"\nHappy Hacking~! {self.SHELL_EMOJI}"
+                                        send_final_reply = await member.send(final_reply)
 
+                                        await self.log_channel.send(f'{self.SHELL_EMOJI} {member.mention} has **checked-in** to ShellHacks 2022!')
                             else:
-                                final_reply = "I couldn't verify your identity. Make sure the ID is correct and try again. (Tip: try copy/pasting it)"
-                                send_final_reply = await member.send(final_reply)
-
-                    elif is_accepted and not is_confirmed:
-                        initial_reply = f"Thank you! It seems you haven't confirmed you attendace. Please try again after you do so.\nYou can try again by unreacting and reacting to {self.SHELL_EMOJI} in the #check-in channel"
-                        send_initial_reply = await member.send(initial_reply)
-                    elif is_checkedin:
-                        initial_reply = f"It seems you've already checked in!\nIf you believe this is a mistake, please contact an organizer.\n"
-                        send_initial_reply = await member.send(initial_reply)                        
-                    else:
-                        initial_reply = "It seems like your application is still pending. If you believe this is a mistake, please contact an organizer."
-                        send_initial_reply = await member.send(initial_reply)
+                                initial_reply = f'You have not confirmed your attendance as a hacker. Please do so at {self.SHELLHACKS_DASHBOARD_URL}'
+                                send_initial_reply = await member.send(initial_reply)     
+                        else:
+                            initial_reply = "You are not an accepted hacker."
+                            send_initial_reply = await member.send(initial_reply)                        
+                    except KeyError:
+                        initial_reply = "There was an issue retrieving your information."
+                        send_initial_reply = await member.send(initial_reply)      
 
                 else:
-                    initial_reply = "I wasn't able to find a matching email address. Make sure to provide the same one you used in your application."
+                    initial_reply = "I could not find a matching code. Make sure to provide only the code on your dashboard from the ShellHacks website."
                     send_initial_reply = await member.send(initial_reply)
     
     @commands.Cog.listener()
