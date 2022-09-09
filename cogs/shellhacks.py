@@ -12,6 +12,16 @@ from firebase_admin import credentials
 load_dotenv()
 airtable_api_key = os.environ["AIRTABLE_API_KEY"]
 shellhacks_base_id = os.environ["SHELLHACKS_BASE_ID"]
+shellhacks_firebase_type = os.environ["SHELLHACKS_FIREBASE_TYPE"]
+shellhacks_firebase_project_id = os.environ["SHELLHACKS_FIREBASE_PROJECT_ID"] 
+shellhacks_firebase_private_key_id= os.environ["SHELLHACKS_FIREBASE_PRIVATE_KEY_ID"]
+shellhacks_firebase_private_key = os.environ["SHELLHACKS_FIREBASE_PRIVATE_KEY"].replace('\\n', '\n')
+shellhacks_firebase_client_email = os.environ["SHELLHACKS_FIREBASE_CLIENT_EMAIL"]
+shellhacks_firebase_client_id = os.environ["SHELLHACKS_FIREBASE_CLIENT_ID"]
+shellhacks_firebase_auth_uri = os.environ["SHELLHACKS_FIREBASE_AUTH_URI"]
+shellhacks_firebase_token_uri = os.environ["SHELLHACKS_FIREBASE_TOKEN_URI"]
+shellhacks_firebase_auth_cert_url = os.environ["SHELLHACKS_FIREBASE_AUTH_CERT_URL"]
+shellhacks_firebase_client_cert_url = os.environ["SHELLHACKS_FIREBASE_CLIENT_CERT_URL"]
 
 class ShellHacks(commands.Cog):
 
@@ -23,8 +33,19 @@ class ShellHacks(commands.Cog):
         self.bot = bot
 
         #Firebase
-        cert_path = os.path.join(os.getcwd(), 'shellhacks_firebase.json')
-        cred = credentials.Certificate(cert_path)
+        cred = credentials.Certificate({
+                "type": shellhacks_firebase_type,
+                "project_id": shellhacks_firebase_project_id,
+                "private_key_id": shellhacks_firebase_private_key_id,
+                "private_key": shellhacks_firebase_private_key,
+                "client_email": shellhacks_firebase_client_email,
+                "client_id": shellhacks_firebase_client_id,
+                "auth_uri": shellhacks_firebase_auth_uri,
+                "token_uri": shellhacks_firebase_token_uri,
+                "auth_provider_x509_cert_url": shellhacks_firebase_auth_cert_url,
+                "client_x509_cert_url": shellhacks_firebase_client_cert_url
+            }
+        )
         firebase_admin.initialize_app(cred, {
             'databaseURL' : 'https://shellhacks2022-default-rtdb.firebaseio.com'
         })
