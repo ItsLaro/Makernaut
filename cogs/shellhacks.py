@@ -211,8 +211,8 @@ class ShellHacks(commands.Cog):
 
         self.channels_dict[ticket_channel.id] = voice_ticket_channel.id
 
-        await ticket_channel.set_permissions(target=ctx.author, read_messages=True, send_messages=True, read_message_history=True)
-        await voice_ticket_channel.set_permissions(target=ctx.author, connect=True, speak=True, view_channel=True)
+        await ticket_channel.set_permissions(target=ctx.author, read_messages=True, send_messages=True, read_message_history=True, attach_files=True)
+        await voice_ticket_channel.set_permissions(target=ctx.author, connect=True, speak=True, view_channel=True, stream=True)
 
         await ticket_channel.send(ctx.author.mention + ', howdy! Thank you for making a new ticket, **type below what you need help with** and a mentor will be with you shortly. Once your concern has been resolved, you can close this ticket by using the `?close` command!')
         await ctx.message.delete()
