@@ -21,7 +21,7 @@ async def on_ready():
     print('Loading cogs:')
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
-            bot.load_extension(f'cogs.{filename[:-3]}')
+            await bot.load_extension(f'cogs.{filename[:-3]}')
             print(f'- {(filename[:-3]).title()} functionality loaded')
     
     #Set status

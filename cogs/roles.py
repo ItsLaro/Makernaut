@@ -690,5 +690,5 @@ class Roles(commands.Cog):
             embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
             await ctx.send(embed=embed_response)
 
-def setup(bot):
-    bot.add_cog(Roles(bot)) 
+async def setup(bot):
+    await bot.add_cog(Roles(bot)) 

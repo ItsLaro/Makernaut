@@ -24,5 +24,5 @@ class Calendar(commands.Cog):
         '''        
         await ctx.send(f'Work in progress! Anyhow, that took {round(self.bot.latency * 1000)}ms')
 
-def setup(bot):
-    bot.add_cog(Calendar(bot)) 
+async def setup(bot):
+    await bot.add_cog(Calendar(bot)) 

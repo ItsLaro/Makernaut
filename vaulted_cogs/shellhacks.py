@@ -358,5 +358,5 @@ def message_check(channel=None, author=None, content=None, ignore_bot=True, lowe
         return True
     return check
 
-def setup(bot):
-    bot.add_cog(ShellHacks(bot)) 
+async def setup(bot):
+    await bot.add_cog(ShellHacks(bot)) 

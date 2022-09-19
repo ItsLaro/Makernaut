@@ -107,5 +107,5 @@ def create_list_from_file(file_name):
     with open('db/sparkdev/' + file_name) as f:
         return f.read().splitlines()
 
-def setup(bot):
-    bot.add_cog(SparkDev(bot)) 
+async def setup(bot):
+    await bot.add_cog(SparkDev(bot)) 

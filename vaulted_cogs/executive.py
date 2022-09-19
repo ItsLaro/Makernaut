@@ -79,5 +79,5 @@ class Executive(commands.Cog):
     async def debug_time(self, ctx):
         print(datetime.now())
         
-def setup(bot):
-    bot.add_cog(Executive(bot)) 
+async def setup(bot):
+    await bot.add_cog(Executive(bot)) 

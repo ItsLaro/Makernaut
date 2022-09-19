@@ -225,6 +225,6 @@ class BotContext(commands.Cog):
                     await self.log_channel.send(f"<@&{self.MODERATOR_ROLE_ID}>")
                     await self.log_channel.send(embed=embed_response)
 
-def setup(bot):
-    bot.add_cog(BotContext(bot)) 
+async def setup(bot):
+    await bot.add_cog(BotContext(bot)) 
     
