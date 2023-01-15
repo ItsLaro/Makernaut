@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 class Roles(commands.Cog):
 
@@ -7,7 +8,7 @@ class Roles(commands.Cog):
     Handles role-related commands and events. Allows  assignment of other other roles via reactions.
     Handles commands to manually manipulate roles.
     '''
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
         self.WHISPERER_ROLE_ID = 797617839355854848 #Additional role for Eboard and Committee members to manage certain commands.
@@ -74,280 +75,8 @@ class Roles(commands.Cog):
         self.YELLOW_HEX = 0xFFBF00  
         self.RED_HEX = 0xD2222D
         
-    #Events
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-
-        reacting_user = payload.member
-
-        ### EVENT ROLE ASSIGNMENT
-    
-        # User added reaction to the Event Message in #welcome
-        if payload.message_id == self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID:
-            
-            # User reacted with the appropiate emoji
-            if str(payload.emoji) == self.emoji_event:
-                # Sets the verified 'User' role
-                event_user_role = discord.utils.get(reacting_user.guild.roles, name=self.EVENT_ROLE_NAME)
-                await reacting_user.add_roles(event_user_role) 
-
-                #Prints to console and notifies bot-log channel
-                await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} is attending {self.EVENT_NAME}!')
-
-        ### UPE ROLES ASSIGNMENT
-
-        # User added reaction to the UPE Program Roles Message in #programs
-        if payload.message_id == self.ROLE_UPE_ASSIGNMENT_MESSAGE_ID:
-            
-            desired_user_role = None
-
-            #Reaction is for Code:
-            if str(payload.emoji) == self.emojis_upe[self.CODE_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.CODE_ROLE_NAME)
-            
-            #Reaction is for Make:
-            elif str(payload.emoji) == self.emojis_upe[self.MAKE_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.MAKE_ROLE_NAME)
-            
-            #Reaction is for Infotech:
-            elif str(payload.emoji) == self.emojis_upe[self.INFOTECH_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.INFOTECH_ROLE_NAME)
-
-            #Reaction is for Design:
-            elif str(payload.emoji) == self.emojis_upe[self.DESIGN_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DESIGN_ROLE_NAME)
-
-            #Reaction is for Advance:
-            elif str(payload.emoji) == self.emojis_upe[self.LEAP_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.LEAP_ROLE_NAME)
-
-            #Reaction is for Ignite:
-            elif str(payload.emoji) == self.emojis_upe[self.IGNITE_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.IGNITE_ROLE_NAME)
-
-            #Reaction is for Sparkdev:
-            elif str(payload.emoji) == self.emojis_upe[self.SPARKDEV_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SPARKDEV_ROLE_NAME)
-
-            #Reaction is for ShellHacks:
-            elif str(payload.emoji) == self.emojis_upe[self.SHELLHACKS_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SHELLHACKS_ROLE_NAME)
-
-            #Reaction is for Discover:
-            elif str(payload.emoji) == self.emojis_upe[self.DISCOVER_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DISCOVER_ROLE_NAME)
-
-            #Invalid reaction (unreachable condition)
-            else:
-                print("Unknown Reaction Added. Verify channel permissions.")
-            
-            if desired_user_role is not None:
-                await reacting_user.add_roles(desired_user_role) 
-                #Prints to console and notifies bot-log channel
-                await self.log_channel.send(f'{self.emojis_upe[str(desired_user_role)]} {reacting_user.mention} is interested in {desired_user_role}!')
-
-        ### MISC ROLES ASSIGNMENT
-
-        # User added reaction to the UPE Misc Roles Message in #additional-roles
-        if payload.message_id == self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID:
-            
-            desired_user_role = None
-
-            #Reaction is for Opportunity Seekers:
-            if str(payload.emoji) == self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.OPPORTUNITY_ROLE_NAME)
-            
-            #Reaction is for Women In Tech:
-            elif str(payload.emoji) == self.emojis_misc[self.WOMENINTECH_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.WOMENINTECH_ROLE_NAME)
-            
-            #Reaction is for Fitness Crew:
-            elif str(payload.emoji) == self.emojis_misc[self.FITNESSCREW_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.FITNESSCREW_ROLE_NAME)
-
-            #Reaction is for Among Us:
-            elif str(payload.emoji) == self.emojis_misc[self.AMONGUS_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.AMONGUS_ROLE_NAME)
-
-            #Reaction is for Tamagotchi Tamers:
-            elif str(payload.emoji) == self.emojis_misc[self.TAMAGOTCHI_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.TAMAGOTCHI_ROLE_NAME)
-
-            #Reaction is for Pokemon Trainers:
-            elif str(payload.emoji) == self.emojis_misc[self.POKE_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.POKE_ROLE_NAME)
-
-            #Reaction is for Gacha Addicts:
-            elif str(payload.emoji) == self.emojis_misc[self.GACHA_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.GACHA_ROLE_NAME)
-
-            #Reaction is for Anime Bingers:
-            elif str(payload.emoji) == self.emojis_misc[self.ANIME_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ANIME_ROLE_NAME)
-
-            #Invalid reaction (unreachable condition)
-            else:
-                print("Unknown Reaction Added. Verify channel permissions.")
-            
-            if desired_user_role is not None:
-                await reacting_user.add_roles(desired_user_role) 
-
-    #Events
-    @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
-        
-        guild = await self.bot.fetch_guild(payload.guild_id)
-        reacting_user = await guild.fetch_member(payload.user_id) 
-        
-        ### EVENT ROLE ASSIGNMENT
-    
-        # User added reaction to the Rules Acceptance Message in #welcome
-        if payload.message_id == self.ROLE_EVENT_ASSIGNMENT_MESSAGE_ID:
-
-            # User reacted with the appropiate emoji
-            if str(payload.emoji) == self.emoji_event:
-                # Sets the verified 'User' role
-                event_user_role = discord.utils.get(reacting_user.guild.roles, name=self.EVENT_ROLE_NAME)
-                await reacting_user.remove_roles(event_user_role) 
-
-                #Prints to console and notifies bot-log channel
-                print("User " + reacting_user.name + " has exited the event!")                
-                await self.log_channel.send(f'{self.emoji_event} {reacting_user.mention} has *left* {self.EVENT_NAME}!')
-
-
-        ### UPE ROLES UNASSIGNMENT
-
-        # User added reaction to the UPE Program Roles Message in #programs
-        if payload.message_id == self.ROLE_UPE_ASSIGNMENT_MESSAGE_ID:
-            
-            desired_user_role = None
-
-            #Reaction is for Code:
-            if str(payload.emoji) == self.emojis_upe[self.CODE_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.CODE_ROLE_NAME)
-            
-            #Reaction is for Make:
-            elif str(payload.emoji) == self.emojis_upe[self.MAKE_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.MAKE_ROLE_NAME)
-            
-            #Reaction is for Infotech:
-            elif str(payload.emoji) == self.emojis_upe[self.INFOTECH_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.INFOTECH_ROLE_NAME)
-
-            #Reaction is for Design:
-            elif str(payload.emoji) == self.emojis_upe[self.DESIGN_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DESIGN_ROLE_NAME)
-
-            #Reaction is for Advance:
-            elif str(payload.emoji) == self.emojis_upe[self.LEAP_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.LEAP_ROLE_NAME)
-
-            #Reaction is for Ignite:
-            elif str(payload.emoji) == self.emojis_upe[self.IGNITE_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.IGNITE_ROLE_NAME)
-
-            #Reaction is for Sparkdev:
-            elif str(payload.emoji) == self.emojis_upe[self.SPARKDEV_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SPARKDEV_ROLE_NAME)
-
-            #Reaction is for ShellHacks:
-            elif str(payload.emoji) == self.emojis_upe[self.SHELLHACKS_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.SHELLHACKS_ROLE_NAME)
-
-            #Reaction is for Discover:
-            elif str(payload.emoji) == self.emojis_upe[self.DISCOVER_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.DISCOVER_ROLE_NAME)
-
-            #Invalid reaction (unreachable condition)
-            else:
-                print("Unknown Reaction Added. Verify channel permissions.")
-            
-            if desired_user_role is not None:
-                await reacting_user.remove_roles(desired_user_role) 
-                #Prints to console and notifies bot-log channel
-
-        ### MISC ROLES UNASSIGNMENT
-
-        # User added reaction to the UPE Misc Roles Message in #additional-roles
-        if payload.message_id == self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID:
-            
-            desired_user_role = None
-
-            #Reaction is for Opportunity Seekers:
-            if str(payload.emoji) == self.emojis_misc[self.OPPORTUNITY_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.OPPORTUNITY_ROLE_NAME)
-            
-            #Reaction is for Women In Tech:
-            elif str(payload.emoji) == self.emojis_misc[self.WOMENINTECH_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.WOMENINTECH_ROLE_NAME)
-            
-            #Reaction is for Fitness Crew:
-            elif str(payload.emoji) == self.emojis_misc[self.FITNESSCREW_ROLE_NAME]:
-                # Sets the verified 'Interested' role 
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.FITNESSCREW_ROLE_NAME)
-
-            #Reaction is for Among Us:
-            elif str(payload.emoji) == self.emojis_misc[self.AMONGUS_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.AMONGUS_ROLE_NAME)
-
-            #Reaction is for Tamagotchi Tamers:
-            elif str(payload.emoji) == self.emojis_misc[self.TAMAGOTCHI_ROLE_NAME]:
-                # Sets the verified 'Interested' role
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.TAMAGOTCHI_ROLE_NAME)
-
-            #Reaction is for Pokemon Trainers:
-            elif str(payload.emoji) == self.emojis_misc[self.POKE_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.POKE_ROLE_NAME)
-
-            #Reaction is for Gacha Addicts:
-            elif str(payload.emoji) == self.emojis_misc[self.GACHA_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.GACHA_ROLE_NAME)
-
-            #Reaction is for Anime Bingers:
-            elif str(payload.emoji) == self.emojis_misc[self.ANIME_ROLE_NAME]:
-                # Sets the verified 'Interested' role (placeholder)
-                desired_user_role = discord.utils.get(reacting_user.guild.roles, name=self.ANIME_ROLE_NAME)
-
-            #Invalid reaction (unreachable condition)
-            else:
-                print("Unknown Reaction Removed. Verify channel permissions.")
-            
-            if desired_user_role is not None:
-                await reacting_user.remove_roles(desired_user_role) 
-
-    @commands.command()
-    async def seerole(self, ctx, *args):
+    @app_commands.command(name="see_roles", description="Inquire about an existing server role")
+    async def seerole(self, interaction: discord.Interaction, role_name: str):
 
         '''
         Used to acquire information about a role.\nEx: ?seerole Code Member
@@ -358,27 +87,26 @@ class Roles(commands.Cog):
         response_users = "N/A"
         embed_color = self.RED_HEX
 
-        roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
-        whisperer_role = ctx.guild.get_role(self.WHISPERER_ROLE_ID)
+        roles = interaction.user.roles
+        mod_role = interaction.guild.get_role(self.MODERATOR_ROLE_ID)
+        whisperer_role = interaction.guild.get_role(self.WHISPERER_ROLE_ID)
 
         role_members = []
         role_members_count = 0
         
         if (mod_role not in roles) and (whisperer_role not in roles):
-            response_description += f'{ctx.author.mention} this command is only meant to be used by Moderators or Program Organizers'
+            response_description += f'{interaction.author.mention} this command is only meant to be used by Moderators or Program Organizers'
         else:
             desired_role = None
-            if len(args) == 0:
+            if len(role_name) == 0:
                 response_description += "You must include the name of the role to see"
             else:
-                desired_role_name = (" ".join(args)).strip()
-                desired_role = discord.utils.get(ctx.guild.roles, name=desired_role_name)
+                desired_role = discord.utils.get(interaction.guild.roles, name=role_name)
 
                 if not desired_role:
-                    response_description += f'Role "{desired_role_name}"could not be found... Verify and try again!'
+                    response_description += f'Role "{role_name}"could not be found... Verify and try again!'
                 else:
-                    for member in ctx.guild.members:
+                    for member in interaction.guild.members:
                         if desired_role in member.roles:
                             role_members.append(str(member))
                             role_members_count += 1
@@ -394,7 +122,7 @@ class Roles(commands.Cog):
             
         embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
         embed_response.add_field(name=f"Users: ({role_members_count})", value=response_users, inline=False)
-        await ctx.send(embed=embed_response)
+        await interaction.response.send_message(embed=embed_response)
 
     @commands.command()
     async def giverole(self, ctx, member_name=None, *args):
@@ -691,4 +419,4 @@ class Roles(commands.Cog):
             await ctx.send(embed=embed_response)
 
 async def setup(bot):
-    await bot.add_cog(Roles(bot)) 
+    await bot.add_cog(Roles(bot), guilds=[discord.Object(id=245393533391863808)]) 

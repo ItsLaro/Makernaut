@@ -33,6 +33,10 @@ async def on_disconnect():
     print('Bot Disconnected...')
 
 @bot.command()
+async def sync(ctx):
+    await bot.tree.sync(guild= discord.Object(id=245393533391863808))
+
+@bot.command()
 async def load(ctx, extension):
     roles = ctx.author.roles
     mod_role = ctx.guild.get_role(MODERATOR_ROLE_ID)

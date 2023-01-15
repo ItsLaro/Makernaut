@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 class Utilities(commands.Cog):
@@ -17,12 +18,12 @@ class Utilities(commands.Cog):
     #     pass
         
     #Commands
-    @commands.command()
-    async def ping(self, ctx):
+    @app_commands.command(name="ping", description="Echo a ping into the void (checks the bot latency)")
+    async def ping(self, interaction: discord.Interaction):
         '''
         Check bot's latency.
         '''        
-        await ctx.send(f'--Pong! That took {round(self.bot.latency * 1000)}ms')
+        await interaction.response.send_message(f'--Pong! That took {round(self.bot.latency * 1000)}ms')
 
     # Deletes as many messages as passed in parameter
     @commands.command()
@@ -123,4 +124,4 @@ class Utilities(commands.Cog):
             pass
 
 async def setup(bot):
-    await bot.add_cog(Utilities(bot)) 
+    await bot.add_cog(Utilities(bot), guilds=[discord.Object(id=245393533391863808)]) 
