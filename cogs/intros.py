@@ -38,7 +38,7 @@ What's your name? ─ What do you study or work in? Where? ─ What's a fun fact
             latest_message = message
             break
 
-        if latest_message.author == self.bot.user.id:
+        if latest_message.author.id == self.bot.user.id:
             self.bot_intro_message = latest_message
         else:
             # We clean channel for stale messages
