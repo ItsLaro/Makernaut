@@ -2,6 +2,7 @@ from xmlrpc.client import boolean
 import discord
 from discord.ext import commands
 import re
+import config
 
 class BotContext(commands.Cog):
 
@@ -10,7 +11,7 @@ class BotContext(commands.Cog):
     '''
     def __init__(self, bot):
         self.bot = bot
-        self.UPE_GUILD_ID = 245393533391863808
+        self.UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
 
         self.MODERATOR_ROLE_ID = 399551100799418370
@@ -104,7 +105,7 @@ class BotContext(commands.Cog):
         )'''
         self.gifs_pattern = r'^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$|\W*(tenor.com)\W*|\W*(gfycat.com)\W*|\W*(imgur.com)\W*|\W*(giphy.com)\W*'
         self.mentions_nitro_pattern = r'\W*(discord)\W*|\W*(nitro)\W*'
-        self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discord.gg)\W*|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
+        self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
 
     #Commands
     @commands.command()

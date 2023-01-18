@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+import config 
 
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
@@ -15,14 +16,17 @@ MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
 @bot.event
 async def on_ready():
     
-    print(f'Bot is Online~\n{bot.user.name}, (ID: {bot.user.id})\n')
+    print(f'{"Prod" if config.isProd else "Test"} Bot is Online~\n{bot.user.name}, (ID: {bot.user.id})\n')
     
     #Loads cogs
     print('Loading cogs:')
     for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
-            await bot.load_extension(f'cogs.{filename[:-3]}')
-            print(f'- {(filename[:-3]).title()} functionality loaded')
+        try:
+            if filename.endswith('.py'):
+                await bot.load_extension(f'cogs.{filename[:-3]}')
+                print(f'- {(filename[:-3]).title()} functionality loaded ✅')
+        except Exception as error:
+                print(f'- {(filename[:-3]).title()} failed to load ❌ due to "{error}""')
     
     #Set status
     await bot.change_presence(status = discord.Status.online, activity=discord.Game("Ready to Help!"))

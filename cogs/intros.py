@@ -1,4 +1,5 @@
 import discord
+import config
 from discord.ext import tasks, commands
 from datetime import datetime
 
@@ -10,10 +11,10 @@ class Intros(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.UPE_GUILD_ID = 245393533391863808
+        self.UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
-        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
-        self.INTRO_CHANNEL_ID = 881347138636894218
+        self.MODERATOR_ROLE_ID = 399551100799418370 if config.isProd else 1065046848747872368
+        self.INTRO_CHANNEL_ID = 881347138636894218 if config.isProd else 1065042157800542301
         self.intro_channel = self.bot.get_channel(self.INTRO_CHANNEL_ID)
         self.bot_intro_message = None
         
@@ -38,7 +39,7 @@ What's your name? ─ What do you study or work in? Where? ─ What's a fun fact
             latest_message = message
             break
 
-        if latest_message.author.id == self.bot.user.id:
+        if latest_message and latest_message.author.id == self.bot.user.id:
             self.bot_intro_message = latest_message
         else:
             # We clean channel for stale messages
