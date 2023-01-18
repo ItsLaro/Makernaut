@@ -23,51 +23,51 @@ class Roles(commands.Cog):
         self.ROLE_SOCIAL_ASSIGNMENT_MESSAGE_ID = 798334792349384714
         
         #Roles
-        self.EVENT_NAME = "Global Game Jam 2021"
-        self.EVENT_ROLE_NAME = "GGJ Jammer" #CHANGE THIS FOR EVENTS.
+        # self.EVENT_NAME = "Global Game Jam 2021"
+        # self.EVENT_ROLE_NAME = "GGJ Jammer" #CHANGE THIS FOR EVENTS.
 
-        self.CODE_ROLE_NAME = "Code"
-        self.MAKE_ROLE_NAME = "Make"
-        self.INFOTECH_ROLE_NAME = "InfoTech"
-        self.DESIGN_ROLE_NAME = "Design"
-        self.LEAP_ROLE_NAME = "Leap"
-        self.IGNITE_ROLE_NAME = "Ignite"
-        self.SPARKDEV_ROLE_NAME = "SparkDev"
-        self.SHELLHACKS_ROLE_NAME = "ShellHacks"
-        self.DISCOVER_ROLE_NAME = "Discover"
+        # self.CODE_ROLE_NAME = "Code"
+        # self.MAKE_ROLE_NAME = "Make"
+        # self.INFOTECH_ROLE_NAME = "InfoTech"
+        # self.DESIGN_ROLE_NAME = "Design"
+        # self.LEAP_ROLE_NAME = "Leap"
+        # self.IGNITE_ROLE_NAME = "Ignite"
+        # self.SPARKDEV_ROLE_NAME = "SparkDev"
+        # self.SHELLHACKS_ROLE_NAME = "ShellHacks"
+        # self.DISCOVER_ROLE_NAME = "Discover"
 
-        self.OPPORTUNITY_ROLE_NAME = "Opportunity Seekers"
-        self.WOMENINTECH_ROLE_NAME = "Women In Tech"
-        self.FITNESSCREW_ROLE_NAME = "Fitness Crew"
-        self.AMONGUS_ROLE_NAME = "Among Us"
-        self.GACHA_ROLE_NAME = "Tamagotchi Tamers"
-        self.POKE_ROLE_NAME = "Pokemon Trainers"
-        self.TAMAGOTCHI_ROLE_NAME = "Gacha Addicts"
-        self.ANIME_ROLE_NAME = "Anime Bingers"
+        # self.OPPORTUNITY_ROLE_NAME = "Opportunity Seekers"
+        # self.WOMENINTECH_ROLE_NAME = "Women In Tech"
+        # self.FITNESSCREW_ROLE_NAME = "Fitness Crew"
+        # self.AMONGUS_ROLE_NAME = "Among Us"
+        # self.GACHA_ROLE_NAME = "Tamagotchi Tamers"
+        # self.POKE_ROLE_NAME = "Pokemon Trainers"
+        # self.TAMAGOTCHI_ROLE_NAME = "Gacha Addicts"
+        # self.ANIME_ROLE_NAME = "Anime Bingers"
 
-        #Emojis
-        self.emoji_event = '<:GGJ21:804515872449232896>'
-        self.emojis_upe = {
-            self.CODE_ROLE_NAME : "<:upecode:753692446738612384>",
-            self.MAKE_ROLE_NAME : "<:upemake:753692447044927518>",
-            self.INFOTECH_ROLE_NAME :"<:upeinfotech:753692446726029388>",
-            self.DESIGN_ROLE_NAME : "<:upedesign:797531069951770674>",
-            self.LEAP_ROLE_NAME : "<:upeleap:882407121923227648>",
-            self.IGNITE_ROLE_NAME : "<:upeignite:753692446801789039>",
-            self.SPARKDEV_ROLE_NAME : "<:upesparkdev:753692446784880760>",
-            self.SHELLHACKS_ROLE_NAME : "<:upeshellhacks:753692446621433927>",
-            self.DISCOVER_ROLE_NAME : "<:upediscover:753692446524702782>"
-        }
-        self.emojis_misc = {
-            self.OPPORTUNITY_ROLE_NAME : "<:blobjob:797536764863578142>",
-            self.WOMENINTECH_ROLE_NAME : "<:blobwit:797536764885073950>",
-            self.FITNESSCREW_ROLE_NAME : "<:blobfit:797541060565401600>",
-            self.AMONGUS_ROLE_NAME : "<:blobimposter:797536765052977152>",
-            self.GACHA_ROLE_NAME : "<:blobtama:797536764554248214>",
-            self.POKE_ROLE_NAME : "<:blobpoke:797536764700131338>",
-            self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>",
-            self.ANIME_ROLE_NAME : "<:blobpopcorn:797958181081841664>"
-        }
+        # #Emojis
+        # self.emoji_event = '<:GGJ21:804515872449232896>'
+        # self.emojis_upe = {
+        #     self.CODE_ROLE_NAME : "<:upecode:753692446738612384>",
+        #     self.MAKE_ROLE_NAME : "<:upemake:753692447044927518>",
+        #     self.INFOTECH_ROLE_NAME :"<:upeinfotech:753692446726029388>",
+        #     self.DESIGN_ROLE_NAME : "<:upedesign:797531069951770674>",
+        #     self.LEAP_ROLE_NAME : "<:upeleap:882407121923227648>",
+        #     self.IGNITE_ROLE_NAME : "<:upeignite:753692446801789039>",
+        #     self.SPARKDEV_ROLE_NAME : "<:upesparkdev:753692446784880760>",
+        #     self.SHELLHACKS_ROLE_NAME : "<:upeshellhacks:753692446621433927>",
+        #     self.DISCOVER_ROLE_NAME : "<:upediscover:753692446524702782>"
+        # }
+        # self.emojis_misc = {
+        #     self.OPPORTUNITY_ROLE_NAME : "<:blobjob:797536764863578142>",
+        #     self.WOMENINTECH_ROLE_NAME : "<:blobwit:797536764885073950>",
+        #     self.FITNESSCREW_ROLE_NAME : "<:blobfit:797541060565401600>",
+        #     self.AMONGUS_ROLE_NAME : "<:blobimposter:797536765052977152>",
+        #     self.GACHA_ROLE_NAME : "<:blobtama:797536764554248214>",
+        #     self.POKE_ROLE_NAME : "<:blobpoke:797536764700131338>",
+        #     self.TAMAGOTCHI_ROLE_NAME : "<:bloboro:558279426086010890>",
+        #     self.ANIME_ROLE_NAME : "<:blobpopcorn:797958181081841664>"
+        # }
 
         #Colors HEX
         self.BLUE_HEX = 0x3895D3
