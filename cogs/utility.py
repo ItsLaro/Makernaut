@@ -123,5 +123,5 @@ class Utilities(commands.Cog):
         except:
             pass
 
-async def setup(bot):
-    await bot.add_cog(Utilities(bot), guilds=[discord.Object(id=245393533391863808)]) 
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Utilities(bot)) 
