@@ -1,6 +1,7 @@
 from xmlrpc.client import boolean
 import discord
 from discord.ext import commands
+from discord import app_commands
 import re
 import config
 
@@ -56,6 +57,9 @@ class BotContext(commands.Cog):
             self.SHELLHACKS_2020_ROLE_ID,
         ]
 
+        #Colors HEX
+        self.BLUE_HEX = 0x3895D3
+
         self.UNPROTECTED_ROLES = []
         for role_id in self.UNPROTECTED_ROLES_IDS:
             self.UNPROTECTED_ROLES.append(self.upe_guild.get_role(role_id))
@@ -108,32 +112,17 @@ class BotContext(commands.Cog):
         self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
 
     #Commands
-    @commands.command()
-    async def speak(self, ctx, *args):
+    @app_commands.command(name="speak", description="Gui will repeat after you.")
+    @commands.has_permissions(administrator=True)
+    async def speak(self, interaction: discord.Interaction, message: str, channel: discord.TextChannel):
         '''
-        Gui will repeat after you.Ex: ?speak Hello World!\nYou can also specify the channel after a `|`.\nEx: ?speak Hello users in another channel! | 808635094373761064
+        Gui will repeat after you.
         '''     
-        roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
-
-        if (mod_role not in roles):
-            return
-        if len(args) != 0:
-            payload = " ".join(args)
-            payload_arguments = payload.split("|")
-            if len(payload_arguments) < 2:
-                message = payload_arguments [0]
-                await ctx.send(message)
-                await ctx.message.delete()
-            else: 
-                message = payload_arguments [0]
-                channel_name = payload_arguments[1]
-                try:
-                    channel = self.bot.get_channel(int(channel_name))
-                except ValueError:
-                    channel = self.bot.get_channel(int(channel_name.strip()[2:][:-1]))
-                if channel != None:
-                    await channel.send(message)
+        await channel.send(message)
+        embed_response = discord.Embed(title="<a:verified:798786443903631360> Message Sent!", description="", color=self.BLUE_HEX)
+        embed_response.add_field(name="Message:", value=f'"{message}"', inline=False)
+        embed_response.add_field(name="channel:", value=channel.mention, inline=True)
+        await interaction.response.send_message(embed=embed_response, ephemeral=True)
 
     #Events
     @commands.Cog.listener()

@@ -37,6 +37,10 @@ async def on_ready():
 async def on_disconnect():
     print('Bot Disconnected...')
 
+@bot.tree.error
+async def on_error(interaction, error):
+    await interaction.send_message(error, ephemeral=True)
+
 @bot.hybrid_group(name='core', group='core', description="Core commands")
 async def core(self, ctx):
     pass

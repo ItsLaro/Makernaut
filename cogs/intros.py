@@ -20,15 +20,15 @@ class Intros(commands.Cog):
         
         self.BOT_INTRO_TITLE_TEXT = "Nice to meet you~!"
         self.BOT_INTRO_BODY_TEXT = """ 
-My name is **Gui** and I'm the official mascot, friend and virtual assistant of everyone here at **INIT**.
+            My name is **Gui** and I'm the official mascot, friend and virtual assistant of everyone here at **INIT**.
 
-We want to know more about **YOU**! Post your intro in this channel with the following: 
-What's your name? ─ What do you study or work in? Where? ─ What's a fun fact about yourself? ─ Anything else you'd like to share?
+            We want to know more about **YOU**! Post your intro in this channel with the following: 
+            What's your name? ─ What do you study or work in? Where? ─ What's a fun fact about yourself? ─ Anything else you'd like to share?
 
-We are happy you're here *in it*!
+            We are happy you're here *in it*!
 
-*Please **ONLY** post introductions in this channel. If you'd like to start a conversation with someone here, please start a thread or tag them in another relevant channel instead.*
-"""
+            *Please **ONLY** post introductions in this channel. If you'd like to start a conversation with someone here, please start a thread or tag them in another relevant channel instead.*
+        """
         self.YELLOW_HEX = 0xFFBF00  
         self.bot_intro_embed = discord.Embed(title=self.BOT_INTRO_TITLE_TEXT, description=self.BOT_INTRO_BODY_TEXT, color=self.YELLOW_HEX)
         # self.bot_intro_embed.set_thumbnail(url="https://i.imgur.com/7IyphRI.png")

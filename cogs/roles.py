@@ -28,7 +28,7 @@ class Roles(commands.GroupCog, name="roles"):
         self.YELLOW_HEX = 0xFFBF00  
         self.RED_HEX = 0xD2222D
         
-    @app_commands.command(name="see", description="Used to inquire about a role. Ex: /roles see @Ignite Member")
+    @app_commands.command(name="see", description="Used to inquire about a role.")
     async def see(self, interaction: discord.Interaction, role: discord.Role):
 
         '''
@@ -71,7 +71,7 @@ class Roles(commands.GroupCog, name="roles"):
         embed_response.add_field(name=f"Users: ({role_members_count})", value=response_users, inline=False)
         await interaction.response.send_message(embed=embed_response)
 
-    @app_commands.command(name="give", description="Used to assign a role to a user. Ex: /roles give @Laro#0001 @Ignite Member")
+    @app_commands.command(name="give", description="Used to assign a role to a user.")
     async def give(self, interaction: discord.Interaction, user: discord.User, role: discord.Role):
         '''
         Used to assign a role to a user. Ex: ?giverole @Laro#0001 Code Member
@@ -100,7 +100,7 @@ class Roles(commands.GroupCog, name="roles"):
         embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
         await interaction.response.send_message(embed=embed_response, ephemeral=not is_success)
     
-    @app_commands.command(name="take", description="Used to remove a role to a user. Ex: /roles take @Laro#0001 @Build Member")
+    @app_commands.command(name="take", description="Used to remove a role to a user.")
     async def take(self, interaction: discord.Interaction, user: discord.User, role: discord.Role):
 
         '''
@@ -133,11 +133,12 @@ class Roles(commands.GroupCog, name="roles"):
         embed_response = discord.Embed(title=None, description=response_description, color=embed_color)
         await interaction.response.send_message(embed=embed_response, ephemeral=not is_success)
 
-    @app_commands.command(name="purge", description="Removes the specified role from ALL users. Ex: /roles purge @SparkDev Member")
-    async def purge(self, interaction: discord.Interaction, role: discord.Role):
+    @app_commands.command(name="wash", description="Removes the specified role from ALL users.")
+    @commands.has_permissions(administrator=True)
+    async def wash(self, interaction: discord.Interaction, role: discord.Role):
 
         '''
-        Removes the specified role from ALL users. Ex: ?purgerole SparkDev Member
+        Removes the specified role from ALL users.
         '''
         
         is_success = False
@@ -257,6 +258,7 @@ class Roles(commands.GroupCog, name="roles"):
             await interaction.response.send_message(embed=embed_response, ephemeral=not is_success)
 
     @app_commands.command(name="swap", description="Used to replace a role for another on every user.")
+    @commands.has_permissions(administrator=True)
     async def swap(self, interaction: discord.Interaction, old_role: discord.User, new_role: discord.User):
         '''
         Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker

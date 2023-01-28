@@ -11,6 +11,7 @@ class Utilities(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.MODERATOR_ROLE_ID = 399551100799418370
+        self.GREEN_HEX = 0x238823 
 
     #Events
     # @commands.Cog.listener()
@@ -26,26 +27,22 @@ class Utilities(commands.Cog):
         await interaction.response.send_message(f'--Pong! That took {round(self.bot.latency * 1000)}ms')
 
     # Deletes as many messages as passed in parameter
-    @commands.command()
-    async def purge(self, ctx, num_messages):
+    @app_commands.command(name="purge", description="Mass delete messages")
+    @commands.has_permissions(administrator=True)
+    async def purge(self, interaction: discord.Interaction, number: int):
         '''
-        Deletes multiple messages.\nThe number corresponds to the number of messages to delete from bottom to top\nEx: $purge 10 
+        Deletes multiple messages.
         '''  
-        roles = ctx.author.roles
-        mod_role = ctx.guild.get_role(self.MODERATOR_ROLE_ID)
+        embed_response = discord.Embed(title="<a:verified:798786443903631360> Channel messages purged!", description=f"{number} message{'' if number == 1 else 's deleted'}", color=self.GREEN_HEX)
+        await interaction.response.send_message(embed=embed_response, ephemeral=True)
+        await interaction.channel.purge(limit=abs(number))
 
-        if mod_role not in roles:
-            await ctx.send(
-                f'{ctx.author.mention} this command is only meant to be used by Moderators.')
-        else:
-            await ctx.channel.purge(limit=int(num_messages) + 1)
-    
     @commands.command()
     async def help(self,ctx,*cog):
-        """Displays this message."""
-
+        '''
+        Displays this message.
+        '''
         commands.has_permissions(add_reactions=True,embed_links=True)
-
         try:
             if not cog:
                 help=discord.Embed(title='Command Categories',
