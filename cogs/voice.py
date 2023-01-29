@@ -13,7 +13,7 @@ class Voice(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
-        possible_channel_name = f"{member.display_name}'s Room"
+        possible_channel_name = f"{member.display_name.split()[0]}'s Room"
         if after.channel:
             if after.channel.id == self.room_creation_vc_id:
                 temp_channel = await after.channel.clone(name=possible_channel_name)
