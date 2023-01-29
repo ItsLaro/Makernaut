@@ -19,7 +19,7 @@ class Voice(commands.Cog):
                 temp_channel = await after.channel.clone(name=possible_channel_name)
                 await member.move_to(temp_channel)
                 self.temporary_channels.append(temp_channel.id)
-                await temp_channel.send(f"Hey {member.mention}, welcome to your very own voice channel! If you leave the channel and its contents will be deleted.")
+                await temp_channel.send(f"Hey {member.mention}, welcome to your very own voice channel! If you leave, the channel and its contents will be deleted.")
         if before.channel:
             if before.channel.id in self.temporary_channels:
                 if len(before.channel.members) == 0:
