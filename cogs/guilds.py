@@ -13,7 +13,6 @@ BLUE = 0x3895D3
 YELLOW = 0xFFBF00  
 
 class DecisionControls (View):
-
     isApproved : bool = None
     decisionByUser = None
 
@@ -48,7 +47,7 @@ class DecisionControls (View):
 
         #response in parties
         new_party_message = f"Hey, this is the start of {self.guild_name} Guild! In {self.guild_author.mention}'s own words: "
-        new_party_embed = discord.Embed(description=self.guild_description, color=BLUE)
+        new_party_embed = discord.Embed(description=self.guild_description, color=discord.Colour.random())
         new_party_embed.set_author(name=self.guild_author.display_name.split()[0], icon_url=self.guild_author.avatar.url)
         await parties_channel.create_thread(name=self.guild_name, content=new_party_message, embed=new_party_embed)       
 
@@ -60,28 +59,32 @@ class DecisionControls (View):
         await interaction.response.send_message(
             f"You've **rejected** the request for the *{self.guild_name} Guild*. Let's reach out to {self.guild_author.mention} to see how they can improve their initiative!", 
             ephemeral=True
-        )      
+        )
+
+class InitiateControls (View):
+    @discord.ui.button(label="Start your Own Guild", style=discord.ButtonStyle.primary)
+    async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(NewPartyModal()) 
 
 class NewPartyModal(Modal, title='Create a Guild!'):
     name = TextInput(
         style=discord.TextStyle.short,
-        label="Guild Name",
+        label="Guild Name (Please omit the word 'Guild')",
         required=True,
-        placeholder="Must be something meaningful and straightforward",
+        placeholder="Something meaningful but clear and straightforward",
         min_length=3
     )
 
     description = TextInput(
         style=discord.TextStyle.long,
-        label="Guild Description",
+        label="Guild Description (This will be public)",
         required=True,
         max_length=1000,
-        min_length=64,
-        placeholder="What is this Guild about? This will be public and sent as the first message in the channel"
+        min_length=128,
+        placeholder="What is it about? What will you do together? In-person or Online? Technical or Fun? Be descriptive!"
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        # townhall_channel = interaction.guild.get_channel(1066464344231125083 if config.isProd else 1069736956738666506)
         parties_channel = interaction.guild.get_channel(1067996331727134780 if config.isProd else 1071815435714043996)
 
         embed_response = discord.Embed(title="New Guild Application",
@@ -118,7 +121,46 @@ class Guild(commands.GroupCog, name="guild"):
 
     def __init__(self, bot) -> None:
         self.bot = bot
-        pass
+
+    async def cog_load(self):
+        TOWNHALL_CHANNEL_ID = 1066464344231125083 if config.isProd else 1069736956738666506
+        townhall_channel = self.bot.get_channel(TOWNHALL_CHANNEL_ID)
+
+        PARTIES_CHANNEL_ID = 1067996331727134780 if config.isProd else 1071815435714043996
+        parties_channel = self.bot.get_channel(PARTIES_CHANNEL_ID)
+
+        # We clean channel for stale messages and resend a new one
+        async for message in townhall_channel.history():
+            if message.author.id == self.bot.user.id:
+                await message.delete()
+
+        # Send a new Guild start message
+        embed_title = "Let's Build Community!"
+        embed_description = "_Guilds_ are subcommunities, by members for members, that revolve around a particular focus or interest. These can range from learning and honing a particular skill or simply to hang out, make friends, and vibe along."
+
+        embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
+        embed.add_field(name="How can I join?", value=f'You can check out _established_ Guilds by selecting them on the <id:customize> menu or visit the rising ones forming over at the {parties_channel.mention} channel', inline=False)
+        embed.add_field(name="What are _Parties_?", value=f"A Party is just a friendly term for a _level 0_ Guild that has yet to be _established_ and therefore has yet to be officially endorsed by INIT.", inline=False)
+        embed.add_field(name="What are Levels?", value=f'Levels are indicative of the size and scale of your Guild. The higher the level of your guild, the more support and benefits it will receive.', inline=False)
+        embed.add_field(name="Level 3", value=f'TBA', inline=True)
+        embed.insert_field_at(3, name="Level 2", value=f'TBA', inline=True)
+        embed.insert_field_at(3, name="Level 1", value=f'TBA', inline=True)
+
+        embed.add_field(name="What are the requirements?", value="The are requirements that should be reached and _maintained_ to progress through each level", inline=False)
+        embed.add_field(name="Level 3", value=f'TBA', inline=True)
+        embed.insert_field_at(7, name="Level 2", value=f'TBA', inline=True)
+        embed.insert_field_at(7, name="Level 1", value=f'TBA', inline=True)
+
+        embed.add_field(name="What are the benefits?", value="Many many benefits, but the true reward is the friendships we will make along the way", inline=False)
+
+        embed.add_field(name="What happens if I fail?", value="There's **no** such thing as failure with Guilds. A Guild is a hands off initiative from members by members. If activity fades away to the point where it no longer qualifies to be _established_, the Guild will _vanish_. Don't let that discourage you however! You can always try again!", inline=False)
+
+        embed.add_field(name="Want to start your own?", value=f'If you want to lead a Guild or have a great idea, click the button below to get started.', inline=False)
+
+        controls = InitiateControls(timeout=None)
+        
+        self.bot_intro_message = await townhall_channel.send(embed=embed, view=controls)
+
         
     @app_commands.command(name="initiate", description="Sow the seeds to a new Guild")
     async def initiate(self, interaction: discord.Interaction):
