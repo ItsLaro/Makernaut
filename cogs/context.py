@@ -15,12 +15,11 @@ class BotContext(commands.Cog):
         self.UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
 
-        self.MODERATOR_ROLE_ID = 399551100799418370
-        self.BOT_LOGS_CHANNEL_ID = 626541886533795850
+        self.MODERATOR_ROLE_ID = 399551100799418370 if config.isProd else 1065042154407338039
+        self.BOT_LOGS_CHANNEL_ID = 626541886533795850 if config.isProd else 1065042159679578154
         self.EBOARD_BOTSPAM_CHANNEL_ID = 626183709372186635
         self.GENERAL_BOTSPAM_CHANNEL_ID = 401577290863083531    
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
-        self.MODERATOR_ROLE_ID = 399551100799418370  #Current: Main; Test: 788930867593871381
 
         self.EVERYONE_ROLE_ID = 245393533391863808
         self.CODE_INTEREST_ROLE_ID = 798068011667161128
@@ -192,13 +191,14 @@ class BotContext(commands.Cog):
                 else: 
                     # Most likely a scam
 
-                    SPAM_REPORT_TITLE = "Pontential Spam Removed"
-                    SPAM_REPORT_DESCRIPTION = f"" #tags moderators
+                    SPAM_REPORT_TITLE = "Pontential Spam!"
+                    SPAM_REPORT_DESCRIPTION = f"At the moment, I'm no longer removing message automatically since our friend **AutoMod** is more talented and has us covered. Please review and take action accordingly!"
                     RED_HEX = 0xD2222D  
                     embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=RED_HEX)
-                    embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
                     embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)
-                    embed_response.add_field(name="Channel", value=f'{message.channel.mention}', inline=False)                        
+                    embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
+                    embed_response.add_field(name="Channel", value=f'{message.channel.mention}', inline=False)
+                    embed_response.add_field(name="URL", value=f'{message.jump_url}', inline=False)                                                
                     isProtected = False
                     for role in author.roles:
                         if role in self.UNPROTECTED_ROLES:
@@ -212,8 +212,7 @@ class BotContext(commands.Cog):
                         embed_response.add_field(name="Resolution", value= "Message **deleted** and member **banned**!", inline=False)
                         await message.delete()
                         await author.ban(reason = f"Automated Ban: Potential Nitro Scam\nMessage:\n {message.content}")
-                    await self.log_channel.send(f"<@&{self.MODERATOR_ROLE_ID}>")
-                    await self.log_channel.send(embed=embed_response)
+                    await self.log_channel.send(content=f"<@&{self.MODERATOR_ROLE_ID}>", embed=embed_response)
 
 async def setup(bot):
     await bot.add_cog(BotContext(bot)) 

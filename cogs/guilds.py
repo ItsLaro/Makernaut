@@ -86,6 +86,7 @@ class NewPartyModal(Modal, title='Create a Guild!'):
 
     async def on_submit(self, interaction: discord.Interaction):
         parties_channel = interaction.guild.get_channel(1067996331727134780 if config.isProd else 1071815435714043996)
+        moderator_role = interaction.guild.get_role(399551100799418370 if config.isProd else 1065042154407338039)
 
         embed_response = discord.Embed(title="New Guild Application",
                               description="Review carefully and react below to approve or reject. Approving will automatically create a public thread for this Guild.",
@@ -99,7 +100,7 @@ class NewPartyModal(Modal, title='Create a Guild!'):
         controls = DecisionControls(self.name.value, self.description.value, interaction.user, embed_response, timeout=None)
 
         bot_log_channel = interaction.guild.get_channel(626541886533795850 if config.isProd else 1065042159679578154)
-        log_message = await bot_log_channel.send(embed=embed_response, view=controls)
+        log_message = await bot_log_channel.send(content=f'{moderator_role.mention}', embed=embed_response, view=controls)
 
         controls.message = log_message 
 
