@@ -98,10 +98,10 @@ class NewPartyModal(Modal, title='Create a Guild!'):
 
         controls = DecisionControls(self.name.value, self.description.value, interaction.user, embed_response, timeout=None)
 
-        moderator_channel = interaction.guild.get_channel(745092495725297825 if config.isProd else 1065042159176273989)
-        moderator_message = await moderator_channel.send(embed=embed_response, view=controls)
+        bot_log_channel = interaction.guild.get_channel(626541886533795850 if config.isProd else 1065042159679578154)
+        log_message = await bot_log_channel.send(embed=embed_response, view=controls)
 
-        controls.message = moderator_message 
+        controls.message = log_message 
 
         await interaction.response.send_message(
             f"Thank you for you interest, {interaction.user.mention}! You should see the start of your Guild in the form of a thread in the {parties_channel.mention} channel in the next *24 hours* following approval. I'll try to DM you!", 
