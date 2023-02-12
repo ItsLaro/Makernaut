@@ -37,9 +37,9 @@ async def on_ready():
 async def on_disconnect():
     print('Bot Disconnected...')
 
-@bot.tree.error
-async def on_error(interaction, error):
-    await interaction.send_message(error, ephemeral=True)
+# @bot.tree.error
+# async def on_error(interaction, error):
+#     await interaction.channel.send(error, ephemeral=True)
 
 @bot.hybrid_group(name='core', group='core', description="Core commands")
 async def core(self, ctx):
@@ -52,32 +52,32 @@ async def sync(ctx: commands.Context):
     print('Command Tree Synced! 🔄')
     await ctx.reply('Command Tree Synced! 🔄', ephemeral=True)
 
-@core.command(name='load', with_app_command=True, description="Load a specified cog")
-@commands.has_permissions(administrator=True)
-async def load(ctx: commands.Context, extension: str):
-    bot.load_extension(f'cogs.{extension}')
-    await ctx.reply(f'{extension.title()} cog has been loaded', ephemeral=True)
+# @core.command(name='load', with_app_command=True, description="Load a specified cog")
+# @commands.has_permissions(administrator=True)
+# async def load(ctx: commands.Context, extension: str):
+#     bot.load_extension(f'cogs.{extension}')
+#     await ctx.reply(f'{extension.title()} cog has been loaded', ephemeral=True)
 
-@core.command(name='unload', with_app_command=True, description="Unload a specified cog")
-@commands.has_permissions(administrator=True)
-async def unload(ctx: commands.Context, extension: str):
-    bot.unload_extension(f'cogs.{extension}')
-    await ctx.repy(f'{extension.title()} cog was unloaded', ephemeral=True)
+# @core.command(name='unload', with_app_command=True, description="Unload a specified cog")
+# @commands.has_permissions(administrator=True)
+# async def unload(ctx: commands.Context, extension: str):
+#     bot.unload_extension(f'cogs.{extension}')
+#     await ctx.repy(f'{extension.title()} cog was unloaded', ephemeral=True)
 
-@core.command(name='reload', with_app_command=True, description="Reload all cogs")
-@commands.has_permissions(administrator=True)
-async def reload(ctx: commands.Context):
-    try:
-        for filename in os.listdir('./cogs'):
-            if filename.endswith('.py'):
-                bot.unload_extension(f'cogs.{filename[:-3]}')
-                bot.load_extension(f'cogs.{filename[:-3]}')
-                print(f'- {(filename[:-3]).title()} functionality reloaded')
-        await ctx.reply(f'Cogs reloaded succesfully', ephemeral=True)
-        print(f'Cogs reloaded succesfully\n')
-    except Exception:
-        await ctx.reply(f"Something's not right...", ephemeral=True)
-        print(Exception)
+# @core.command(name='reload', with_app_command=True, description="Reload all cogs")
+# @commands.has_permissions(administrator=True)
+# async def reload(ctx: commands.Context):
+#     try:
+#         for filename in os.listdir('./cogs'):
+#             if filename.endswith('.py'):
+#                 bot.unload_extension(f'cogs.{filename[:-3]}')
+#                 bot.load_extension(f'cogs.{filename[:-3]}')
+#                 print(f'- {(filename[:-3]).title()} functionality reloaded')
+#         await ctx.reply(f'Cogs reloaded succesfully', ephemeral=True)
+#         print(f'Cogs reloaded succesfully\n')
+#     except Exception:
+#         await ctx.reply(f"Something's not right...", ephemeral=True)
+#         print(Exception)
 
 if __name__ == "__main__":
     bot.run(secret_key)
