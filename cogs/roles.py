@@ -420,7 +420,7 @@ class Roles(commands.GroupCog, name="roles"):
     @ app_commands.command(name="swap",
                            description="Used to replace a role for another on every user.")
     @ commands.has_permissions(administrator=True)
-    async def swap(self, interaction: discord.Interaction, old_role: discord.User, new_role: discord.User):
+    async def swap(self, interaction: discord.Interaction, old_role: discord.Role, new_role: discord.Role):
         '''
         Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker
         '''
@@ -495,7 +495,7 @@ class Roles(commands.GroupCog, name="roles"):
     @ app_commands.command(name="adjoin",
                            description="Used to replace a role for another on every user.")
     @ commands.has_permissions(administrator=True)
-    async def adjoin(self, interaction: discord.Interaction, old_role: discord.User, new_role: discord.User):
+    async def adjoin(self, interaction: discord.Interaction, old_role: discord.Role, new_role: discord.Role):
         '''
         Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker
         '''
@@ -534,7 +534,7 @@ class Roles(commands.GroupCog, name="roles"):
             is_success = True if counter > 0 else False
 
         if is_success:
-            response_description = f"Adjoined Roles in Members: {old_role} ➕ {new_role}"
+            response_description = f"Gave the {new_role} role to every member with the {old_role} role."
             if has_failures:
                 response_title = "<a:verified:798786443903631360> Done. Please Review."
                 embed_color = self.YELLOW_HEX
