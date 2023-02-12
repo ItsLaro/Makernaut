@@ -110,19 +110,6 @@ class BotContext(commands.Cog):
         self.mentions_nitro_pattern = r'\W*(discord)\W*|\W*(nitro)\W*'
         self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
 
-    #Commands
-    @app_commands.command(name="speak", description="Gui will repeat after you.")
-    @commands.has_permissions(administrator=True)
-    async def speak(self, interaction: discord.Interaction, message: str, channel: discord.TextChannel):
-        '''
-        Gui will repeat after you.
-        '''     
-        await channel.send(message)
-        embed_response = discord.Embed(title="<a:verified:798786443903631360> Message Sent!", description="", color=self.BLUE_HEX)
-        embed_response.add_field(name="Message:", value=f'"{message}"', inline=False)
-        embed_response.add_field(name="channel:", value=channel.mention, inline=True)
-        await interaction.response.send_message(embed=embed_response, ephemeral=True)
-
     #Events
     @commands.Cog.listener()
     async def on_message(self, message):
