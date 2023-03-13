@@ -76,7 +76,7 @@ class ShellHacks(commands.Cog):
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
         self.channels_dict = {}
 
-        #Airtabled
+        #Airtable
         self.hacker_database = Table(airtable_api_key, shellhacks_base_id, '2021 Application')
         self.company_database = Table(airtable_api_key, shellhacks_base_id, '2021 Logistics Forms')
         #Colors HEX and Emojis
