@@ -78,6 +78,7 @@ class Birthday(commands.Cog):
         if now.hour == 8 and now.minute == 0:
             records = self.get_airtable_data()
         else:
+            print("it's not 8am!")
             return
 
         if records is not None:
