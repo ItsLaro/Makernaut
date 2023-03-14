@@ -66,7 +66,7 @@ class Birthday(commands.Cog):
         return all_records
 
 
-    @tasks.loop(minutes=60)
+    @tasks.loop(minutes=1)
     async def check_birthday(self):
         '''
         Checks json for birthday, if match, send message with discord names
@@ -74,8 +74,12 @@ class Birthday(commands.Cog):
         now = datetime.datetime.now()
         current_date = now.strftime("%m-%d")
         date_formatted = now.strftime('%B %d') + ('st' if now.day in [1, 21, 31] else 'nd' if now.day in [2, 22] else 'rd' if now.day in [3, 23] else 'th')
-        records = self.get_airtable_data()
         
+        if now.hour == 8 and now.minute == 0:
+            records = self.get_airtable_data()
+        else:
+            return
+
         if records is not None:
             channel = self.bot.get_channel(self.MEMBERSHIP_CHANNEL_ID)
             response_title = f"<a:blobcake:1063101478321000558> Today's Birthdays: {date_formatted}"
@@ -94,10 +98,11 @@ class Birthday(commands.Cog):
                     discord_user = discord.utils.get(self.bot.guilds, name=discord_user_name)
                     first_name = record['fields']['First Name']
                     last_name = record['fields']['Last Name']
-                    embed_response.add_field(name="Name", value=f"{first_name} {last_name} ({discord_user.mention if discord_user is not None else discord_user_name})", inline=False)
+                    field_name = f"{first_name} {last_name} ({discord_user.mention if discord_user is not None else discord_user_name})"
+                    embed_response.add_field(name=field_name, value="\u200b", inline=False)  # '\u200b' is a zero-width space to set an empty value
                     birthday_count += 1
                     
-            embed_response.set_footer(text=f'\n\nWrite them something special in #spotlight <:partying_face:1085041886139523104>')
+            embed_response.set_footer(text=f'\n\nWrite them something special in the Spotlight channel')
             
         else:
             channel = self.bot.get_channel(self.BOT_CHANNEL_ID)
