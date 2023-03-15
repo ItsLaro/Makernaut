@@ -11,9 +11,9 @@ class Analytics(commands.cog):
         self.GUILDS_CATEGORY_ID = 1065808460492574730
         self.ANALYTICS_FILE = 'db/analytics/analytics.json'
         self.collect_analytics_loop.start()
-        
+    
     def cog_unload(self):
-        self.scheduler.shutdown()
+        self.collect_analytics_loop.cancel()
     
     async def collect_analytics(self, channel):
         messages = []
@@ -25,7 +25,7 @@ class Analytics(commands.cog):
         return messages
 
     @tasks.loop(minutes=1)
-    async def collection_analytics_loop(self):
+    async def collect_analytics_loop(self):
         now = datetime.datetime.now(pytz.timezone('US/Eastern'))
         if now.hour == 3 and now.minute == 0:
             await self.collect_analytics()
