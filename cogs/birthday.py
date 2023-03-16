@@ -1,10 +1,8 @@
 import discord
-from discord import app_commands
 from discord.ext import tasks, commands
 import config
-import asyncio
 import datetime
-from datetime import date
+from datetime import time
 import os
 import pytz
 import requests
@@ -17,7 +15,7 @@ DISCORD_NAME_FIELD_ID = 'fldoUSAvFtdsI51FP'
 NAME_FIELD_ID = 'fld3mtI8hayU9UPHD'
 YELLOW_COLOR = 0xFFBF00  
 RED_COLOR = 0xD2222D
-
+TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern'))
 BOT_KEY = os.environ['BOT_KEY']
 
 class Birthday(commands.Cog):
@@ -33,6 +31,7 @@ class Birthday(commands.Cog):
         self.SPOTLIGHT_CHANNEL_ID = 1019725350701379685
         self.GUILD = bot.get_guild(245393533391863808)
         self.check_birthday.start()
+
     
     def unload(self):
         self.check_birthday.cancel()
@@ -65,7 +64,7 @@ class Birthday(commands.Cog):
         
         return all_records
 
-    @tasks.loop(minutes=59)
+    @tasks.loop(time=TIME_TO_RUN)
     async def check_birthday(self):
         '''
         Checks json for birthday, if match, send message with discord names
@@ -73,9 +72,6 @@ class Birthday(commands.Cog):
         now = datetime.datetime.now()
         current_date = now.strftime("%m-%d")
         date_formatted = now.strftime('%B %d') + ('st' if now.day in [1, 21, 31] else 'nd' if now.day in [2, 22] else 'rd' if now.day in [3, 23] else 'th')
-        
-        if not now.hour == 8:
-            return
 
         records = self.get_airtable_data()
         if records is not None:
@@ -109,6 +105,7 @@ class Birthday(commands.Cog):
             embed_response = discord.Embed(title=response_title, description=response_description, color=embed_color)
         
         if birthday_count == 0:
+            channel = self.bot.get_channel(self.BOT_LOG_CHANNEL_ID)
             response_title = f"<a:blobcake:1063101478321000558> Today's Birthdays: {date_formatted}"
             response_description = "None of our members are celebrating their birthdays today."
             embed_color = YELLOW_COLOR
