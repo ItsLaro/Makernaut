@@ -11,57 +11,36 @@ AIRTABLE_BASE_ID = 'key'
 AIRTABLE_TABLE_ID = 'key'
 TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern'))
 
-
 class Analytics(commands.cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot = bot 
         self.activity = []
         self.ANALYTICS_FILE = 'db/analytics/analytics.json'
         self.GUILD_ID = 245393533391863808
         self.GUILD = self.bot.get_guild(self.GUILD_ID)
         self.collect_analytics_loop.start()
-
-    #def get_unique_chapter_channel_ids(chapter):
-    #    '''
-    #    Retrieves unique discord channel id's per chapter
-    #    '''
-    #    endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_ID}'
-    #    headers = {
-    #        'Authorization': f'Bearer {AIRTABLE_API_KEY}',
-    #        'Content-Type': 'application/json'
-    #    }
-    #    # subject to change, depends on airtable layout
-    #    params = {
-    #        'filterByFormula': f'Chapter="{chapter}"'
-    #    }
-    #    response = requests.get(endpoint, headers=headers, params=params)
-    #    response.raise_for_status()
-    #    data = response.json()
-#
-    #    # subject to change, depends on airtable response
-    #    chapter_channel_ids = [record['fields']['Channel_ids'] for record in data['records']] 
-    #    return chapter_channel_ids
-        
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
-    
-    async def collect_analytics(self, category_id):
-        '''
-        Collects analytics from response file, and dumps into analytics.json
-        '''
-        pass
 
     async def get_guilds_and_parties_channels_ids(self, server):
+        '''
+        Step 1: Collects all guild and party channel ids
+        '''
         category_names = ['Guilds', 'Parties']
         exclude_channel_name = 'townhall'
         channels = self.get_channels_under_category(server, category_names, exclude_channel_name)
         return channels
 
+    async def update_airtable_channels(self, server):
+        '''
+        Step 2: Update airtable with new channels
+        '''
+        pass
 
     async def collect_activity(self, channel_id):
         '''
-        Collects all messages from the previous 24hrs, returns dictionary
+        Step 3: Collects all messages from the previous 24hrs, returns dictionary
         messages_dict = {channel_id: [messages objects]}
         '''
         messages_dict = {}
@@ -81,7 +60,18 @@ class Analytics(commands.cog):
         
         messages_dict[channel_id] = messages
         return messages_dict
+    
+    async def calculate_analytics(self, category_id):
+        '''
+        Step 4: Collects analytics from response file, and dumps into analytics.json
+        '''
+        pass
 
+    async def check_status(self):
+        '''
+        Step 5: Check the status of guilds and return whether we need to upgrade or down level
+        '''
+        pass
 
     @tasks.loop(minutes=TIME_TO_RUN)
     async def collect_analytics_loop(self):
