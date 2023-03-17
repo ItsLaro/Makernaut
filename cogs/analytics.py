@@ -60,6 +60,7 @@ class Analytics(commands.cog):
         Step 3: Collects all messages from the previous 24hrs, returns dictionary
         messages_dict = {channel_id: [messages objects]}
         '''
+
         now = datetime.datetime.utcnow('US/Eastern')
         one_day_ago = now - datetime.datetime.timedelta(days=1)
 
@@ -89,6 +90,8 @@ class Analytics(commands.cog):
     async def check_status(self):
         '''
         Step 5: Check the status of guilds and return whether we need to upgrade or down level
+
+        TODO: If party meets criteria to be a guild, then change the channel ID
         '''
         pass
 

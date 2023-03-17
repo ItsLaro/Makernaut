@@ -8,6 +8,10 @@ import config
 import traceback
 import inspect
 
+"""
+TODO: Add Airtable Automation. When Guilds approved, it creates new Airtable table.
+"""
+
 #Colors HEX
 BLUE = 0x3895D3
 YELLOW = 0xFFBF00  
