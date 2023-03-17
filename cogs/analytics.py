@@ -5,10 +5,11 @@ from datetime import time
 import pytz
 import requests
 import json
+import os
 
-AIRTABLE_API_KEY = 'key'
-AIRTABLE_BASE_ID = 'key'
-AIRTABLE_TABLE_ID = 'key'
+AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
+AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
+AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
 TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern'))
 
 class Analytics(commands.cog):
@@ -30,40 +31,42 @@ class Analytics(commands.cog):
         category_names = ['Guilds', 'Parties']
         exclude_channel_name = 'townhall'
         channels = self.get_channels_under_category(server, category_names, exclude_channel_name)
-        return channels
+        return channels # returns list of channel objects
 
-    async def update_airtable_channels(self, server):
+    async def update_airtable_channels(self, channel_ids):
         '''
         Step 2: Update airtable with new channels
         '''
         pass
 
-    async def collect_activity(self, channel_id):
+    async def collect_activity(self, channel_ids):
         '''
         Step 3: Collects all messages from the previous 24hrs, returns dictionary
         messages_dict = {channel_id: [messages objects]}
         '''
-        messages_dict = {}
         now = datetime.datetime.utcnow('US/Eastern')
         one_day_ago = now - datetime.datetime.timedelta(days=1)
-        channel = self.bot.get_channel(channel_id)
-        if channel is None:
-            print(f'Channel with ID {channel_id} not found.')
-            return
 
-        messages = []
-        async for message in channel.history(limit=None, after=one_day_ago):
-            if message.created_at >= one_day_ago:
-                messages.append(message)
-            else:
-                break
+        guild_and_party_message_history = {}
+        for channel_id in channel_ids:
+            channel = self.bot.get_channel(channel_id) # retrieve channel object
+            if channel is None:
+                print(f'Channel with ID {channel_id} not found.')
+                return
+
+            message_history = []
+            async for message in channel.history(limit=None, after=one_day_ago):
+                if message.created_at >= one_day_ago:
+                    message_history.append(message)
+                else:
+                    break
         
-        messages_dict[channel_id] = messages
-        return messages_dict
+            guild_and_party_message_history[channel_id] = message_history
+        return guild_and_party_message_history
     
-    async def calculate_analytics(self, category_id):
+    async def calculate_analytics(self, messages):
         '''
-        Step 4: Collects analytics from response file, and dumps into analytics.json
+        Step 4: Collects analytics from messages, and dumps into analytics.json
         '''
         pass
 
@@ -76,17 +79,14 @@ class Analytics(commands.cog):
     @tasks.loop(minutes=TIME_TO_RUN)
     async def collect_analytics_loop(self):
         '''
-        Loops for each chapter in INIT
+        Loops at 3am, conducts all processes
         '''
-        chapters = ['FIU', 'MDC', 'FMU']
-        for chapter in chapters:
-            chapter_channel_ids = self.get_unique_chapter_channel_ids(chapter) # retrieve ids per chapter
-            for channel_id in chapter_channel_ids:
-                activity = await self.get_activity(channel_id) 
-        else:
-            return
-
-
-
-    
-    
+        # Retrieve new parties
+        guild_and_party_ids = self.get_guilds_and_parties_channels_ids(server=self.GUILD_ID)
+        # update airtable
+        await self.update_airtable_channels(channel_ids=guild_and_party_ids) 
+        # Collect Activity
+        guild_and_party_message_history = await self.collect_activity(channel_ids=guild_and_party_ids)
+        # Calculate Analytics
+        await self.calculate_analytics(messages=guild_and_party_message_history)
+        await self.check_status()
