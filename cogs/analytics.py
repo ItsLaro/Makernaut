@@ -25,7 +25,7 @@ class Analytics(commands.cog):
         self.collect_analytics_loop.cancel()
     
     def get_airtable_data(self):
-        endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_NAME}'
+        endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_ID}'
         headers =  {
             'Authorization': f'Bearer {AIRTABLE_API_KEY}',
             'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ class Analytics(commands.cog):
             data = response.json()
         except Exception as e:
             print(f'Something went wrong with the Airtable query: {e}')
-            
+
         return
 
     async def get_guilds_and_parties_channels_ids(self, server):
