@@ -23,6 +23,9 @@ class Analytics(commands.cog):
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
+    
+    def get_airtable_data(self):
+        pass
 
     async def get_guilds_and_parties_channels_ids(self, server):
         '''
