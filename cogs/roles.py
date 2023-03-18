@@ -165,7 +165,7 @@ class Roles(commands.GroupCog, name="roles"):
         '''
 
         is_success = False
-        response_description = f"<a:utilfailure:809713365088993291> "
+        response_description = f"<a:utilfailure:809713365088993291>"
         embed_color = self.RED_HEX
 
         roles = interaction.user.roles
