@@ -6,6 +6,7 @@ import pytz
 import requests
 import json
 import os
+import Airtable
 
 AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
 AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
@@ -14,12 +15,14 @@ TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern'))
 
 class Analytics(commands.cog):
     def __init__(self, bot):
+        self.airtable = Airtable()
         self.bot = bot 
         self.activity = []
         self.ANALYTICS_FILE = 'db/analytics/analytics.json'
         self.GUILD_ID = 245393533391863808
         self.GUILD = self.bot.get_guild(self.GUILD_ID)
         self.collect_analytics_loop.start()
+        self.airtable.test()
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
