@@ -7,9 +7,10 @@ import os
 import pytz
 import requests
 
-AIRTABLE_API_KEY = os.environ['UPE_AIRTABLE_API_KEY']
-AIRTABLE_BASE_ID = os.environ['UPE_AIRTABLE_BASE_KEY']        
-AIRTABLE_TABLE_ID = os.environ['UPE_AIRTABLE_TABLE_ID']
+AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+AIRTABLE_UPE_BASE_KEY='appIYzWDeROTPg8Yv'
+AIRTABLE_UPE_MEMBERSHIP_TABLE_ID='tbluUiP1zIUtP2uwS'
+
 BIRTHDAY_FIELD_ID = 'fldoUSAvFtdsI51FP'
 DISCORD_NAME_FIELD_ID = 'fldoUSAvFtdsI51FP'
 NAME_FIELD_ID = 'fld3mtI8hayU9UPHD'
@@ -42,7 +43,7 @@ class Birthday(commands.Cog):
         '''
 
         all_records = []
-        endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_ID}'
+        endpoint = f'https://api.airtable.com/v0/{AIRTABLE_UPE_BASE_KEY}/{AIRTABLE_UPE_MEMBERSHIP_TABLE_ID}'
         headers = {
             'Authorization': f'Bearer {AIRTABLE_API_KEY}', 
             'Content-Type': 'application/json'
