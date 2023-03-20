@@ -11,7 +11,7 @@ import Airtable
 AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
 AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
 AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
-TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern'))
+TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern')) # change to datetime
 
 class Analytics(commands.cog):
     def __init__(self, bot):
@@ -98,7 +98,7 @@ class Analytics(commands.cog):
         '''
         pass
 
-    @tasks.loop(minutes=TIME_TO_RUN)
+    @tasks.loop(minutes=TIME_TO_RUN) # change to datetime
     async def collect_analytics_loop(self):
         '''
         Loops at 3am, conducts all processes
