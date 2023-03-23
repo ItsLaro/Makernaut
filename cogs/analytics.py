@@ -66,9 +66,9 @@ class Analytics(commands.cog):
 
         now = datetime.datetime.utcnow('US/Eastern')
         one_day_ago = now - datetime.datetime.timedelta(days=1)
-
-        guild_and_party_message_history = {}
+        all_guild_and_party_channel_history = []
         for channel_id in channel_ids:
+            guild_and_party_message_history = {}
             channel = self.bot.get_channel(channel_id) # retrieve channel object
             if channel is None:
                 print(f'Channel with ID {channel_id} not found.')
@@ -82,7 +82,8 @@ class Analytics(commands.cog):
                     break
         
             guild_and_party_message_history[channel_id] = message_history
-        return guild_and_party_message_history
+            all_guild_and_party_channel_history.append(guild_and_party_message_history)
+        return all_guild_and_party_channel_history
     
     async def calculate_analytics(self, messages):
         '''
