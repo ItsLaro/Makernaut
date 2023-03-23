@@ -5,7 +5,9 @@ import discord
 from discord.ext import commands
 from discord.app_commands import command
 import config 
-from cogs.verification import InitiateControls
+from cogs.verification import InitiateControls as VerificationInitiateControls
+from cogs.guilds import InitiateControls as PartyInitiateControls
+from cogs.guilds import DecisionControls
 
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
@@ -17,7 +19,9 @@ class Gui(commands.Bot):
         super().__init__(command_prefix =prefix , intents=intents)
 
     async def setup_hook(self):
-        self.add_view(InitiateControls())
+        self.add_view(VerificationInitiateControls())
+        self.add_view(PartyInitiateControls())
+        # self.add_view(DecisionControls('','','',''))
 
     async def on_ready(self):
         

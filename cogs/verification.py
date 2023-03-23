@@ -36,10 +36,7 @@ class VerifyControls (View):
 
         for item in self.children:
             item.disabled = True
-        message_embed = 'The operation timed out and the code expired, please restart the process'    
-        message_embed.add_field(name="Status:", value=f'{"✅ Approved" if self.isApproved else "❌ Rejected"} by {self.decisionByUser.mention}', inline=False)
-        
-        await self.message.edit(embed=message_embed, view=self)
+        await self.message.edit(view=self)
 
 class EmailSubmitModal(Modal, title='Enter your Email Address'):
     email = TextInput(
@@ -196,6 +193,7 @@ class Verification(commands.GroupCog, name="verify"):
             if message.author.id == self.bot.user.id and message.embeds[0].title == embed_title:
                 return
 
+        # Send new verification message otherwise
         embed_description = "Are you a member of the INIT AA? Gain access to the alumni section of the server by getting verified through your email."
         embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
         embed_response.add_field(name="Not a member?", value=f"You can apply at https://airtable.com/shrri7hDqYq9tFyki now!")
