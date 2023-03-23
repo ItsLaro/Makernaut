@@ -12,7 +12,10 @@ YELLOW_COLOR = 0xFFBF00
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
              
 class InitiateControls (View):
-    @discord.ui.button(label='Initiate', style=discord.ButtonStyle.primary ,emoji="🏁")
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label='Initiate', style=discord.ButtonStyle.primary ,emoji="🏁", custom_id='verification:initiate_button')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
@@ -45,6 +48,9 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
         required=True,
         placeholder="gui@fiu.edu",
     )
+
+    def __init__(self):
+        super().__init__(timeout=None, custom_id="verification:email_modal")
 
     async def on_submit(self, interaction: discord.Interaction):
         try:
@@ -183,17 +189,18 @@ class Verification(commands.GroupCog, name="verify"):
         ALUMNI_VERIFY_CHANNEL_ID = 1087566994682949672 if config.isProd else 1087566806820077659
         alumni_verification_channel = self.bot.get_channel(ALUMNI_VERIFY_CHANNEL_ID)
 
-        # We clean channel for stale messages and resend a new one
-        async for message in alumni_verification_channel.history():
-            if message.author.id == self.bot.user.id:
-                await message.delete()
-
         embed_title = "Verify your INIT Alumni Association Membership!"
+
+        # If message already exists, we leave channel alone
+        async for message in alumni_verification_channel.history():
+            if message.author.id == self.bot.user.id and message.embeds[0].title == embed_title:
+                return
+
         embed_description = "Are you a member of the INIT AA? Gain access to the alumni section of the server by getting verified through your email."
         embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
         embed_response.add_field(name="Not a member?", value=f"You can apply at https://airtable.com/shrri7hDqYq9tFyki now!")
 
-        button = InitiateControls(timeout=None)
+        button = InitiateControls()
 
         await alumni_verification_channel.send(embed=embed_response, view=button) 
 

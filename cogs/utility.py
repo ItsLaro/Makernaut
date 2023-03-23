@@ -37,8 +37,8 @@ class Utilities(commands.Cog):
         await interaction.response.send_message(embed=embed_response, ephemeral=True)
         await interaction.channel.purge(limit=abs(number))
 
-    @commands.command()
-    async def help(self,ctx,*cog):
+    @app_commands.command(name="help", description="Provides info about different commands")
+    async def help_command(self, interaction: discord.Interaction, cog: str):
         '''
         Displays this message.
         '''
@@ -55,11 +55,11 @@ class Utilities(commands.Cog):
                 for y in self.bot.walk_commands():
                     if not y.cog_name and not y.hidden:
                         cmds_desc += ('{} - {}'.format(y.name,y.help)+'\n')
-                await ctx.send('',embed=help)
+                await interaction.response.send_message(embed=help, ephemeral=True)
             else:
                 if len(cog) > 1:
                     help = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
-                    await ctx.send('',embed=help)
+                    await interaction.response.send_message(embed=help, ephemeral=True)
                 else:
                     found = False
                     for x in self.bot.cogs:
@@ -74,49 +74,7 @@ class Utilities(commands.Cog):
                         help = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
                     else:
                         pass
-                    await ctx.send('',embed=help)
-        except:
-            pass
-
-    @commands.command()
-    async def helpdm(self,ctx,*cog):
-        """Displays this message."""
-
-        commands.has_permissions(add_reactions=True,embed_links=True)
-
-        try:
-            if not cog:
-                help=discord.Embed(title='Command Categories',
-                                description='Use `$help Category` to learn more about them!\n(Category Name Must Be in Title Case, Just Like this Sentence.)')
-                cogs_desc = ''
-                for x in self.bot.cogs:
-                    cogs_desc += ('{} - {}'.format(x,self.bot.cogs[x].__doc__)+'\n')
-                help.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
-                cmds_desc = ''
-                for y in self.bot.walk_commands():
-                    if not y.cog_name and not y.hidden:
-                        cmds_desc += ('{} - {}'.format(y.name,y.help)+'\n')
-                await ctx.message.add_reaction(emoji='✉')
-                await ctx.message.author.send('',embed=help)
-            else:
-                if len(cog) > 1:
-                    help = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
-                    await ctx.message.author.send('',embed=help)
-                else:
-                    found = False
-                    for x in self.bot.cogs:
-                        for y in cog:
-                            if x == y:
-                                help=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
-                                for c in self.bot.get_cog(y).get_commands():
-                                    if not c.hidden:
-                                        help.add_field(name=c.name,value=c.help,inline=False)
-                                found = True
-                    if not found:
-                        help = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
-                    else:
-                        await ctx.message.add_reaction(emoji='✉')
-                    await ctx.message.author.send('',embed=help)
+                    await interaction.response.send_message(embed=help, ephemeral=True)
         except:
             pass
 

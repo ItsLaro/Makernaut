@@ -2,9 +2,6 @@ import os
 import requests
 import discord
 
-AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
-
-
 # TODO: Organize these constants better
 AIRTABLE_UPE_BASE_ID='appIYzWDeROTPg8Yv'
 AIRTABLE_UPE_MEMBERSHIP_TABLE_ID='tbluUiP1zIUtP2uwS'
@@ -12,9 +9,7 @@ AIRTABLE_UPE_AA_BASE_ID='appmBfrXhvebmMnbq'
 AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID='tblGjYHulggH2gGPJ'
 
 def get_record_by_email(email):
-    '''
-    Returns full response json, of all pages
-    '''
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
 
     endpoint = f'https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}'
     headers = {
@@ -35,6 +30,8 @@ def get_record_by_email(email):
     return record[0] if len(record) else None
 
 def store_token_by_record(record, token: str):
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+
     url = f"https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}/{record['id']}"
     headers = {
         "Authorization": f"Bearer {AIRTABLE_API_KEY}",
@@ -51,6 +48,8 @@ def store_token_by_record(record, token: str):
     return response.status_code == 200
 
 def verify_discord_user(record, discord_user: discord.User):
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+    
     url = f"https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}/{record['id']}"
     headers = {
         "Authorization": f"Bearer {AIRTABLE_API_KEY}",
