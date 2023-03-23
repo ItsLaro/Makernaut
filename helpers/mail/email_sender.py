@@ -40,7 +40,7 @@ def send_verification_SMTP_email(recipient):
 
         msg.attach(MIMEText(updatedhtml, "html"))
         msg['Subject'] = SUBJECT
-        msg['From'] = SENDER
+        msg['From'] = 'INIT Team'
         msg['To'] = recipient
         smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         smtp_server.login(SENDER, GMAIL_APP_PASSWORD)

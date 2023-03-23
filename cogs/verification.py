@@ -16,6 +16,28 @@ class InitiateControls (View):
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
+class VerifyControls (View):
+    def __init__(self, user_record, verification_token):
+        self.verification_token = verification_token
+        self.user_record = user_record
+        super().__init__(timeout=600) #times-out after 10 minutes
+
+    @discord.ui.button(label='Verify', style=discord.ButtonStyle.secondary, emoji='🔑')
+    async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
+        modal = VerificationCodeSubmitModal(self.user_record, self.verification_token)
+        await interaction.response.send_modal(modal) 
+    
+    async def on_timeout(self, interaction: discord.Interaction):
+        # after a timeout, clean token from AIRTABLE
+        store_token_by_record(self.user_record, '')
+
+        for item in self.children:
+            item.disabled = True
+        message_embed = 'The operation timed out and the code expired, please restart the process'    
+        message_embed.add_field(name="Status:", value=f'{"✅ Approved" if self.isApproved else "❌ Rejected"} by {self.decisionByUser.mention}', inline=False)
+        
+        await self.message.edit(embed=message_embed, view=self)
+
 class EmailSubmitModal(Modal, title='Enter your Email Address'):
     email = TextInput(
         style=discord.TextStyle.short,
@@ -45,7 +67,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                 )
                 await interaction.response.send_message(embed=embed_response, ephemeral=True)
 
-            elif user_record['fields']["Discord ID"] != 0:
+            elif "Discord ID" in user_record['fields']:
                 title = '<a:utilsuccess:809713352061354016> Already Verified!'
                 description = 'Your INIT AA Membership had been previously verified!'
                 color = discord.Color.green()
@@ -91,28 +113,6 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                 color=discord.Color.red()
             )
             await interaction.response.send_message(embed=embed_response, ephemeral=True)
-
-class VerifyControls (View):
-    def __init__(self, user_record, verification_token):
-        self.verification_token = verification_token
-        self.user_record = user_record
-        super().__init__(timeout=600) #times-out after 10 minutes
-
-    @discord.ui.button(label='Verify', style=discord.ButtonStyle.secondary, emoji='🔑')
-    async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
-        modal = VerificationCodeSubmitModal(self.user_record, self.verification_token)
-        await interaction.response.send_modal(modal) 
-    
-    async def on_timeout(self, interaction: discord.Interaction):
-        # after a timeout, clean token from AIRTABLE
-        store_token_by_record(self.user_record, '')
-
-        for item in self.children:
-            item.disabled = True
-        message_embed = 'The operation timed out and the code expired, please restart the process'    
-        message_embed.add_field(name="Status:", value=f'{"✅ Approved" if self.isApproved else "❌ Rejected"} by {self.decisionByUser.mention}', inline=False)
-        
-        await self.message.edit(embed=message_embed, view=self)
 
 class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
     token_input = TextInput(
@@ -195,16 +195,8 @@ class Verification(commands.GroupCog, name="verify"):
 
         button = InitiateControls(timeout=None)
 
-        self.bot_intro_message = await alumni_verification_channel.send(embed=embed_response, view=button)
+        await alumni_verification_channel.send(embed=embed_response, view=button) 
 
-    #Commands
-    @app_commands.command(name="alumni", description="Verify your membership of the INIT AA (Alumni Association)")
-    @commands.has_permissions(administrator=True)
-    async def verify_alumni(self, interaction: discord.Interaction, email: str):
-        '''
-        Gui will repeat after you.
-        '''     
-        
 
 async def setup(bot):
     await bot.add_cog(Verification(bot)) 
