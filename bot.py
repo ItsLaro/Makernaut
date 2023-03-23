@@ -1,4 +1,5 @@
 import os
+import traceback
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
@@ -26,8 +27,9 @@ async def on_ready():
             if filename.endswith('.py'):
                 await bot.load_extension(f'cogs.{filename[:-3]}')
                 print(f'- {(filename[:-3]).title()} functionality loaded ✅')
-        except Exception as error:
-                print(f'- {(filename[:-3]).title()} failed to load ❌ due to "{error}""')
+        except Exception:
+                tb = traceback.format_exc()
+                print(f'- {(filename[:-3]).title()} failed to load ❌ due to "{tb}""')
     
     #Set status
     await bot.change_presence(status = discord.Status.online, activity=discord.Game("Ready to Help!"))
