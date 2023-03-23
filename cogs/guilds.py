@@ -7,62 +7,17 @@ from discord import SelectOption, ActionRow, ButtonStyle
 import config
 import traceback
 import inspect
+import uuid
 
 #Colors HEX
 BLUE = 0x3895D3
 YELLOW = 0xFFBF00  
 
-class DecisionControls (View):
-    isApproved : bool = None
-    decisionByUser = None
-
-    def __init__(self, guild_name, guild_description, guild_author, message_embed, timeout=None):
-        self.guild_name = guild_name
-        self.guild_description = guild_description
-        self.guild_author = guild_author
-        self.message_embed = message_embed
-        super().__init__(timeout=timeout)
-
-    async def decide_and_disable(self):
-        for item in self.children:
-            item.disabled = True
-
-        message_embed = self.message_embed    
-        message_embed.remove_field(index=3)
-        message_embed.add_field(name="Status:", value=f'{"✅ Approved" if self.isApproved else "❌ Rejected"} by {self.decisionByUser.mention}', inline=False)
-        
-        await self.message.edit(embed=message_embed, view=self)
-
-    @discord.ui.button(label="Approve", style=discord.ButtonStyle.success)
-    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
-        parties_channel = interaction.guild.get_channel(1067996331727134780 if config.isProd else 1071815435714043996)
-
-        self.isApproved = True
-        self.decisionByUser = interaction.user
-        self.stop()
-        await interaction.response.send_message(
-            f"You've **approved** the request for the *{self.guild_name} Guild*, make sure that a thread has been properly created in {parties_channel.mention}", 
-            ephemeral=True
-        ) 
-
-        #response in parties
-        new_party_message = f"Hey, this is the start of {self.guild_name} Guild! In {self.guild_author.mention}'s own words: "
-        new_party_embed = discord.Embed(description=self.guild_description, color=discord.Colour.random())
-        new_party_embed.set_author(name=self.guild_author.display_name.split()[0], icon_url=self.guild_author.avatar.url)
-        await parties_channel.create_thread(name=self.guild_name, content=new_party_message, embed=new_party_embed)       
-
-    @discord.ui.button(label="Reject", style=discord.ButtonStyle.red)
-    async def reject(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.isApproved = False
-        self.decisionByUser = interaction.user
-        self.stop()
-        await interaction.response.send_message(
-            f"You've **rejected** the request for the *{self.guild_name} Guild*. Let's reach out to {self.guild_author.mention} to see how they can improve their initiative!", 
-            ephemeral=True
-        )
-
 class InitiateControls (View):
-    @discord.ui.button(label="Start your Own Guild", style=discord.ButtonStyle.primary)
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Start your Own Guild", style=discord.ButtonStyle.primary, emoji='<:ablobflag:1066842384161329182>', custom_id='guilds:party_initiate_button')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(NewPartyModal()) 
 
@@ -84,6 +39,9 @@ class NewPartyModal(Modal, title='Create a Guild!'):
         placeholder="What is it about? What will you do together? In-person or Online? Technical or Fun? Be descriptive!"
     )
 
+    def __init__(self):
+        super().__init__(timeout=None, custom_id="guilds:party_application_modal")
+
     async def on_submit(self, interaction: discord.Interaction):
         parties_channel = interaction.guild.get_channel(1067996331727134780 if config.isProd else 1071815435714043996)
         moderator_role = interaction.guild.get_role(399551100799418370 if config.isProd else 1065042154407338039)
@@ -97,7 +55,7 @@ class NewPartyModal(Modal, title='Create a Guild!'):
         embed_response.add_field(name="Founder / Submitter:", value=f'{interaction.user.mention}', inline=False)
         embed_response.add_field(name="Status:", value=f'⏺ Pending', inline=False)
 
-        controls = DecisionControls(self.name.value, self.description.value, interaction.user, embed_response, timeout=None)
+        controls = DecisionControls(self.name.value, self.description.value, interaction.user, embed_response)
 
         bot_log_channel = interaction.guild.get_channel(626541886533795850 if config.isProd else 1065042159679578154)
         log_message = await bot_log_channel.send(content=f'{moderator_role.mention}', embed=embed_response, view=controls)
@@ -118,6 +76,55 @@ class NewPartyModal(Modal, title='Create a Guild!'):
 
         await interaction.response.send_message(f"Oops... There was an error completing your request. {interaction.user.mention}, please try again later or reach out to a Moderator!", ephemeral=True)
 
+class DecisionControls (View):
+    isApproved : bool = None
+    decisionByUser = None
+
+    def __init__(self, guild_name, guild_description, guild_author, message_embed):
+        self.guild_name = guild_name
+        self.guild_description = guild_description
+        self.guild_author = guild_author
+        self.message_embed = message_embed
+        super().__init__(timeout=None)
+
+    async def decide_and_disable(self):
+        for item in self.children:
+            item.disabled = True
+
+        message_embed = self.message_embed    
+        message_embed.remove_field(index=3)
+        message_embed.add_field(name="Status:", value=f'{"✅ Approved" if self.isApproved else "❌ Rejected"} by {self.decisionByUser.mention}', inline=False)
+        
+        await self.message.edit(embed=message_embed, view=self)
+
+    @discord.ui.button(label="Approve", style=discord.ButtonStyle.success, emoji="<:ablobmagic:1063101916973908048>", custom_id="guilds:party_approve_button")
+    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
+        parties_channel = interaction.guild.get_channel(1067996331727134780 if config.isProd else 1071815435714043996)
+
+        self.isApproved = True
+        self.decisionByUser = interaction.user
+        self.stop()
+        await interaction.response.send_message(
+            f"You've **approved** the request for the *{self.guild_name} Guild*, make sure that a thread has been properly created in {parties_channel.mention}", 
+            ephemeral=True
+        ) 
+
+        #response in parties
+        new_party_message = f"Hey, this is the start of {self.guild_name} Guild! In {self.guild_author.mention}'s own words: "
+        new_party_embed = discord.Embed(description=self.guild_description, color=discord.Colour.random())
+        new_party_embed.set_author(name=self.guild_author.display_name.split()[0], icon_url=self.guild_author.avatar.url)
+        await parties_channel.create_thread(name=self.guild_name, content=new_party_message, embed=new_party_embed)       
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.red, emoji='<:ablobdash:1063101496826273802> ', custom_id="guilds:party_reject_button")
+    async def reject(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.isApproved = False
+        self.decisionByUser = interaction.user
+        self.stop()
+        await interaction.response.send_message(
+            f"You've **rejected** the request for the *{self.guild_name} Guild*. Let's reach out to {self.guild_author.mention} to see how they can improve their initiative!", 
+            ephemeral=True
+        )
+
 class Guild(commands.GroupCog, name="guild"):
 
     def __init__(self, bot) -> None:
@@ -130,13 +137,14 @@ class Guild(commands.GroupCog, name="guild"):
         PARTIES_CHANNEL_ID = 1067996331727134780 if config.isProd else 1071815435714043996
         parties_channel = self.bot.get_channel(PARTIES_CHANNEL_ID)
 
-        # We clean channel for stale messages and resend a new one
-        async for message in townhall_channel.history():
-            if message.author.id == self.bot.user.id:
-                await message.delete()
-
-        # Send a new Guild start message
         embed_title = "Let's Build Community!"
+
+        # If message already exists, we leave the channel alone
+        async for message in townhall_channel.history():
+            if message.author.id == self.bot.user.id and message.embeds[0].title == embed_title:
+                return
+
+        # Send a new Guild start message otherwise
         embed_description = "_Guilds_ are subcommunities, by members for members, that revolve around a particular focus or interest. These can range from learning and honing a particular skill or simply to hang out, make friends, and vibe along."
 
         embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
@@ -158,9 +166,9 @@ class Guild(commands.GroupCog, name="guild"):
 
         embed.add_field(name="Want to start your own?", value=f'If you want to lead a Guild or have a great idea, click the button below to get started.', inline=False)
 
-        controls = InitiateControls(timeout=None)
+        controls = InitiateControls()
         
-        self.bot_intro_message = await townhall_channel.send(embed=embed, view=controls)
+        await townhall_channel.send(embed=embed, view=controls)
 
         
     @app_commands.command(name="initiate", description="Sow the seeds to a new Guild")
