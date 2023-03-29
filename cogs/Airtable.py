@@ -1,8 +1,11 @@
-'''
-Airtable Interface
 
-'''
+
+
+
 class AirtableInterface: 
+    '''
+    Abstracts all interactions with airtable
+    '''
 
     def __init__(self) -> None:
         pass

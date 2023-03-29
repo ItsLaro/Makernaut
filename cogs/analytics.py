@@ -26,42 +26,20 @@ class Analytics(commands.cog):
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
-    
-    def get_airtable_data(self):
-        endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_ID}'
-        headers =  {
-            'Authorization': f'Bearer {AIRTABLE_API_KEY}',
-            'Content-Type': 'application/json'
-        }
-        url = endpoint
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-        except Exception as e:
-            print(f'Something went wrong with the Airtable query: {e}')
-
-        return
 
     async def get_guilds_and_parties_channels_ids(self, server):
         '''
-        Step 1: Collects all guild and party channel ids
+        Collects all guild and party channel ids
         '''
         category_names = ['Guilds', 'Parties']
         exclude_channel_name = 'townhall'
         channels = self.get_channels_under_category(server, category_names, exclude_channel_name)
         return channels # returns list of channel objects
 
-    async def update_airtable_channels(self, channel_ids):
-        '''
-        Step 2: Update airtable with new channels
-        '''
-        pass
-
     async def collect_activity(self, channel_ids):
         '''
-        Step 3: Collects all messages from the previous 24hrs, returns dictionary
-        messages_dict = {channel_id: [messages objects]}
+        Collects all messages from the previous 24hrs, returns dictionary
+        messages_dict = [{channel_id: [messages objects]}]
         '''
 
         now = datetime.datetime.utcnow('US/Eastern')
@@ -75,7 +53,7 @@ class Analytics(commands.cog):
                 return
 
             message_history = []
-            async for message in channel.history(limit=None, after=one_day_ago):
+            for message in channel.history(limit=None, after=one_day_ago):
                 if message.created_at >= one_day_ago:
                     message_history.append(message)
                 else:
@@ -85,17 +63,29 @@ class Analytics(commands.cog):
             all_guild_and_party_channel_history.append(guild_and_party_message_history)
         return all_guild_and_party_channel_history
     
-    async def calculate_analytics(self, messages):
+    async def collect_analytics_from_message_history(self, all_guild_and_party_channel_history):
         '''
-        Step 4: Collects analytics from messages, and dumps into analytics.json
+        Collects analytics from messages
+        Will return dictionary with the following format
+        {channel_id: [list of unique_user objects]}
         '''
-        pass
+
+        analytics = {}
+        for channel_id, messages in all_guild_and_party_channel_history.items():
+            unique_users = set()
+
+            for message in messages:
+                unique_users.add(message.author.id)
+        
+            analytics['channel_id'] = channel_id
+            analytics['unique_users'] = list(unique_users)
+        
+        return analytics
 
     async def check_status(self):
         '''
-        Step 5: Check the status of guilds and return whether we need to upgrade or down level
-
-        TODO: If party meets criteria to be a guild, then change the channel ID
+        Check the status of guilds and return whether we need to upgrade or down level
+        If party meets criteria to be a guild, then change the channel ID
         '''
         pass
 
@@ -111,5 +101,5 @@ class Analytics(commands.cog):
         # Collect Activity
         guild_and_party_message_history = await self.collect_activity(channel_ids=guild_and_party_ids)
         # Calculate Analytics
-        await self.calculate_analytics(messages=guild_and_party_message_history)
+        await self.collect_analytics_from_message_history(messages=guild_and_party_message_history)
         await self.check_status()
