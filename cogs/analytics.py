@@ -6,7 +6,7 @@ import pytz
 import requests
 import json
 import os
-import Airtable
+from Airtable import AirtableInterface
 
 AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
 AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
