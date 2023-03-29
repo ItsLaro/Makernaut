@@ -5,7 +5,6 @@ class DataSchema:
         pass                                                 
 
 class Database:
-
     def __init__(self) -> None:
         uri = "" # TODO: Figure out URI
         databaseName = ""

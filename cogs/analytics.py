@@ -15,7 +15,7 @@ TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern')) # change to datet
 
 class Analytics(commands.cog):
     def __init__(self, bot):
-        self.airtable = Airtable()
+        self.airtable = AirtableInterface()
         self.bot = bot 
         self.activity = []
         self.ANALYTICS_FILE = 'db/analytics/analytics.json'
