@@ -23,12 +23,9 @@ class Analytics(commands.cog):
     def __init__(self, bot):
         self.airtable = AirtableInterface()
         self.bot = bot 
-        self.activity = []
-        self.ANALYTICS_FILE = 'db/analytics/analytics.json'
         self.GUILD_ID = 245393533391863808
         self.GUILD = self.bot.get_guild(self.GUILD_ID)
         self.collect_analytics_loop.start()
-        self.airtable.test()
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
