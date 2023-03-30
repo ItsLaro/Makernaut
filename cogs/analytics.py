@@ -1,10 +1,6 @@
-import discord
 from discord.ext import commands, tasks
 import datetime
 from datetime import time
-import pytz
-import requests
-import json
 import os
 from airtable import AirtableInterface
 
@@ -18,6 +14,7 @@ class Analytics(commands.cog):
 
     TODO: 1. Upload all data logs to mongodb
           2. Upload analytics collected to airtable frontend
+          3. Complete task loops to have it run at 3am everyday
     '''
     def __init__(self, bot):
         self.airtable = AirtableInterface()
