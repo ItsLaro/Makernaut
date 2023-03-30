@@ -66,7 +66,7 @@ class Analytics(commands.cog):
         # returns list of dictionaries
         return daily_guilds_activity 
     
-    async def collect_unique_visiters(self, daily_guilds_activity):
+    async def get_unique_visiters(self, daily_guilds_activity):
         '''
         Collects daily unique visiters from messages
         Will return dictionary with the following format
