@@ -18,7 +18,7 @@ class Analytics(commands.cog):
     Controls all analytics of guilds and parties
 
     TODO: 1. Upload all data logs to mongodb
-          2. Upload analytics collected to 
+          2. Upload analytics collected to airtable frontend
     '''
     def __init__(self, bot):
         self.airtable = AirtableInterface()
