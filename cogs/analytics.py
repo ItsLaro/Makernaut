@@ -66,24 +66,24 @@ class Analytics(commands.cog):
         # returns list of dictionaries
         return daily_guilds_activity 
     
-    async def collect_daily_unique_visiters(self, daily_guilds_activity):
+    async def collect_unique_visiters(self, daily_guilds_activity):
         '''
         Collects daily unique visiters from messages
         Will return dictionary with the following format
         {channel_id: [list of unique_user objects]}
         '''
 
-        daily_unique_users = {}
+        unique_users = {}
         for channel_id, messages in daily_guilds_activity.items():
             unique_users = set()
 
             for message in messages:
                 unique_users.add(message.author.id)
         
-            daily_unique_users['channel_id'] = channel_id
-            daily_unique_users['unique_users'] = list(unique_users)
+            unique_users['channel_id'] = channel_id
+            unique_users['unique_users'] = list(unique_users)
         
-        return daily_unique_users
+        return unique_users
 
     async def check_status(self):
         '''
