@@ -14,6 +14,12 @@ AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
 TIME_TO_RUN = time(hour=8, tzinfo=pytz.timezone('US/Eastern')) # change to datetime
 
 class Analytics(commands.cog):
+    '''
+    Controls all analytics of guilds and parties
+
+    TODO: 1. Upload all data logs to mongodb
+          2. Upload analytics collected to 
+    '''
     def __init__(self, bot):
         self.airtable = AirtableInterface()
         self.bot = bot 
@@ -36,51 +42,55 @@ class Analytics(commands.cog):
         channels = self.get_channels_under_category(server, category_names, exclude_channel_name)
         return channels # returns list of channel objects
 
-    async def collect_activity(self, channel_ids):
+    async def get_daily_messages(self, channel_ids):
         '''
         Collects all messages from the previous 24hrs, returns dictionary
-        messages_dict = [{channel_id: [messages objects]}]
+        daily_guild_party_activity = [{channel_id: [messages objects]}]
         '''
 
         now = datetime.datetime.utcnow('US/Eastern')
         one_day_ago = now - datetime.datetime.timedelta(days=1)
-        all_guild_and_party_channel_history = []
+        daily_guild_party_activity = [] # list of guild/parties message history 
         for channel_id in channel_ids:
-            guild_and_party_message_history = {}
+            guild_and_party_message_history = {} # ex. {channel_id: [message_history]}
             channel = self.bot.get_channel(channel_id) # retrieve channel object
             if channel is None:
                 print(f'Channel with ID {channel_id} not found.')
                 return
 
-            message_history = []
+            message_history = [] # previous 24 hour message history 
             for message in channel.history(limit=None, after=one_day_ago):
                 if message.created_at >= one_day_ago:
                     message_history.append(message)
                 else:
                     break
-        
+            
+            # add 24 hour message history to channel
             guild_and_party_message_history[channel_id] = message_history
-            all_guild_and_party_channel_history.append(guild_and_party_message_history)
-        return all_guild_and_party_channel_history
+            # add channel history to list of all channels
+            daily_guild_party_activity.append(guild_and_party_message_history)
+
+        # returns list of dictionaries
+        return daily_guild_party_activity 
     
-    async def collect_analytics_from_message_history(self, all_guild_and_party_channel_history):
+    async def collect_daily_unique_visiters(self, daily_guild_party_activity):
         '''
-        Collects analytics from messages
+        Collects daily unique visiters from messages
         Will return dictionary with the following format
         {channel_id: [list of unique_user objects]}
         '''
 
-        analytics = {}
-        for channel_id, messages in all_guild_and_party_channel_history.items():
+        daily_unique_users = {}
+        for channel_id, messages in daily_guild_party_activity.items():
             unique_users = set()
 
             for message in messages:
                 unique_users.add(message.author.id)
         
-            analytics['channel_id'] = channel_id
-            analytics['unique_users'] = list(unique_users)
+            daily_unique_users['channel_id'] = channel_id
+            daily_unique_users['unique_users'] = list(unique_users)
         
-        return analytics
+        return daily_unique_users
 
     async def check_status(self):
         '''
@@ -101,5 +111,5 @@ class Analytics(commands.cog):
         # Collect Activity
         guild_and_party_message_history = await self.collect_activity(channel_ids=guild_and_party_ids)
         # Calculate Analytics
-        await self.collect_analytics_from_message_history(messages=guild_and_party_message_history)
+        await self.collect_daily_unique_visiters(messages=guild_and_party_message_history)
         await self.check_status()
