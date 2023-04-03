@@ -4,10 +4,6 @@ from datetime import time
 import os
 from airtable import AirtableInterface
 
-AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
-AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
-AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
-
 class Analytics(commands.cog):
     '''
     Controls all analytics of guilds and parties
@@ -17,6 +13,9 @@ class Analytics(commands.cog):
     '''
     def __init__(self, bot):
         self.airtable = AirtableInterface()
+        self.AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
+        self.AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
+        self.AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
         self.bot = bot 
         self.GUILD_ID = 245393533391863808
         self.GUILD = self.bot.get_guild(self.GUILD_ID)
