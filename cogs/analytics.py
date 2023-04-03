@@ -1,10 +1,11 @@
+import discord
 from discord.ext import commands, tasks
 import datetime
 from datetime import time
 import os
-from airtable import AirtableInterface
+# from ..db import airtable
 
-class Analytics(commands.cog):
+class Analytics(commands.Cog):
     '''
     Controls all analytics of guilds and parties
     TODO: 1. Upload all data logs to mongodb
@@ -12,7 +13,7 @@ class Analytics(commands.cog):
           3. Complete task loops to have it run at 3am everyday
     '''
     def __init__(self, bot):
-        self.airtable = AirtableInterface()
+        # self.airtable = airtable.AirtableInterface()
         self.AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
         self.AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
         self.AIRTABLE_TABLE_ID = os.getenv('AIRTABLE_TABLE_ID')
@@ -23,6 +24,16 @@ class Analytics(commands.cog):
     
     def cog_unload(self):
         self.collect_analytics_loop.cancel()
+    
+    def get_channels_under_category(self, server, category_names, exclude_channel_name):
+        channels_to_return = []
+
+        for category in server.categories:
+            if category.name in category_names:
+                for channel in category.channels:
+                    if channel.name != exclude_channel_name:
+                        channels_to_return.append(channel)
+        return channels_to_return
 
     async def get_guilds_and_parties_channels_ids(self, server):
         '''
@@ -31,6 +42,7 @@ class Analytics(commands.cog):
         category_names = ['Guilds', 'Parties']
         exclude_channel_name = 'townhall'
         channels = self.get_channels_under_category(server, category_names, exclude_channel_name)
+        print(channels)
         return channels # returns list of channel objects
 
     async def get_daily_messages(self, channel_ids):
@@ -94,15 +106,18 @@ class Analytics(commands.cog):
         '''
         TODO: Task loop needs to be redone at the end
         '''
-    #@tasks.loop(minutes=TIME_TO_RUN) # change to datetime
-    #async def collect_analytics_loop(self):
-    #    '''
-    #    Loops at 3am, conducts all processes
-    #    '''
-    #    # Retrieve new parties
-    #    guild_and_party_ids = self.get_guilds_and_parties_channels_ids(server=self.GUILD_ID) 
-    #    # Collect Activity
-    #    guild_and_party_message_history = await self.collect_activity(channel_ids=guild_and_party_ids)
-    #    # Calculate Analytics
-    #    await self.collect_daily_unique_visiters(messages=guild_and_party_message_history)
-    #    await self.check_status()
+    @tasks.loop(minutes=1) # change to datetime
+    async def collect_analytics_loop(self):
+        '''
+        Loops at 3am, conducts all processes
+        '''
+        # Retrieve new parties
+        guild_and_party_ids = await self.get_guilds_and_parties_channels_ids(server=self.GUILD_ID) 
+        # Collect Activity
+        guild_and_party_message_history = await self.get_daily_messages(channel_ids=guild_and_party_ids)
+        # Calculate Analytics
+        await self.get_unique_visiters(daily_guilds_activity=guild_and_party_message_history)
+        await self.check_status()
+
+async def setup(bot):
+    await bot.add_cog(Analytics(bot)) 
