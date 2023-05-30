@@ -175,7 +175,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
 class Verification(commands.GroupCog, name="verify"):
 
     '''
-    Links Discord users to their identity with the INIT National database.
+    Commands to navigate the UPE Calendar of Events!
     '''
 
     def __init__(self, bot):
