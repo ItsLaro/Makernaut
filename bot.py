@@ -45,9 +45,8 @@ class Gui(commands.Bot):
     async def on_disconnect(self):
         print('Bot Disconnected...')
 
-    # @bot.tree.error
-    # async def on_error(interaction, error):
-    #     await interaction.channel.send(error, ephemeral=True)
+    async def on_error(self, error):
+            print("Oh No!")
 
 bot = Gui()
 
