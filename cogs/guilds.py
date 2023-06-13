@@ -11,7 +11,7 @@ import uuid
 
 #Colors HEX
 BLUE = 0x3895D3
-YELLOW = 0xFFBF00  
+YELLOW = 0xFFBF00 
 
 class InitiateControls (View):
     def __init__(self):
