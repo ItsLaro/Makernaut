@@ -140,7 +140,6 @@ class Guild(commands.GroupCog, name="guild"):
         embed_title = "Let's Build Community!"
 
         # If message already exists, we leave the channel alone
-        print("townhall_channel: " + townhall_channel)
         async for message in townhall_channel.history():
             if message.author.id == self.bot.user.id and message.embeds[0].title == embed_title:
                 return
