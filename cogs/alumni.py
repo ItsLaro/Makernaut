@@ -35,8 +35,14 @@ class DropdownMenu (Select):
 class SelectView(discord.ui.View):
     def __init__(self, company_options, profession_options, company_roles, profession_roles):
         super().__init__(timeout = None)
-        self.add_item(DropdownMenu(company_options, company_roles, "Select your Company", "alumni:company_roles_dropdown"))
-        self.add_item(DropdownMenu(profession_options, profession_roles, "Choose your Role", "alumni:profession_roles_dropdown"))
+        company_options_paginated_matrix = split_list(company_options, 25)
+        company_roles_paginated_matrix = split_list(company_roles, 25)
+        for index, page in enumerate(company_options_paginated_matrix):
+            self.add_item(DropdownMenu(page, company_roles_paginated_matrix[index], f"Select your Company ({index+1}/{len(company_options_paginated_matrix)})", "alumni:company_roles_dropdown"))
+        profession_options_paginated_matrix = split_list(profession_options, 25)
+        profession_roles_paginated_matrix = split_list(profession_roles, 25)
+        for index, page in enumerate(profession_options_paginated_matrix):
+            self.add_item(DropdownMenu(page, profession_roles_paginated_matrix[index], f"Choose your Role ({index+1}/{len(profession_options_paginated_matrix)})", "alumni:profession_roles_dropdown"))
 
 class Alumni(commands.GroupCog, name="alumni"):
 
@@ -57,7 +63,7 @@ class Alumni(commands.GroupCog, name="alumni"):
         embed_title = "Tell us more about you!"
         embded_description = "If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. If your company or role aren't listed, please reach out to a member of the team so we can have it added."
 
-        embed_response = discord.Embed(title=embed_title, description=embded_description)
+        embed_response = discord.Embed(title=embed_title, description=embded_description, color=YELLOW_COLOR)
 
         # If message already exists, we leave channel alone
         # async for message in alumni_roles_channel.history():
@@ -105,4 +111,5 @@ class Alumni(commands.GroupCog, name="alumni"):
 async def setup(bot):
     await bot.add_cog(Alumni(bot)) 
 
-    
+def split_list(lst, max_elements):
+    return [lst[i:i + max_elements] for i in range(0, len(lst), max_elements)]
