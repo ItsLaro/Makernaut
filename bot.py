@@ -8,6 +8,7 @@ import config
 from cogs.verification import InitiateControls as VerificationInitiateControls
 from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.guilds import DecisionControls
+from cogs.alumni import SelectView
 
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
@@ -21,7 +22,7 @@ class Gui(commands.Bot):
     async def setup_hook(self):
         self.add_view(VerificationInitiateControls())
         self.add_view(PartyInitiateControls())
-        # self.add_view(DecisionControls('','','',''))
+        self.add_view(SelectView([], [], '', ''))
 
     async def on_ready(self):
         
@@ -45,9 +46,8 @@ class Gui(commands.Bot):
     async def on_disconnect(self):
         print('Bot Disconnected...')
 
-    # @bot.tree.error
-    # async def on_error(interaction, error):
-    #     await interaction.channel.send(error, ephemeral=True)
+    async def on_error(self, error):
+            print("Oh No!")
 
 bot = Gui()
 
