@@ -38,11 +38,11 @@ class SelectView(discord.ui.View):
         company_options_paginated_matrix = split_list(company_options, 25)
         company_roles_paginated_matrix = split_list(company_roles, 25)
         for index, page in enumerate(company_options_paginated_matrix):
-            self.add_item(DropdownMenu(page, company_roles_paginated_matrix[index], f"Select your Company ({index+1}/{len(company_options_paginated_matrix)})", "alumni:company_roles_dropdown"))
+            self.add_item(DropdownMenu(page, company_roles_paginated_matrix[index], f"Select your Company ({index+1}/{len(company_options_paginated_matrix)})", f"alumni:company_roles_dropdown_{index}"))
         profession_options_paginated_matrix = split_list(profession_options, 25)
         profession_roles_paginated_matrix = split_list(profession_roles, 25)
         for index, page in enumerate(profession_options_paginated_matrix):
-            self.add_item(DropdownMenu(page, profession_roles_paginated_matrix[index], f"Choose your Role ({index+1}/{len(profession_options_paginated_matrix)})", "alumni:profession_roles_dropdown"))
+            self.add_item(DropdownMenu(page, profession_roles_paginated_matrix[index], f"Choose your Role ({index+1}/{len(profession_options_paginated_matrix)})", f"alumni:profession_roles_dropdown_{index}"))
 
 class Alumni(commands.GroupCog, name="alumni"):
 
