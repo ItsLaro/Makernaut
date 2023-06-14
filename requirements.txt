@@ -42,4 +42,3 @@ six==1.16.0
 typing-extensions==3.7.4.3
 uritemplate==4.1.1
 urllib3==1.26.15
-yarl==1.6.3

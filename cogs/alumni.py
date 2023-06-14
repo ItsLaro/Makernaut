@@ -1,17 +1,15 @@
 import config
 import discord
-import traceback
 from discord.ext import commands
-from discord import app_commands, SelectOption, PartialEmoji
-from discord.ui import TextInput, View, Button, Modal, Select
-from email_validator import validate_email, EmailNotValidError
-from helpers.airtable import get_record_by_email, store_token_by_record, verify_discord_user
-from helpers.mail.email_sender import send_verification_SMTP_email
+from discord import SelectOption, PartialEmoji
+from discord.ui import Select
 from helpers.emojis import alphabet
 
 YELLOW_COLOR = 0xFFBF00  
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
-             
+DROPDOWN_OPTION_LIMIT = 2
+COMPANY_PREFIX = 'Alumni Company - '
+PROFESSION_PREFIX =  'Alumni Role - '
 class DropdownMenu (Select):
     def __init__(self, options, roles, placeholder, custom_id):
         self.roles = roles
@@ -23,29 +21,23 @@ class DropdownMenu (Select):
         selection = int(self.values[0])
         role = self.roles[selection]
 
-        company_prefix = 'Alumni Company - '
-        profession_prefix =  'Alumni Role - '
-        prefix_length = len(company_prefix) if role.name.startswith(company_prefix) else len(profession_prefix)
-        role_type = "company" if role.name.startswith(company_prefix) else "occupation"
+        prefix_length = len(COMPANY_PREFIX) if role.name.startswith(COMPANY_PREFIX) else len(PROFESSION_PREFIX)
+        role_type = "company" if role.name.startswith(COMPANY_PREFIX) else "occupation"
         role_name = role.name[prefix_length:]
 
         await interaction.user.add_roles(role)
         await interaction.response.send_message(f"You've selected `{role_name}` as your {role_type}", ephemeral=True)
 
 class SelectView(discord.ui.View):
-    def __init__(self, company_options, profession_options, company_roles, profession_roles):
+    def __init__(self, options_and_roles):
         super().__init__(timeout = None)
-        company_options_paginated_matrix = split_list(company_options, 25)
-        company_roles_paginated_matrix = split_list(company_roles, 25)
-        for index, page in enumerate(company_options_paginated_matrix):
-            self.add_item(DropdownMenu(page, company_roles_paginated_matrix[index], f"Select your Company ({index+1}/{len(company_options_paginated_matrix)})", f"alumni:company_roles_dropdown_{index}"))
-        profession_options_paginated_matrix = split_list(profession_options, 25)
-        profession_roles_paginated_matrix = split_list(profession_roles, 25)
-        for index, page in enumerate(profession_options_paginated_matrix):
-            self.add_item(DropdownMenu(page, profession_roles_paginated_matrix[index], f"Choose your Role ({index+1}/{len(profession_options_paginated_matrix)})", f"alumni:profession_roles_dropdown_{index}"))
+
+        options_and_roles_paginated_matrix = split_list(options_and_roles, DROPDOWN_OPTION_LIMIT)
+        for index, key in enumerate(options_and_roles_paginated_matrix):
+            page = options_and_roles_paginated_matrix[key]
+            self.add_item(DropdownMenu([entry['option'] for entry in page], [entry['role'] for entry in page], f"Select an Answer [{key}]", f"alumni:roles_dropdown_{index}"))
 
 class Alumni(commands.GroupCog, name="alumni"):
-
     '''
     Provides functionality specific to the INIT Alumni chapter category.
     '''
@@ -60,10 +52,13 @@ class Alumni(commands.GroupCog, name="alumni"):
         alumni_roles_channel = self.bot.get_channel(ALUMNI_ROLES_CHANNEL_ID)
 
         ## Embed ##
-        embed_title = "Tell us more about you!"
-        embded_description = "If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. If your company or role aren't listed, please reach out to a member of the team so we can have it added."
+        title = "# Tell us more about you!"
+        body = " # If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. "
+        footnote = "If your company or role aren't listed, please reach out to a member of the team so we can have it added."
+        message = f"{title}\n{body}\n{footnote}"
 
-        embed_response = discord.Embed(title=embed_title, description=embded_description, color=YELLOW_COLOR)
+        company_roles_embed_response = discord.Embed(title='Where do you currently work?', description=None, color=YELLOW_COLOR)
+        profession_roles_embed_response = discord.Embed(title="What's your occupation or position?", description=None, color=YELLOW_COLOR)
 
         # If message already exists, we leave channel alone
         # async for message in alumni_roles_channel.history():
@@ -78,7 +73,7 @@ class Alumni(commands.GroupCog, name="alumni"):
         ## Company Roles ##
         company_options=[]
         company_roles=[]
-        prefix = 'Alumni Company - '
+        prefix = COMPANY_PREFIX
         prefix_length = len(prefix)
         index = 0
         for role in roles:
@@ -91,7 +86,7 @@ class Alumni(commands.GroupCog, name="alumni"):
         ## Profession Roles ##
         profession_options=[]
         profession_roles=[]
-        prefix = 'Alumni Role - '
+        prefix = PROFESSION_PREFIX
         prefix_length = len(prefix)
         index = 0
         for role in roles:
@@ -102,14 +97,33 @@ class Alumni(commands.GroupCog, name="alumni"):
                 profession_roles.append(role)
                 index += 1
 
-        # Send message if there are results
-        dropdown_menu_view = SelectView(company_options, profession_options, company_roles, profession_roles)
+        # Combine Option with corresponding Role
+        company_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, company_roles)]
+        profession_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(profession_options, profession_roles)]
+        
+        # Sort alphabetically
+        sorted_company_combined_options_and_roles = sorted(company_combined_options_and_roles, key=lambda entry: entry['role'].name)  
+        sorted_profession_combined_options_and_roles = sorted(profession_combined_options_and_roles, key=lambda entry: entry['role'].name)  
+
+        company_roles_dropdown_menu_view = SelectView(sorted_company_combined_options_and_roles)
+        profession_roles_dropdown_menu_view = SelectView(sorted_profession_combined_options_and_roles)
+
         image_url = "https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450"
         await alumni_roles_channel.send(content=image_url) 
-        await alumni_roles_channel.send(embed=embed_response, view=dropdown_menu_view) 
+        await alumni_roles_channel.send(content=message) 
+        await alumni_roles_channel.send(embed=company_roles_embed_response, view=company_roles_dropdown_menu_view)
+        await alumni_roles_channel.send(embed=profession_roles_embed_response, view=profession_roles_dropdown_menu_view)
 
 async def setup(bot):
     await bot.add_cog(Alumni(bot)) 
 
 def split_list(lst, max_elements):
-    return [lst[i:i + max_elements] for i in range(0, len(lst), max_elements)]
+    result = {}
+    for i in range(0, len(lst), max_elements):
+        sublist = lst[i:i + max_elements]
+        first_item_letter = sublist[0]['option'].label[0]
+        last_item_letter = sublist[-1]['option'].label[0]
+        letter_range =  (first_item_letter + ' - ' + last_item_letter).upper() if first_item_letter != last_item_letter else first_item_letter.upper() 
+        key = letter_range if letter_range not in result else letter_range + f'({i})'
+        result[key] = sublist
+    return result

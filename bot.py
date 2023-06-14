@@ -22,7 +22,7 @@ class Gui(commands.Bot):
     async def setup_hook(self):
         self.add_view(VerificationInitiateControls())
         self.add_view(PartyInitiateControls())
-        self.add_view(SelectView([], [], '', ''))
+        self.add_view(SelectView([]))
 
     async def on_ready(self):
         
