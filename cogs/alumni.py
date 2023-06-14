@@ -102,8 +102,8 @@ class Alumni(commands.GroupCog, name="alumni"):
         profession_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(profession_options, profession_roles)]
         
         # Sort alphabetically
-        sorted_company_combined_options_and_roles = sorted(company_combined_options_and_roles, key=lambda entry: entry['role'].name)  
-        sorted_profession_combined_options_and_roles = sorted(profession_combined_options_and_roles, key=lambda entry: entry['role'].name)  
+        sorted_company_combined_options_and_roles = sorted(company_combined_options_and_roles, key=lambda entry: entry['role'].name.lower())  
+        sorted_profession_combined_options_and_roles = sorted(profession_combined_options_and_roles, key=lambda entry: entry['role'].name.lower())  
 
         company_roles_dropdown_menu_view = SelectView(sorted_company_combined_options_and_roles)
         profession_roles_dropdown_menu_view = SelectView(sorted_profession_combined_options_and_roles)
