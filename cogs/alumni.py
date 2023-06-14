@@ -7,7 +7,7 @@ from helpers.emojis import alphabet
 
 YELLOW_COLOR = 0xFFBF00  
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
-DROPDOWN_OPTION_LIMIT = 2
+DROPDOWN_OPTION_LIMIT = 25
 COMPANY_PREFIX = 'Alumni Company - '
 PROFESSION_PREFIX =  'Alumni Role - '
 class DropdownMenu (Select):
