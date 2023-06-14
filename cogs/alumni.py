@@ -71,42 +71,41 @@ class Alumni(commands.GroupCog, name="alumni"):
         roles = await self.upe_guild.fetch_roles()
 
         ## Company Roles ##
-        company_options=[]
         company_roles=[]
         prefix = COMPANY_PREFIX
         prefix_length = len(prefix)
-        index = 0
         for role in roles:
             if role.name.startswith(prefix):
                 role_name = role.name[prefix_length:]
                 emoji_codepoint = alphabet[role_name[0].upper()]
-                company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index))
                 company_roles.append(role)
-                index += 1
+        
+        sorted_company_roles = sorted(company_roles, key=lambda entry: entry.name.lower())  
+        company_options=[]
+        for index, role in enumerate(sorted_company_roles):
+            role_name = role.name[prefix_length:]
+            company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index))
+        company_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, sorted_company_roles)]
+
         ## Profession Roles ##
-        profession_options=[]
         profession_roles=[]
         prefix = PROFESSION_PREFIX
         prefix_length = len(prefix)
-        index = 0
         for role in roles:
             if role.name.startswith('Alumni Role'):
                 role_name = role.name[prefix_length:]
                 emoji_codepoint = alphabet[role_name[0].upper()]
-                profession_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index))
                 profession_roles.append(role)
-                index += 1
-
-        # Combine Option with corresponding Role
-        company_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, company_roles)]
-        profession_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(profession_options, profession_roles)]
         
-        # Sort alphabetically
-        sorted_company_combined_options_and_roles = sorted(company_combined_options_and_roles, key=lambda entry: entry['role'].name.lower())  
-        sorted_profession_combined_options_and_roles = sorted(profession_combined_options_and_roles, key=lambda entry: entry['role'].name.lower())  
+        sorted_profession_roles = sorted(profession_roles, key=lambda entry: entry.name.lower())  
+        profession_options=[]
+        for index, role in enumerate(sorted_profession_roles):
+            role_name = role.name[prefix_length:]
+            profession_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index))
+        profession_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(profession_options, sorted_profession_roles)]
 
-        company_roles_dropdown_menu_view = SelectView(sorted_company_combined_options_and_roles)
-        profession_roles_dropdown_menu_view = SelectView(sorted_profession_combined_options_and_roles)
+        company_roles_dropdown_menu_view = SelectView(company_sorted_combined_options_and_roles)
+        profession_roles_dropdown_menu_view = SelectView(profession_sorted_combined_options_and_roles)
 
         image_url = "https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450"
         await alumni_roles_channel.send(content=image_url) 
