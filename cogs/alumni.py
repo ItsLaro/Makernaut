@@ -64,10 +64,12 @@ class Alumni(commands.GroupCog, name="alumni"):
 
         # If message already exists, we leave channel alone
         async for message in alumni_roles_channel.history():
-            if message.author.id == self.bot.user.id and message.embeds[0].title == profession_roles_embed_response_title:
-                return
+            if message.author.id == self.bot.user.id and len(message.embeds) > 0:
+                if(message.embeds[0].title == profession_roles_embed_response_title):
+                    return
             else:
                 await alumni_roles_channel.purge()
+                break
 
         company_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix(COMPANY_PREFIX)
         company_roles_dropdown_menu_view = SelectView(company_sorted_combined_options_and_roles)
@@ -77,7 +79,7 @@ class Alumni(commands.GroupCog, name="alumni"):
 
         image_url = "https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450"
         await alumni_roles_channel.send(content=image_url) 
-        
+
         await alumni_roles_channel.send(content=message) 
 
         await alumni_roles_channel.send(embed=company_roles_embed_response, view=company_roles_dropdown_menu_view)
