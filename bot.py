@@ -3,12 +3,12 @@ import traceback
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-from discord.app_commands import command
+from discord import SelectOption, PartialEmoji
 import config 
 from cogs.verification import InitiateControls as VerificationInitiateControls
 from cogs.guilds import InitiateControls as PartyInitiateControls
-from cogs.guilds import DecisionControls
 from cogs.alumni import SelectView
+from helpers.emojis import alphabet
 
 load_dotenv()
 secret_key = os.getenv("BOT_KEY")
@@ -22,7 +22,10 @@ class Gui(commands.Bot):
     async def setup_hook(self):
         self.add_view(VerificationInitiateControls())
         self.add_view(PartyInitiateControls())
-        self.add_view(SelectView([]))
+        company_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix('Alumni Company - ')
+        self.add_view(SelectView(company_sorted_combined_options_and_roles))
+        profession_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix('Alumni Role - ')
+        self.add_view(SelectView(profession_sorted_combined_options_and_roles))
 
     async def on_ready(self):
         
@@ -48,6 +51,27 @@ class Gui(commands.Bot):
 
     async def on_error(self, error):
             print("Oh No!")
+
+    async def fetch_combined_options_and_roles_via_role_prefix(self, prefix):
+        UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
+        upe_guild = await bot.fetch_guild(UPE_GUILD_ID)
+        roles = await upe_guild.fetch_roles()
+        ## Company Roles ##
+        company_roles=[]
+        prefix_length = len(prefix)
+        for role in roles:
+            if role.name.startswith(prefix):
+                role_name = role.name[prefix_length:]
+                emoji_codepoint = alphabet[role_name[0].upper()]
+                company_roles.append(role)
+        
+        sorted_company_roles = sorted(company_roles, key=lambda entry: entry.name.lower())  
+        company_options=[]
+        for index, role in enumerate(sorted_company_roles):
+            role_name = role.name[prefix_length:]
+            company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index))
+        company_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, sorted_company_roles)]
+        return company_sorted_combined_options_and_roles
 
 bot = Gui()
 
