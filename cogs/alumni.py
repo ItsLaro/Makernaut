@@ -55,7 +55,7 @@ class Alumni(commands.GroupCog, name="alumni"):
         title = "# Tell us more about you!"
         body = " # If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. "
         footnote = "If your company or role aren't listed, please reach out to a member of the team so we can have it added."
-        message = f"{title}\n{body}\n{footnote}"
+        response_message = f"{title}\n{body}\n{footnote}"
 
         company_roles_embed_response_title = 'Where do you currently work?'
         company_roles_embed_response = discord.Embed(title=company_roles_embed_response_title, description=None, color=YELLOW_COLOR)
@@ -80,7 +80,7 @@ class Alumni(commands.GroupCog, name="alumni"):
         image_url = "https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450"
         await alumni_roles_channel.send(content=image_url) 
 
-        await alumni_roles_channel.send(content=message) 
+        await alumni_roles_channel.send(content=response_message) 
 
         await alumni_roles_channel.send(embed=company_roles_embed_response, view=company_roles_dropdown_menu_view)
 
