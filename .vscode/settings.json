@@ -1,3 +1,34 @@
 {
-    "python.pythonPath": "C:\\Users\\ivanr\\Anaconda3\\python.exe"
+    "python.pythonPath": "C:\\Users\\ivanr\\Anaconda3\\python.exe",
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#314b3b",
+        "activityBar.background": "#314b3b",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#0f0d13",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#314b3b",
+        "statusBar.background": "#1d2c23",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#314b3b",
+        "statusBarItem.remoteBackground": "#1d2c23",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#1d2c23",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#1d2c2399",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#1D2C23",
+    "cSpell.words": [
+        "DATEPART",
+        "dotenv",
+        "pymysql",
+        "pyodbc",
+        "pyplot",
+        "selectbox",
+        "streamlit",
+        "xlabel",
+        "ylabel"
+    ]
 }
