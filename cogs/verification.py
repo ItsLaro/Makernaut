@@ -51,6 +51,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
+        await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
         try:
             # Check that the email address is valid.
             validation = validate_email(self.email.value, check_deliverability=True)
