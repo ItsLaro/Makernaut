@@ -174,7 +174,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         print(traceback.format_exc())
         response = await interaction.response.send_message(embed=embed_response, ephemeral=True)        
 
-class Verification(commands.GroupCog, name="verify"):
+class Verification(commands.GroupCog, name="alumni_verification"):
 
     '''
     Links Discord users to their identity with the INIT National database.

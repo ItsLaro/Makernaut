@@ -174,7 +174,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         print(traceback.format_exc())
         response = await interaction.response.send_message(embed=embed_response, ephemeral=True)        
 
-class ShellhacksVerification(commands.GroupCog, name="verify"):
+class ShellhacksVerification(commands.GroupCog, name="shellacks_verification"):
 
     '''
     Links Discord users to their identity with the ShellHacks 2023 database.
