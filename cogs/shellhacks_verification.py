@@ -15,7 +15,7 @@ class InitiateControls (View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label='Initiate', style=discord.ButtonStyle.primary ,emoji="🏁", custom_id='verification:initiate_button')
+    @discord.ui.button(label='Check-In', style=discord.ButtonStyle.primary ,emoji="🏁", custom_id='verification:initiate_button')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
@@ -218,19 +218,13 @@ At imperdiet dui accumsan sit amet nulla facilisi morbi tempus iaculis urna id v
 •  Gravida cum sociis
 •  Quam elementum pulvinar etiam non 
 
-💌 Contact Info 💌 
-
-• Website: https://www.shellhacks.net/
-• E-mail address: fiu@weareinit.org
-• Instagram: https://www.instagram.com/init.fiu/
-• LinkedIn: https://www.linkedin.com/company/init-fiu/
 ‎ 
         """
 
         # Send new verification message otherwise
-        embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by getting checking in with your email."
+        embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by checking in with your email."
         embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
-        embed_response.add_field(name="Not sure what ShellHacks is?", value=f"Learn more at https://www.shellhacks.net/ !")
+        embed_response.add_field(name="Not sure what ShellHacks is?", value=f"Learn more at https://www.shellhacks.net/")
 
         button = InitiateControls()
 
