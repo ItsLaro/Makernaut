@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord import SelectOption, PartialEmoji
 import config 
 from cogs.alumni_verification import InitiateControls as AlumniVerificationInitiateControls
-from cogs.shellhacks_verification import InitiateControls as ShellhacksVerificationInitiateControls
+from cogs.shellhacks import InitiateControls as ShellhacksVerificationInitiateControls
 from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.alumni import SelectView
 from helpers.emojis import alphabet
