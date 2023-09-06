@@ -5,7 +5,8 @@ import discord
 from discord.ext import commands
 from discord import SelectOption, PartialEmoji
 import config 
-from cogs.verification import InitiateControls as VerificationInitiateControls
+from cogs.alumni_verification import InitiateControls as AlumniVerificationInitiateControls
+from cogs.shellhacks_verification import InitiateControls as ShellhacksVerificationInitiateControls
 from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.alumni import SelectView
 from helpers.emojis import alphabet
@@ -20,7 +21,8 @@ class Gui(commands.Bot):
         super().__init__(command_prefix =prefix , intents=intents)
 
     async def setup_hook(self):
-        self.add_view(VerificationInitiateControls())
+        self.add_view(AlumniVerificationInitiateControls())
+        self.add_view(ShellhacksVerificationInitiateControls())
         self.add_view(PartyInitiateControls())
         company_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix('Alumni Company - ')
         self.add_view(SelectView(company_sorted_combined_options_and_roles))
