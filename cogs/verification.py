@@ -50,6 +50,8 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
         super().__init__(timeout=None, custom_id="verification:email_modal")
 
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
         try:
             # Check that the email address is valid.
             validation = validate_email(self.email.value, check_deliverability=True)
@@ -68,7 +70,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     description="Not match found associated with that email address. Please make sure to use the same email address you used to apply.", 
                     color=discord.Color.red(),
                 )
-                await interaction.response.send_message(embed=embed_response, ephemeral=True)
+                await interaction.followup.send(embed=embed_response, ephemeral=True)
 
             elif "Discord ID" in user_record['fields']:
                 title = '<a:utilsuccess:809713352061354016> Already Verified!'
@@ -85,7 +87,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     color=color,
                 )
                 embed_response.set_footer(text="If you still don't get access, please reach out to a mod for assistance.")
-                response = await interaction.response.send_message(embed=embed_response, ephemeral=True)
+                response = await interaction.followup.send(embed=embed_response, ephemeral=True)
             else:
                 # Send email with generated verification_token
                 verification_token = send_verification_SMTP_email(validated_email)
@@ -99,14 +101,14 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                         color=YELLOW_COLOR,
                     )
                     button = VerifyControls(user_record, verification_token)
-                    await interaction.response.send_message(embed=embed_response, view=button, ephemeral=True)
+                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
                 else:
                     embed_response = discord.Embed(
                         title="<a:utilfailure:809713365088993291> Something unexpected happened...", 
                         description="Please try again. The developers have been notified of this.", 
                         color=discord.Color.red(),
                     )
-                    await interaction.response.send_message(embed=embed_response, view=button, ephemeral=True)
+                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
                 
         except EmailNotValidError as e:
             # Email is not valid.
@@ -115,7 +117,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                 description="Please make sure you spelled it correctly.", 
                 color=discord.Color.red()
             )
-            await interaction.response.send_message(embed=embed_response, ephemeral=True)
+            await interaction.followup.send(embed=embed_response, ephemeral=True)
 
 class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
     token_input = TextInput(
