@@ -47,7 +47,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
     )
 
     def __init__(self):
-        super().__init__(timeout=None, custom_id="verification:email_modal")
+        super().__init__(timeout=None, custom_id="alumni_verification:email_modal")
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()

@@ -14,32 +14,34 @@ import os
 
 YELLOW_COLOR = 0xFFBF00  
 GREEN_HEX = 0x238823 
-INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
+SHELLHACKS_ROLE_ID = 1149115195063541840 if config.isProd else 1149115440791027762
+NATIONAL_BOT_LOG_ID = 626541886533795850 if config.isProd else 1065042159679578153
 HACKER_GUIDE_SHORTENED_URL = 'https://www.notion.so/weareinit/Hacker-Guide-7deb058ff624449a98391c910f7ad0bd?pvs=4'
 sponsor_info = {
-            "Microsoft": "Microsoft is a multinational technology corporation known for its software products and services.",
-            "Vanguard": "Vanguard is an investment management company specializing in mutual funds and ETFs.",
-            "Bitstop": "Bitstop is a blockchain technology company providing secure cryptocurrency solutions.",
-            "Waymo": "Waymo is a self-driving technology company developing autonomous vehicles.",
-            "Mediastream": "Mediastream is a media streaming service offering a wide range of content.",
-            "LexisNexis": "LexisNexis is a provider of legal, regulatory, and business information and analytics.",
-            "CodePath": "CodePath is an education platform that offers mobile app development courses.",
-            "Assurant": "Assurant is a global provider of risk management solutions and insurance services.",
-            "Google": "Google is a multinational technology company known for its search engine and online services.",
-            "Schonfeld": "Schonfeld is a proprietary trading firm specializing in quantitative and algorithmic trading strategies.",
-            "Southwest Airlines": "Southwest Airlines is a major American airline known for its low-cost and customer-friendly approach.",
-            "Toren AI": "Toren AI is an artificial intelligence company focused on advancing machine learning technology.",
-            "Elfen Software": "Elfen Software is a software development company specializing in innovative solutions.",
-            "Addigy": "Addigy is a cloud-based IT management platform for Apple devices.",
-            "State Farm": "State Farm is a major insurance and financial services company in the United States.",
-            "NVIDIA": "NVIDIA is a leading technology company known for its graphics processing units (GPUs).",
-            "Capital One": "Capital One is a diversified bank and financial services company.",
-            "Adobe": "Adobe is a multinational software company known for its creative and multimedia software products.",
-            "MLT": "MLT (Management Leadership for Tomorrow) is a nonprofit organization dedicated to advancing diversity and leadership.",
-            "Miami Dade County": "Miami-Dade County is a county in Florida known for its vibrant community and diverse culture.",
-            "Chevron": "Chevron is an American multinational energy corporation involved in the production and exploration of oil and gas.",
-            "Wells Fargo": "Wells Fargo is a major American bank and financial services company."
-        }
+    "Microsoft": "Microsoft is a multinational technology corporation known for developing, manufacturing, supporting, and selling computer software, consumer electronics, personal computers, and related services. They are most famous for their Windows operating system and Office productivity suite.",
+    "Mediastream": "Mediastream is a leading media streaming service that offers a vast catalog of movies, TV shows, and original content to subscribers worldwide. With a user-friendly interface and high-quality streaming, Mediastream has become a go-to platform for entertainment enthusiasts.",
+    "Vanguard": "Vanguard is a renowned investment management company with a strong focus on mutual funds, exchange-traded funds (ETFs), and retirement solutions. They are known for their low-cost index funds and commitment to providing investors with reliable financial products.",
+    "Bitstop": "Bitstop is an innovative blockchain technology company specializing in secure cryptocurrency solutions. They develop cutting-edge software and services to facilitate safe and efficient cryptocurrency transactions, contributing to the growth of the digital economy.",
+    "Waymo": "Waymo, a subsidiary of Alphabet Inc. (Google's parent company), is a pioneer in self-driving technology. They are at the forefront of developing autonomous vehicles and shaping the future of transportation with a focus on safety and innovation.",
+    "LexisNexis": "LexisNexis is a global provider of legal, regulatory, and business information, offering advanced analytics and data-driven solutions to legal professionals, businesses, and government agencies. They empower decision-makers with critical insights.",
+    "Southwest Airlines": "Southwest Airlines is a major American airline known for its commitment to low fares, excellent customer service, and a vast domestic network. They prioritize affordability and convenience, making air travel accessible to millions.",
+    "Schonfeld": "Schonfeld is a leading proprietary trading firm specializing in quantitative and algorithmic trading strategies. They leverage cutting-edge technology to navigate financial markets and optimize trading performance.",
+    "Toren AI": "Toren AI is a trailblazing artificial intelligence company dedicated to advancing machine learning technology. Their innovative solutions drive automation, data analysis, and decision-making across various industries.",
+    "Elfen Software": "Elfen Software is a dynamic software development company that excels in crafting innovative solutions for businesses. They specialize in creating user-friendly software products that streamline operations and drive growth.",
+    "Addigy": "Addigy is a cloud-based IT management platform designed for Apple device management. They provide businesses with powerful tools to monitor, secure, and optimize their Apple device fleets, enhancing productivity and security.",
+    "Meta": "Meta (formerly Facebook) is a technology giant known for its social media platforms, including Facebook, Instagram, WhatsApp, and Oculus VR. They connect billions of people globally, shaping the way we communicate and share experiences.",
+    "Wells Fargo": "Wells Fargo is a prominent American bank and financial services company that offers a wide range of banking, investment, and mortgage services. They are committed to helping customers succeed financially.",
+    "State Farm": "State Farm is a leading insurance and financial services company in the United States. They provide a comprehensive suite of insurance products and financial planning services, helping individuals and families protect their futures.",
+    "Capital One": "Capital One is a diversified bank and financial services company known for its credit cards, banking, auto loans, and mortgage products. They leverage technology to create seamless financial experiences for customers.",
+    "Assurant": "Assurant is a global provider of risk management solutions and insurance services. They safeguard the things that matter most to people and businesses, offering protection, support, and peace of mind.",
+    "Google": "Google is a multinational technology company renowned for its search engine, online advertising, cloud computing, and hardware products. They drive innovation and connect people with information worldwide.",
+    "CodePath": "CodePath is an educational platform that offers mobile app development courses and resources to empower students and professionals with in-demand coding skills. They bridge the gap between education and industry needs.",
+    "Adobe": "Adobe is a multinational software company known for its creative and multimedia software products, including Photoshop, Illustrator, and Adobe Creative Cloud. They empower creatives and businesses to bring their visions to life.",
+    "Nvidia": "NVIDIA is a technology leader known for its graphics processing units (GPUs). They play a crucial role in advancing artificial intelligence, gaming, and scientific computing, delivering breakthrough performance and innovation.",
+    "MLT": "MLT (Management Leadership for Tomorrow) is a nonprofit organization dedicated to advancing diversity and leadership in business and technology. They provide mentorship and professional development programs to underrepresented talent.",
+    "Miami Dade County": "Miami-Dade County is a vibrant and culturally diverse county in Florida. It is known for its beautiful beaches, dynamic arts scene, and thriving business community, making it a hub of creativity and opportunity.",
+    "Chevron": "Chevron is a leading American multinational energy corporation engaged in the exploration, production, and refining of oil and gas. They are committed to powering the world with energy solutions that drive progress and sustainability."
+}
 
 def generate_hacker_guide_line():
     # List of hackathon guide responses with a beach, Miami, city, and tech theme
@@ -146,7 +148,7 @@ At imperdiet dui accumsan sit amet nulla facilisi morbi tempus iaculis urna id v
         sponsor_object_list = [HackathonSponsor(sponsor_name, sponsor_info[sponsor_name]) for sponsor_name in sponsors_list]
 
         for sponsor in reversed(sponsor_object_list):
-            await sponsors_forum_channel.create_thread(name=sponsor.name, content=sponsor.description, file=sponsor.image)     
+            await sponsors_forum_channel.create_thread(name=sponsor.name, content=f'# {sponsor.description}', file=sponsor.image)     
         await interaction.followup.send(f"{len(sponsors_list)} sponsor subthreads created in {sponsors_forum_channel.mention}", ephemeral=True)
 
     @app_commands.command(name="guide", description="Publicly Sends the hacker guide")
@@ -174,24 +176,23 @@ class InitiateControls (View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label='Check-In', style=discord.ButtonStyle.primary ,emoji="🏁", custom_id='verification:initiate_button')
+    @discord.ui.button(label='Check-In', style=discord.ButtonStyle.primary ,emoji="🛫", custom_id='shellhacks_verification:initiate_button')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
 class VerifyControls (View):
-    def __init__(self, user_record, verification_token):
-        self.verification_token = verification_token
-        self.user_record = user_record
-        super().__init__(timeout=600) #times-out after 10 minutes
+    def __init__(self):
+        super().__init__(timeout=900) #times-out after 15 minutes
 
     @discord.ui.button(label='Verify', style=discord.ButtonStyle.secondary, emoji='🔑')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
-        modal = VerificationCodeSubmitModal(self.user_record, self.verification_token)
+        modal = VerificationCodeSubmitModal()
         await interaction.response.send_modal(modal) 
     
     async def on_timeout(self, interaction: discord.Interaction):
-        # after a timeout, clean token from AIRTABLE
-        store_token_by_record(self.user_record, '')
+        ####################################################################################
+        # Hit Endpoint to Reset check in flow.                                             # 
+        ####################################################################################
 
         for item in self.children:
             item.disabled = True
@@ -218,56 +219,61 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             # Take the normalized form of the email address
             validated_email = validation.email
 
-            # Use Airtable API in AA member table to locate matching record with email.
-            user_record = get_record_by_email(validated_email)
-
-            print(user_record)
-
-            if user_record is None:
-                embed_response = discord.Embed(
-                    title="<a:utilfailure:809713365088993291> Could not find Alumni Association", 
-                    description="Not match found associated with that email address. Please make sure to use the same email address you used to apply.", 
-                    color=discord.Color.red(),
-                )
-                await interaction.followup.send(embed=embed_response, ephemeral=True)
-
-            elif "Discord ID" in user_record['fields']:
-                title = '<a:utilsuccess:809713352061354016> Already Verified!'
-                description = 'Your INIT Alumni Chapter Membership had been previously verified!'
-                color = discord.Color.green()
-
-                init_aa_verified_role = interaction.guild.get_role(INIT_AA_VERIFIED_ROLE_ID)
-                if init_aa_verified_role not in interaction.user.roles:     
-                    await interaction.user.add_roles(init_aa_verified_role)             
-                    description += " However, seems like you were missing the appropiate role here on Discord. I've gone ahead and attempted to fix that for you!"
-                embed_response = discord.Embed(
-                    title=title,
-                    description=description,
-                    color=color,
-                )
-                embed_response.set_footer(text="If you still don't get access, please reach out to a mod for assistance.")
-                response = await interaction.followup.send(embed=embed_response, ephemeral=True)
-            else:
-                # Send email with generated verification_token
-                verification_token = send_verification_SMTP_email(validated_email)
-                # Store verification_token in new Airtable column for the record.
-                succeeded = store_token_by_record(user_record, verification_token)
-
-                if succeeded:
+            ####################################################################################
+            # Hit Endpoint 1 to check record can be found --- this should return Discord ID if already exists
+            ####################################################################################
+            print(validated_email)
+            if OK1:
+                if RECORD_NOT_FOUND:
                     embed_response = discord.Embed(
-                        title="Check your inbox to verify!", 
-                        description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog", 
-                        color=YELLOW_COLOR,
-                    )
-                    button = VerifyControls(user_record, verification_token)
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
-                else:
-                    embed_response = discord.Embed(
-                        title="<a:utilfailure:809713365088993291> Something unexpected happened...", 
-                        description="Please try again. The developers have been notified of this.", 
+                        title="<a:utilfailure:809713365088993291> The email doesn't not seem to be associated with a confirmed ShellHacks application.", 
+                        description="Not match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance.", 
                         color=discord.Color.red(),
                     )
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    await interaction.followup.send(embed=embed_response, ephemeral=True)
+
+                elif RECORD_FOUND:         
+                    ####################################################################################
+                    # If Discord ID already existed, user is only missing their role.
+                    ####################################################################################
+                    if DISCORD_ID is not None:
+                        title = '<a:utilsuccess:809713352061354016> Already Verified!'
+                        description = 'Your ShellHacks accound and Discord account had been previously linked!'
+                        color = discord.Color.green()
+
+                        shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
+                        if shellhacks_hacker_role not in interaction.user.roles:     
+                            await interaction.user.add_roles(shellhacks_hacker_role)             
+                            description += " However, seems like you were missing the appropiate role here on Discord. I've gone ahead and attempted to fix that for you!"
+                        embed_response = discord.Embed(
+                            title=title,
+                            description=description,
+                            color=color,
+                        )
+                        embed_response.set_footer(text="If you still don't get access, please reach out to a mod for assistance.")
+                        await interaction.followup.send(embed=embed_response, ephemeral=True)
+
+                    else:
+                        ####################################################################################
+                        # We need to link these accounts by verifying the email address with a token.
+                        # We assume the server already sent the token if it replied with OK
+                        ####################################################################################
+
+                        embed_response = discord.Embed(
+                            title="Check your inbox to verify!", 
+                            description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog", 
+                            color=YELLOW_COLOR,
+                        )
+                        button = VerifyControls()
+                        await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+
+            else:
+                embed_response = discord.Embed(
+                    title="<a:utilfailure:809713365088993291> Something unexpected happened...", 
+                    description="Please try again. The developers have been notified of this.", 
+                    color=discord.Color.red(),
+                )
+                await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
                 
         except EmailNotValidError as e:
             # Email is not valid.
@@ -283,32 +289,32 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         style=discord.TextStyle.short,
         label="Verification Code",
         required=True,
-        placeholder="ABCD1234",
+        placeholder="L4R0",
         min_length=8,
         max_length=10,
     )
 
-    def __init__(self, user_record, verification_token):
-        self.verification_token = verification_token
-        self.user_record = user_record
+    def __init__(self):
         self.response_description = 'An unknown error occured... The developers have been notified.'
         super().__init__()
 
     async def on_submit(self, interaction: discord.Interaction):
 
+        await interaction.response.defer()
+
         # Sanitize input and compare with server token
         sanitized_token_input = (''.join(ch for ch in self.token_input.value if ch.isalnum())).upper()
-        if  sanitized_token_input == self.verification_token:
-            # Store Discord ID of user and erase server token and 
-            succeeded = verify_discord_user(self.user_record, interaction.user)
 
-            if succeeded:
-                # Give roles to user
-                try:
-                    init_aa_verified_role = interaction.guild.get_role(INIT_AA_VERIFIED_ROLE_ID)
-                    await interaction.user.add_roles(init_aa_verified_role)
-                except Exception as error:
-                    description = 'There was an error assigning the correct role. Please contact a mod.' 
+        ####################################################################################
+        # Hit endpoint 2 which compares tokens with user input and their Discord ID, if correct server stores Discord ID, and sends back 200
+        ####################################################################################
+        if 200:
+            # Give roles to user
+            try:
+                init_aa_verified_role = interaction.guild.get_role(INIT_AA_VERIFIED_ROLE_ID)
+                await interaction.user.add_roles(init_aa_verified_role)
+            except Exception as error:
+                description = 'There was an error assigning the correct role. Please contact an organizer.' 
 
             # Send success response
             title = '<a:utilsuccess:809713352061354016> Verified!'
@@ -318,7 +324,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                         description=self.response_description,
                         color=color,
             )
-            response = await interaction.response.send_message(embed=embed_response, ephemeral=True)
+            await interaction.followup.send(embed=embed_response, ephemeral=True)
         else:
             self.response_description = 'The code did not match. Please try again.' 
             raise Exception()
