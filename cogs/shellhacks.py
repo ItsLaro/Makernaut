@@ -1,3 +1,4 @@
+import requests
 import config
 import discord
 import traceback
@@ -71,6 +72,23 @@ def generate_hacker_guide_line():
     # Randomly select a response and return the string with the injected URL
     random_response = random.choice(hackathon_guide_responses)
     return random_response.format(HACKER_GUIDE_SHORTENED_URL)
+
+def get_response_from_api_send_email(email, discord_id):
+    data = {
+        "email": email,
+        "discord_id": discord_id
+    }
+    res = requests.post(' http://shellhacks.net/api/admin/sendDiscordEmail', json=data)
+    return res
+
+def get_response_from_api_verify_discord(email, discord_id, verification_code):
+    data = {
+        "email": email,
+        "discord_id": discord_id,
+        "verification_code": verification_code 
+    }
+    res = requests.post('http://shellhacks.net/api/admin/verifyDiscord', json=data)
+    return res
 
 class ShellHacks(commands.GroupCog, name="shell"):
 
@@ -190,10 +208,6 @@ class VerifyControls (View):
         await interaction.response.send_modal(modal) 
     
     async def on_timeout(self, interaction: discord.Interaction):
-        ####################################################################################
-        # Hit Endpoint to Reset check in flow.                                             # 
-        ####################################################################################
-
         for item in self.children:
             item.disabled = True
         await self.message.edit(view=self)
@@ -222,9 +236,10 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             ####################################################################################
             # Hit Endpoint 1 to check record can be found --- this should return Discord ID if already exists
             ####################################################################################
-            print(validated_email)
-            if OK1:
-                if RECORD_NOT_FOUND:
+            response = get_response_from_api_send_email(validated_email, interaction.user.id)
+            print(response)
+            if response.status_code == 200:
+                if False: #RECORD_NOT_FOUND:
                     embed_response = discord.Embed(
                         title="<a:utilfailure:809713365088993291> The email doesn't not seem to be associated with a confirmed ShellHacks application.", 
                         description="Not match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance.", 
@@ -232,7 +247,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     )
                     await interaction.followup.send(embed=embed_response, ephemeral=True)
 
-                elif RECORD_FOUND:         
+                elif False: #RECORD_FOUND:         
                     ####################################################################################
                     # If Discord ID already existed, user is only missing their role.
                     ####################################################################################
@@ -273,7 +288,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     description="Please try again. The developers have been notified of this.", 
                     color=discord.Color.red(),
                 )
-                await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                await interaction.followup.send(embed=embed_response, ephemeral=True)
                 
         except EmailNotValidError as e:
             # Email is not valid.
