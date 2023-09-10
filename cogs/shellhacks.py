@@ -21,9 +21,11 @@ SHELLHACKS_API_TOKEN = os.getenv('SHELLHACKS_API_TOKEN')
 YELLOW_COLOR = 0xFFBF00  
 GREEN_HEX = 0x238823 
 SHELLHACKS_ROLE_ID = 1149115195063541840 if config.isProd else 1149115440791027762
+SHELLHACKS_DISCORD_SUPPORT_ROLE_ID = 1150551214845603880 if config.isProd else 1150550766927495309
 NATIONAL_BOT_LOG_ID = 626541886533795850 if config.isProd else 1065042159679578153
 BOT_LOG_CHANNEL_ID = 626541886533795850 if config.isProd else 1065042159679578154
 HACKER_GUIDE_SHORTENED_URL = 'https://www.notion.so/weareinit/Hacker-Guide-7deb058ff624449a98391c910f7ad0bd?pvs=4'
+VERIFICATION_TOKEN_LENGTH = 4
 sponsor_info = {
     "Microsoft": "Microsoft is a multinational technology corporation known for developing, manufacturing, supporting, and selling computer software, consumer electronics, personal computers, and related services. They are most famous for their Windows operating system and Office productivity suite.",
     "Mediastream": "Mediastream is a leading media streaming service that offers a vast catalog of movies, TV shows, and original content to subscribers worldwide. With a user-friendly interface and high-quality streaming, Mediastream has become a go-to platform for entertainment enthusiasts.",
@@ -82,28 +84,26 @@ def generate_hacker_guide_line():
 def get_response_from_api_send_email(email, discord_id):
     data = {
         "email": email,
-        "discord_id": discord_id
+        "discord_id": str(discord_id)
     }
     res = requests.post(
         f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/sendDiscordEmail', 
-        data=data, 
-        headers={'Authorization': SHELLHACKS_API_TOKEN},
+        json=data, 
+        headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',}, 
     )
-    print(res.status_code, res.reason, res.text)
     return res
 
 def get_response_from_api_verify_discord(email, discord_id, verification_code):
     data = {
         "email": email,
-        "discord_id": discord_id,
+        "discord_id": str(discord_id),
         "verification_code": verification_code 
     }
     res = requests.post(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/verifyDiscord', 
-        data=data,
-        headers={'Authorization': SHELLHACKS_API_TOKEN},
+        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/verifyDiscordAccount', 
+        json=data,
+        headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',},
     )
-    print(res.status_code, res.reason, res.text)
     return res
 
 class ShellHacks(commands.GroupCog, name="shell"):
@@ -119,7 +119,7 @@ class ShellHacks(commands.GroupCog, name="shell"):
         VERIFY_CHANNEL_ID = 1148791017999433788 if config.isProd else 1148818637319319562
         verification_channel = self.bot.get_channel(VERIFY_CHANNEL_ID)
 
-        embed_title = "Check-in for ShellHacks 2023!"
+        embed_title = "Link your Discord with ShellHacks 2023!"
 
         # If message already exists, we leave channel alone
         async for message in verification_channel.history():
@@ -200,7 +200,6 @@ class HackathonSponsor:
 
     def load_png(self):
         png_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Sponsors", f"{self.name}.png")
-        print(png_path)
         if os.path.exists(png_path):
             with open(png_path, "rb") as png_file:
                 self.image = discord.File(png_file)
@@ -209,7 +208,7 @@ class InitiateControls (View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label='Check-In', style=discord.ButtonStyle.primary ,emoji="🛫", custom_id='shellhacks_verification:initiate_button')
+    @discord.ui.button(label='Start', style=discord.ButtonStyle.primary ,emoji="🐚", custom_id='shellhacks_verification:initiate_button')
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
@@ -239,74 +238,87 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
     def __init__(self):
         self.response_title = "Error..."
         self.response_description = 'An unknown error occured... The developers have been notified.'
+        self.response_footer = ''
         super().__init__(timeout=None, custom_id="verification:email_modal")
 
     async def on_submit(self, interaction: discord.Interaction):
+        shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
+        shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
+        if shellhacks_hacker_role in interaction.user.roles:
+            embed_response = discord.Embed(
+                title= '<a:utilsuccess:809713352061354016> Already Verified!',
+                description='Your ShellHacks accound and Discord account had been previously linked and everything looks fine here on Discord!',
+                color=discord.Color.green(),
+            )
+            embed_response.set_footer(text=f"If you believe this is a mistake, contact someone with the '@Shellhacks - Discord Support' role")
+            await interaction.response.send_message(embed=embed_response, ephemeral=True)
+            return
         await interaction.response.defer()
         try:
             # Check that the email address is valid.
             validation = validate_email(self.email.value, check_deliverability=True)
 
             # Take the normalized form of the email address
-            validated_email = validation.email
+            validated_email = validation.email            
 
-            ####################################################################################
-            # Hit Endpoint 1 to check record can be found --- this should return Discord ID if already exists
-            ####################################################################################
+            # Hit Shell-Discord endpoint #1
             await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
             response = get_response_from_api_send_email(validated_email, interaction.user.id)
             
             try:
                 data = response.json()
-                print(data)
             except json.JSONDecodeError as e:
                 print(f"Error parsing JSON: {e}")
-
             if response.status_code == 200:
-
-
                 if 'discord_id' in data and data['discord_id'] is not None :         
                     title = '<a:utilsuccess:809713352061354016> Already Verified!'
                     description = 'Your ShellHacks accound and Discord account had been previously linked!'
                     color = discord.Color.green()
 
                     shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
+                    shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
                     if shellhacks_hacker_role not in interaction.user.roles:     
                         await interaction.user.add_roles(shellhacks_hacker_role)             
-                        description += " However, seems like you were missing the appropiate role here on Discord. I've gone ahead and attempted to fix that for you!"
+                        description += f" However, seems like you were missing the appropiate role here on Discord. I've gone ahead and attempted to fix that for you! If you still don't get access, please reach out to someone with the {shellhacks_support_role.mention} role"
                     embed_response = discord.Embed(
                         title=title,
                         description=description,
                         color=color,
                     )
-                    embed_response.set_footer(text="If you still don't get access, please reach out to a mod for assistance.")
                     await interaction.followup.send(embed=embed_response, ephemeral=True)
                     return
 
                 else:
                     embed_response = discord.Embed(
                         title="Check your inbox to verify!", 
-                        description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog. Completing this process will change your server nickname to your real name and unlock the rest of the channels for ShellHacks'23.", 
+                        description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog.", 
                         color=YELLOW_COLOR,
                     )
+                    embed_response.set_footer(text="Completing this process will change your server nickname to your real name and unlock the rest of the channels for ShellHacks'23.")
                     button = VerifyControls(validated_email)
                     await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
                     return
             # ERROR HANDLING
             elif response.status_code == 404:
                 self.response_title ="<a:utilfailure:809713365088993291> The email doesn't not seem to be associated with a confirmed ShellHacks application."
-                self.response_description ="Not match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance."                
+                self.response_description ="Not match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance."      
+                self.response_footer = "The developers have been notified about this error"          
             elif response.status_code == 400:
                 if 'application_status' in data and data['application_status'] == "accepted":
                     self.response_title ="<a:utilfailure:809713365088993291> Seems like you haven't confirmed your attendance."
                     self.response_description ="Before linking your accounts, confirm that you will be attending ShellHacks 2023 by visiting https://www.shellhacks.net/dashboard. Please try again after doing so."              
-                else:
+                elif 'discord_id' in data and data['discord_id'] is not None and data['discord_id'] != interaction.user.id:
                     self.response_title ="<a:utilfailure:809713365088993291> Seems like you previously completed this step from a different Discord account."
-                    self.response_description ="Switch to the Discord account you used to complete this step. If you believe this is a mistake, reach out to one of our Discord moderators." 
+                    self.response_description =f"Switch to the Discord account you used to complete this step. If you believe this is a mistake, reach out to {shellhacks_support_role.mention}." 
+                else:
+                    self.response_title ="<a:utilfailure:809713365088993291> Seems like you're still on the waitlist..."
+                    self.response_description =f"You can verify your status at https://www.shellhacks.net/dashboard. If you believe this is a mistake, reach out to someone with the {shellhacks_support_role.mention} role."          
+                    
             else:
                 self.response_title ="<a:utilfailure:809713365088993291> Something unexpected happened..."
-                self.response_description ="Please notify one of our Discord moderators for assistance. The developers have already been notified of an issue."                      
-                
+                self.response_description =f"Please notify one of our Discord moderators for assistance at {shellhacks_support_role.mention}. "                      
+                self.response_footer = "The developers have already been notified of this issue."          
+
         except EmailNotValidError as e:
             # Email is not valid.
             self.response_title = "<a:utilfailure:809713365088993291> Invalid email address!"
@@ -317,22 +329,28 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                         description=self.response_description,
                         color=discord.Color.red(),
             )
-            embed_response_for_admin.add_field(name="Debug Info", value=f'{response.status_code}: {response.reason}', inline=False)
+            embed_response_for_admin.set_footer(text=self.response_footer)
+            embed_response_for_admin.add_field(name="User Info", value=f'Email: {validated_email}', inline=False)
+            embed_response_for_admin.add_field(name="Server Response", value=f'{response.status_code}—{response.reason}: {response.text}', inline=False)
             bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
-            await bot_log_channel.send(f'{interaction.user.mention} encountered an error in {interaction.channel.mention} during Step 1:',embed=embed_response_for_admin)
+            await bot_log_channel.send(f'{shellhacks_support_role.mention} , error encountered by {interaction.user.mention} in {interaction.channel.mention} during **Step 1**:',embed=embed_response_for_admin)
         embed_response = discord.Embed(title=self.response_title,
             description=self.response_description,
             color=discord.Color.red(),
         )
+        embed_response.set_footer(text=self.response_footer)
         await interaction.followup.send(embed=embed_response, ephemeral=True)         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
+        shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
+        print(traceback.format_exc())
         bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
         color = discord.Color.red()
         embed_response = discord.Embed(title='Error traceback:',
                     description=traceback.format_exc(),
                     color=color,
         )
-        await bot_log_channel.send(embed=embed_response)
+        embed_response.set_footer(text=self.response_footer)
+        await bot_log_channel.send(f"{shellhacks_support_role.mention}, an error was caught: ", embed=embed_response)
 
 
 class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
@@ -341,73 +359,105 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         label="Verification Code",
         required=True,
         placeholder="L4R0",
-        min_length=6,
-        max_length=6,
+        min_length=VERIFICATION_TOKEN_LENGTH,
+        max_length=VERIFICATION_TOKEN_LENGTH,
     )
 
     def __init__(self, previously_used_email):
-        self.response_description = 'An unknown error occured... The developers have been notified.'
         self.response_title = "Error..."
+        self.response_description = 'An unknown error occured... The developers have been notified.'
+        self.reponse_footer=''
         self.previously_used_email = previously_used_email
         super().__init__()
 
     async def on_submit(self, interaction: discord.Interaction):
-
+        shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
+        shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
+        bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
+        
         await interaction.response.defer()
 
         # Sanitize input and compare with server token
         sanitized_token_input = (''.join(ch for ch in self.token_input.value if ch.isalnum()))
 
-        ####################################################################################
-        # Hit endpoint 2 which compares tokens with user input and their Discord ID, if correct server stores Discord ID, and sends back 200
-        ####################################################################################
+        # Hit Shell-Discord endpoint #2
         response = get_response_from_api_verify_discord(self.previously_used_email, interaction.user.id, sanitized_token_input)
         if response.status_code == 200:
             try:
                 data = response.json()
-                shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
                 await interaction.user.add_roles(shellhacks_hacker_role)
-                if data.first_name is not None and data.first_name is not None:
-                    await interaction.user.edit(nick=f'{data.first_name.split()[0]} {data.last_name.split()[0]}')
+                if data['first_name'] is not None and data['last_name'] is not None:
+                    try:
+                        await interaction.user.edit(nick=f"{data['first_name'].split()[0]} {data['last_name'].split()[0]}")
+                    except discord.DiscordException:
+                        self.reponse_footer='There was an error setting your server nickname. We encourage you to try and set it yourself. If you need assistance, reach out to @Shellhacks - Discord Support'
+                        embed_admin_response = discord.Embed(
+                            title="Couldn't set server nickname",
+                            description=f"{interaction.user.display_name} ({interaction.user.mention}) got verified but could not be assigned \"{data['first_name'].split()[0]} {data['last_name'].split()[0]}\" as their nickname",
+                            color=discord.Color.red(),
+                        )
+                        await bot_log_channel.send(f"{shellhacks_support_role.mention}, a discord error was observed: ", embed=embed_admin_response)
             except json.JSONDecodeError as e:
                 self.response_title = 'Verification Failed'
-                self.response_description = 'There was an error reading from our database. Please contact one of our Discord moderator.' 
-            except Exception as error:
+                self.response_description = f'There was an error verifying you account due to a technical error.'
+                self.reponse_footer = 'The developers have been notified about this.' 
+            except discord.DiscordException:
                 self.response_title = 'Verification Failed'
-                self.response_description = 'There was an error assigning the correct role. Please contact one of our Discord moderator.' 
+                self.response_description = f'There was an error assigning the correct role. Please contact one someone with the {shellhacks_support_role.mention} role.'
+                self.reponse_footer = 'The developers have been notified about this.'  
             else:
                 # Send success response
                 self.response_title = '<a:utilsuccess:809713352061354016> Verified!'
-                self.response_description = 'Your INIT Alumni Chapter is now confirmed on Discord'
+                self.response_description = 'Your ShellHacks account is now linked with Discord'
                 embed_response = discord.Embed(title=self.response_title,
                             description=self.response_description,
                             color=discord.Color.green(),
                 )
-            await interaction.followup.send(embed=embed_response, ephemeral=True)
-            return
+                embed_response.set_footer(text=self.reponse_footer)
+                await interaction.followup.send(embed=embed_response, ephemeral=True)
+                return
         # ERROR HANDLING
         elif response.status_code == 404:
             self.response_title = 'Something unexpected happened...'
-            self.response_description = 'We encountered an error with the email you had provided. Please try again or contact Please contact one of our Discord moderator.' 
+            self.response_description = 'We encountered an error with the email you had provided. Please try again.' 
+            self.reponse_footer = "The developers have already been notified of this issue."                     
         elif response.status_code == 400:
-            self.response_title = 'Code mismatch...'
-            self.response_description = 'Verification code does not match. Try copy pasting it if you didn\'t.' 
+            self.response_title = '<a:utilfailure:809713365088993291> Code mismatch...'
+            self.response_description = f'Verification code does not match. Please try again by re-clicking on the Verify button. If this seems to be wrong, reach out to {shellhacks_support_role.mention}.' 
+            self.reponse_footer = "Tip: Try copy pasting it if you didn\'t"
+            embed_response = discord.Embed(
+                title=self.response_title,
+                description=self.response_description,
+                color=discord.Color.red(),
+            )
+            embed_response.set_footer(text=self.reponse_footer)
+            await interaction.followup.send(embed=embed_response, ephemeral=True)
+            return
         else:
                 self.response_title ="<a:utilfailure:809713365088993291> Something unexpected happened..."
-                self.response_description ="Please notify one of our Discord moderators for assistance. The developers have already been notified of an issue."                      
+                self.response_description =f"Please notify someone with the {shellhacks_support_role.mention} role for further assistance" 
+                self.reponse_footer = "The developers have also already been notified of this issue."                     
         embed_response = discord.Embed(
                     title=self.response_title,
                     description=self.response_description,
                     color=discord.Color.red(),
         )
-        await interaction.followup.send(embed=embed_response, ephemeral=True)   
-        embed_response.add_field(name="Debug Info", value=f'{response.status_code}: {response.reason}', inline=False)
-        bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
-        await bot_log_channel.send(f'{interaction.user.mention} encountered an error in {interaction.channel.mention} during Step 2:',embed=embed_response)  
+        embed_response.set_footer(text=self.reponse_footer)
+        await interaction.followup.send(embed=embed_response, ephemeral=True)
+        embed_response.add_field(name="User Info", value=f'Email: {self.previously_used_email}', inline=False)   
+        embed_response.add_field(name="Server Response", value=f'{response.status_code}—{response.reason}: {response.text}', inline=False)
+        await bot_log_channel.send(f'{shellhacks_support_role.mention}, error encountered by {interaction.user.mention} in {interaction.channel.mention} during **Step 2**:',embed=embed_response)  
         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
+        shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         print(traceback.format_exc())
-        await interaction.response.send_message(embed=embed_response, ephemeral=True)        
+        bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
+        color = discord.Color.red()
+        embed_response = discord.Embed(title='Error traceback:',
+                    description=traceback.format_exc(),
+                    color=color,
+        )
+        await bot_log_channel.send(f"{shellhacks_support_role.mention}, an error was caught: ", embed=embed_response)
 
 async def setup(bot):
     await bot.add_cog(ShellHacks(bot)) 
