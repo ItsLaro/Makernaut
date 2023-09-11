@@ -160,11 +160,11 @@ Florida's Largest Hackathon welcomes you to its seventh iteration, taking place 
 
 •  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
 
-•  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Kayaking!
+•  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Cup Stacking!
 
-•  👕 Grab tons of cool swag such as t-shirts, bags, stickers, hats, and more!
+•  👕 Grab tons of cool swag such as t-shirts, bags, stickers, and more!
 
-•  🥘 Enjoy great food - breakfast, lunch, dinner, and snacks are provided the whole weekend!
+•  🥘 Enjoy great food - brunch, lunch, dinner, and snacks are provided the whole weekend!
 ‎ 
         """
 
