@@ -20,12 +20,25 @@ SHELLHACKS_API_TOKEN = os.getenv('SHELLHACKS_API_TOKEN')
 
 YELLOW_COLOR = 0xFFBF00  
 GREEN_HEX = 0x238823 
+
 SHELLHACKS_ROLE_ID = 1149115195063541840 if config.isProd else 1149115440791027762
 SHELLHACKS_DISCORD_SUPPORT_ROLE_ID = 1150551214845603880 if config.isProd else 1150550766927495309
 NATIONAL_BOT_LOG_ID = 626541886533795850 if config.isProd else 1065042159679578153
+
+VERIFY_CHANNEL_ID = 1148791017999433788 if config.isProd else 1148818637319319562
 BOT_LOG_CHANNEL_ID = 626541886533795850 if config.isProd else 1065042159679578154
+ANNOUNCEMENT_CHANNEL_ID = 1148793595780939786 if config.isProd else 1148818637319319562
+TEAM_BUILDING_CHANNEL_ID = 1148794152725790820 if config.isProd else 1148818637319319562
+WORKSHOPS_CHANNEL_ID = 1149087732862287903 if config.isProd else 1148818637319319562
+ACTIVITIES_CHANNEL_ID = 1148794929481523292 if config.isProd else 1148818637319319562
+SOCIAL_CHANNEL_ID = 1148799505806925946 if config.isProd else 1148818637319319562
+ASK_MLH_CHANNEL_ID = 1148794726514970735 if config.isProd else 1148818637319319562
+MENTORSHIP_CHANNEL_ID = 1148792715006459974 if config.isProd else 1148818637319319562
+SPONSOR_CHANNEL_ID = 1148792027715223583 if config.isProd else 1148818637319319562
+
 HACKER_GUIDE_SHORTENED_URL = 'https://www.notion.so/weareinit/Hacker-Guide-7deb058ff624449a98391c910f7ad0bd?pvs=4'
 VERIFICATION_TOKEN_LENGTH = 4
+
 sponsor_info = {
     "Microsoft": "Microsoft is a multinational technology corporation known for developing, manufacturing, supporting, and selling computer software, consumer electronics, personal computers, and related services. They are most famous for their Windows operating system and Office productivity suite.",
     "Mediastream": "Mediastream is a leading media streaming service that offers a vast catalog of movies, TV shows, and original content to subscribers worldwide. With a user-friendly interface and high-quality streaming, Mediastream has become a go-to platform for entertainment enthusiasts.",
@@ -93,12 +106,14 @@ def get_response_from_api_send_email(email, discord_id):
     )
     return res
 
-def get_response_from_api_verify_discord(email, discord_id, verification_code):
+def get_response_from_api_verify_discord(email, discord_id, discord_username, verification_code ):
     data = {
         "email": email,
         "discord_id": str(discord_id),
+        "discord_username": discord_username,
         "verification_code": verification_code 
     }
+    print(discord_username)
     res = requests.post(
         f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/verifyDiscordAccount', 
         json=data,
@@ -111,46 +126,68 @@ class ShellHacks(commands.GroupCog, name="shell"):
     '''
     ShellHacks 2023 related functionality.
     '''
-
     def __init__(self, bot):
         self.bot = bot
+        self.verification_channel = self.bot.get_channel(VERIFY_CHANNEL_ID)
+        self.announcement_channel = self.bot.get_channel(ANNOUNCEMENT_CHANNEL_ID)
+        self.team_building_channel = self.bot.get_channel(TEAM_BUILDING_CHANNEL_ID)
+        self.workshops_channel = self.bot.get_channel(WORKSHOPS_CHANNEL_ID)
+        self.activities_channel = self.bot.get_channel(ACTIVITIES_CHANNEL_ID)
+        self.social_channel = self.bot.get_channel(SOCIAL_CHANNEL_ID)
+        self.ask_mlh_channel = self.bot.get_channel(ASK_MLH_CHANNEL_ID)
+        self.mentorship_channel = self.bot.get_channel(MENTORSHIP_CHANNEL_ID)
+        self.sponsor_channel = self.bot.get_channel(SPONSOR_CHANNEL_ID)
 
     async def cog_load(self):
-        VERIFY_CHANNEL_ID = 1148791017999433788 if config.isProd else 1148818637319319562
-        verification_channel = self.bot.get_channel(VERIFY_CHANNEL_ID)
-
         embed_title = "Link your Discord with ShellHacks 2023!"
 
         # If message already exists, we leave channel alone
-        async for message in verification_channel.history():
+        async for message in self.verification_channel.history():
             if message.author.id == self.bot.user.id and len(message.embeds) > 0 and message.embeds[0].title == embed_title:
                 return
 
-        message = """
+        message_1 = f"""
 ‎ 
 Welcome to the **ShellHacks 2023**! 🎉 
 
-At imperdiet dui accumsan sit amet nulla facilisi morbi tempus iaculis urna id volutpat lacus laoreet non curabitur gravida arcu ac tortor dignissim convallis aenean et tortor at risus viverra adipiscing at in tellus integer feugiat scelerisque varius morbi enim nunc faucibus a pellentesque sit amet porttitor eget dolor morbi non arcu risus quis varius quam quisque id diam vel quam! 🤗
+Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
 
-🏁 **The Goal** 🏁 
+•  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
 
-•  Vivamus arcu felis bibendum ut tristique et egestas quis ipsum suspendisse ultrices gravida dictum fusce
-•  Pellentesque diam volutpat commodo sed egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium vulputate
-•  Suspendisse in est ante in nibh mauris cursus mattis molestie a iaculis at erat pellentesque
-•  Volutpat consequat mauris nunc congue nisi vitae suscipit tellus mauris a diam maecenas sed enim
-•  Pretium nibh ipsum consequat nisl vel pretium lectus quam id leo in vitae turpis massa
+•  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
 
-🚀 **Things to Try** 🚀 
+•  📢 Network with recruiters from top tech companies like Microsoft, Xbox, Google, Waymo, Meta, NVIDIA, Adobe, and more at our sponsor fair and possibly land an internship or job!
 
-•  Sapien eget mi
-•  Id consectetur purus
-•  Diam maecenas sed
-•  Dictum sit amet
-•  Gravida cum sociis
-•  Quam elementum pulvinar etiam non 
+•  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
 
+•  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Kayaking!
+
+•  👕 Grab tons of cool swag such as t-shirts, bags, stickers, hats, and more!
+
+•  🥘 Enjoy great food - breakfast, lunch, dinner, and snacks are provided the whole weekend!
 ‎ 
         """
+
+        message_2 = f"""
+🏁 **Link My Discord?** 🏁 
+
+Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
+Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
+
+In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
+This is important to foster a warmer and safer community and will only be visible to others in the server.  
+
+🚀 **Things to Try Here** 🚀 
+
+•  {self.announcement_channel.mention} will be used to broadcast important information exclusive for those already at ShellHacks.
+•  Still don't have a team? Missing one or two members? Head over to {self.team_building_channel.mention}, where you can sort this.
+•  On {self.ask_mlh_channel.mention} you'll be able to ask hackathon related inquiries to MLH staff and use {self.sponsor_channel.mention} to open a ticket where a mentor can assit you. 
+•  In the {self.sponsor_channel.mention} channel you'll find a digital space to connect with our sponsors.
+•  Some of these channels will become available closer to the event, including {self.workshops_channel.mention}, {self.activities_channel.mention} and {self.social_channel.mention}.
+
+_Note: This is not a replacement to your physical check in at the venue on Friday._
+‎ 
+"""
         # Send new verification message otherwise
         embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by linking your Discord account with your Shellhacks'23 account."
         embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
@@ -158,8 +195,9 @@ At imperdiet dui accumsan sit amet nulla facilisi morbi tempus iaculis urna id v
 
         button = InitiateControls()
 
-        await verification_channel.send("https://cdn.discordapp.com/attachments/1148791017999433788/1148817210438058004/Shellhacks_Logo_Outlined.gif")
-        await verification_channel.send(content=message, embed=embed_response, view=button) 
+        await self.verification_channel.send("https://cdn.discordapp.com/attachments/1148791017999433788/1148817210438058004/Shellhacks_Logo_Outlined.gif")
+        await self.verification_channel.send(content=message_1) 
+        await self.verification_channel.send(content=message_2, embed=embed_response, view=button) 
    
     #Commands
     @app_commands.command(name="sponsors", description="Creates threads for all sponsors")
@@ -381,7 +419,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         sanitized_token_input = (''.join(ch for ch in self.token_input.value if ch.isalnum()))
 
         # Hit Shell-Discord endpoint #2
-        response = get_response_from_api_verify_discord(self.previously_used_email, interaction.user.id, sanitized_token_input)
+        response = get_response_from_api_verify_discord(self.previously_used_email, interaction.user.id, interaction.user.name, sanitized_token_input)
         if response.status_code == 200:
             try:
                 data = response.json()
