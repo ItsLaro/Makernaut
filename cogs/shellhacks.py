@@ -194,7 +194,7 @@ _Note: This is not a replacement to your physical check in at the venue on Frida
         embed_response.add_field(name="Not sure what ShellHacks is?", value=f"Learn more at https://www.shellhacks.net/")
 
         button = InitiateControls()
-        with open('assets\SH_Animated_Logo.gif', 'rb') as file:
+        with open('assets/SH_Animated_Logo.gif', 'rb') as file:
             gif = discord.File(file)
             await self.verification_channel.send(file=gif)
         await self.verification_channel.send(content=message_1) 
