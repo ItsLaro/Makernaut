@@ -179,11 +179,11 @@ This is important to foster a warmer and safer community and will only be visibl
 
 🚀 **Things to Try Here** 🚀 
 
-•  {self.announcement_channel.mention} will be used to broadcast important information exclusive for those already at ShellHacks.
-•  Still don't have a team? Missing one or two members? Head over to {self.team_building_channel.mention}, where you can sort this.
-•  On {self.ask_mlh_channel.mention} you'll be able to ask hackathon related inquiries to MLH staff and use {self.sponsor_channel.mention} to open a ticket where a mentor can assit you. 
-•  In the {self.sponsor_channel.mention} channel you'll find a digital space to connect with our sponsors.
-•  Some of these channels will become available closer to the event, including {self.workshops_channel.mention}, {self.activities_channel.mention} and {self.social_channel.mention}.
+•  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
+•  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
+•  On the Ask MLH channel ({self.ask_mlh_channel.mention}) you'll be able to ask hackathon related inquiries to MLH staff and use the Mentorship channel ({self.mentorship_channel.mention}) to open a ticket where a mentor can assit you. 
+•  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
+•  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
 
 _Note: This is not a replacement to your physical check in at the venue on Friday._
 ‎ 
