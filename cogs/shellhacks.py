@@ -51,7 +51,7 @@ sponsor_info = {
     "Toren AI": "Toren AI is a trailblazing artificial intelligence company dedicated to advancing machine learning technology. Their innovative solutions drive automation, data analysis, and decision-making across various industries.",
     "Elfen Software": "Elfen Software is a dynamic software development company that excels in crafting innovative solutions for businesses. They specialize in creating user-friendly software products that streamline operations and drive growth.",
     "Addigy": "Addigy is a cloud-based IT management platform designed for Apple device management. They provide businesses with powerful tools to monitor, secure, and optimize their Apple device fleets, enhancing productivity and security.",
-    "Meta": "Meta (formerly Facebook) is a technology giant known for its social media platforms, including Facebook, Instagram, WhatsApp, and Oculus VR. They connect billions of people globally, shaping the way we communicate and share experiences.",
+    "Meta": "Meta (formerly Facebook) is a technology giant known for its social media platforms, including Facebook, Instagram, WhatsApp, and a suite of VR technologies (previously Oculus). They connect billions of people globally, shaping the way we communicate and share experiences.",
     "Wells Fargo": "Wells Fargo is a prominent American bank and financial services company that offers a wide range of banking, investment, and mortgage services. They are committed to helping customers succeed financially.",
     "State Farm": "State Farm is a leading insurance and financial services company in the United States. They provide a comprehensive suite of insurance products and financial planning services, helping individuals and families protect their futures.",
     "Capital One": "Capital One is a diversified bank and financial services company known for its credit cards, banking, auto loans, and mortgage products. They leverage technology to create seamless financial experiences for customers.",
@@ -65,6 +65,16 @@ sponsor_info = {
     "Chevron": "Chevron is a leading American multinational energy corporation engaged in the exploration, production, and refining of oil and gas. They are committed to powering the world with energy solutions that drive progress and sustainability."
 }
 
+workshop_tracks_info = {
+    "Web Development" : "Develop web applications using the latest frameworks and tools",
+    "Game Development" : "Create virtual experiences that bring worlds and characters to life", 
+    "Hardware" : "Use computer hardware to tackle and solve real-world problems", 
+    "Design & Product" : "Create intuitive user experiences for your web or mobile applications", 
+    "Mobile Development": "Build interactive mobile applications for iOS and Android platforms",
+    "AI & Machine Learning": "Implement AI/ML algorithms to automate tasks and make predictions",
+    "IT & Cybersecurity": "Dive into the world of cloud computing, cybersecurity, and hacking",
+    "Career Development": "Explore careers in technology and how to break into the industry",
+}
 def generate_hacker_guide_line():
     # List of hackathon guide responses with a beach, Miami, city, and tech theme
     hackathon_guide_responses = [
@@ -148,10 +158,11 @@ class ShellHacks(commands.GroupCog, name="shell"):
 
         message_1 = f"""
 ‎ 
-Welcome to the **ShellHacks 2023**! 🎉 
+# Welcome to the **ShellHacks 2023**! 🎉 
 
 Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
 
+# At Shellhacks, you will: 
 •  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
 
 •  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
@@ -169,7 +180,7 @@ Florida's Largest Hackathon welcomes you to its seventh iteration, taking place 
         """
 
         message_2 = f"""
-🏁 **Link My Discord?** 🏁 
+# Link My Discord? 
 
 Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
 Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
@@ -177,7 +188,7 @@ Only hackers that are *Confirmed* or *Checked In* will be able to complete this 
 In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
 This is important to foster a warmer and safer community and will only be visible to others in the server.  
 
-🚀 **Things to Try Here** 🚀 
+# Things to Try Here
 
 •  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
 •  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
@@ -185,7 +196,11 @@ This is important to foster a warmer and safer community and will only be visibl
 •  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
 •  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
 
-_Note: This is not a replacement to your physical check in at the venue on Friday._
+_**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
+
+_**Note 2:** If a channel above is displayed as "No Access", it means it's still not publicly available._
+
+_**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
 ‎ 
 """
         # Send new verification message otherwise
@@ -207,10 +222,9 @@ _Note: This is not a replacement to your physical check in at the venue on Frida
         '''
         Creates threads for all sponsors
         '''        
-        SPONSOR_CHANNEL_ID = 1148792027715223583 if config.isProd else 1148832420506906644
         sponsors_forum_channel = self.bot.get_channel(SPONSOR_CHANNEL_ID)
 
-        if len(sponsors_forum_channel.threads) > 0:
+        if config.isProd and len(sponsors_forum_channel.threads) > 0:
             await interaction.response.send_message(f"Couldn't complete action as the channel needs to be empty...", ephemeral=True)
             return
         else:
@@ -220,8 +234,34 @@ _Note: This is not a replacement to your physical check in at the venue on Frida
         sponsor_object_list = [HackathonSponsor(sponsor_name, sponsor_info[sponsor_name]) for sponsor_name in sponsors_list]
 
         for sponsor in reversed(sponsor_object_list):
-            await sponsors_forum_channel.create_thread(name=sponsor.name, content=f'# {sponsor.description}', file=sponsor.image)     
+            if sponsor is not None:
+                print(sponsor.name)
+                await sponsors_forum_channel.create_thread(name=sponsor.name, content=f'# {sponsor.description}', file=sponsor.image)     
         await interaction.followup.send(f"{len(sponsors_list)} sponsor subthreads created in {sponsors_forum_channel.mention}", ephemeral=True)
+
+    @app_commands.command(name="tracks", description="Creates threads for all workshop tracks")
+    @commands.has_permissions(administrator=True)
+    async def tracks(self, interaction: discord.Interaction):
+        '''
+        Creates threads for all sponsors
+        '''        
+        WORKSHOPS_CHANNEL_ID = 1149087732862287903 if config.isProd else 1148832420506906644
+        workshops_forum_channel = self.bot.get_channel(WORKSHOPS_CHANNEL_ID)
+
+        if config.isProd and len(workshops_forum_channel.threads) > 0:
+            await interaction.response.send_message(f"Couldn't complete action as the channel needs to be empty...", ephemeral=True)
+            return
+        else:
+            await interaction.response.defer()
+        
+        workshop_list = list(workshop_tracks_info.keys())
+        sponsor_object_list = [HackathonWorkshopTrack(track_name, workshop_tracks_info[track_name]) for track_name in workshop_list]
+
+        for track in reversed(sponsor_object_list):
+            if track is not None:
+                print(track.name)
+                await workshops_forum_channel.create_thread(name=track.name, content=f'# {track.description}', file=track.image)     
+        await interaction.followup.send(f"{len(workshop_list)} sponsor subthreads created in {workshops_forum_channel.mention}", ephemeral=True)
 
     @app_commands.command(name="guide", description="Publicly Sends the hacker guide")
     async def guide(self, interaction: discord.Interaction):
@@ -242,7 +282,20 @@ class HackathonSponsor:
         if os.path.exists(png_path):
             with open(png_path, "rb") as png_file:
                 self.image = discord.File(png_file)
-   
+
+class HackathonWorkshopTrack:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+        self.image = None
+        self.load_png()
+
+    def load_png(self):
+        png_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Workshops", f"{self.name}.png")
+        if os.path.exists(png_path):
+            with open(png_path, "rb") as png_file:
+                self.image = discord.File(png_file)
+
 class InitiateControls (View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -301,7 +354,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             validated_email = validation.email            
 
             # Hit Shell-Discord endpoint #1
-            await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
+            bot_reply = await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
             response = get_response_from_api_send_email(validated_email, interaction.user.id)
             
             try:
@@ -324,7 +377,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                         description=description,
                         color=color,
                     )
-                    await interaction.followup.send(embed=embed_response, ephemeral=True)
+                    await bot_reply.edit(content='', embed=embed_response)
                     return
 
                 else:
@@ -335,13 +388,12 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     )
                     embed_response.set_footer(text="Completing this process will change your server nickname to your real name and unlock the rest of the channels for ShellHacks'23.")
                     button = VerifyControls(validated_email)
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    await bot_reply.edit(content='', embed=embed_response, view=button)
                     return
             # ERROR HANDLING
             elif response.status_code == 404:
                 self.response_title ="<a:utilfailure:809713365088993291> The email doesn't not seem to be associated with a confirmed ShellHacks application."
-                self.response_description ="Not match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance."      
-                self.response_footer = "The developers have been notified about this error"          
+                self.response_description ="No match found associated with that email address. Please make sure to use the same email address you used to apply and that you had confirmed your attendance."      
             elif response.status_code == 400:
                 if 'application_status' in data and data['application_status'] == "accepted":
                     self.response_title ="<a:utilfailure:809713365088993291> Seems like you haven't confirmed your attendance."
@@ -372,13 +424,13 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             embed_response_for_admin.add_field(name="User Info", value=f'Email: {validated_email}', inline=False)
             embed_response_for_admin.add_field(name="Server Response", value=f'{response.status_code}—{response.reason}: {response.text}', inline=False)
             bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
-            await bot_log_channel.send(f'{shellhacks_support_role.mention} , error encountered by {interaction.user.mention} in {interaction.channel.mention} during **Step 1**:',embed=embed_response_for_admin)
+            await bot_log_channel.send(f'{(shellhacks_support_role.mention + ", an error has been encountered by " + interaction.user.mention) if response.status_code != 404 else "Looks like " + interaction.user.mention + " is having a hard time with their email"} in {interaction.channel.mention} during **Step 1**:',embed=embed_response_for_admin)
         embed_response = discord.Embed(title=self.response_title,
             description=self.response_description,
             color=discord.Color.red(),
         )
         embed_response.set_footer(text=self.response_footer)
-        await interaction.followup.send(embed=embed_response, ephemeral=True)         
+        await bot_reply.edit(content='', embed=embed_response)         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
         shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         print(traceback.format_exc())
@@ -427,7 +479,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                 await interaction.user.add_roles(shellhacks_hacker_role)
                 if data['first_name'] is not None and data['last_name'] is not None:
                     try:
-                        await interaction.user.edit(nick=f"{data['first_name'].split()[0]} {data['last_name'].split()[0]}")
+                        await interaction.user.edit(nick=f"{data['first_name']} {data['last_name'].split()}")
                     except discord.DiscordException:
                         self.reponse_footer='There was an error setting your server nickname. We encourage you to try and set it yourself. If you need assistance, reach out to @Shellhacks - Discord Support'
                         embed_admin_response = discord.Embed(
