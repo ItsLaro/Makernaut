@@ -158,10 +158,11 @@ class ShellHacks(commands.GroupCog, name="shell"):
 
         message_1 = f"""
 ‎ 
-Welcome to the **ShellHacks 2023**! 🎉 
+# Welcome to the **ShellHacks 2023**! 🎉 
 
 Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
 
+# At Shellhacks, you will: 
 •  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
 
 •  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
@@ -179,7 +180,7 @@ Florida's Largest Hackathon welcomes you to its seventh iteration, taking place 
         """
 
         message_2 = f"""
-🏁 **Link My Discord?** 🏁 
+# Link My Discord? 
 
 Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
 Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
@@ -187,7 +188,7 @@ Only hackers that are *Confirmed* or *Checked In* will be able to complete this 
 In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
 This is important to foster a warmer and safer community and will only be visible to others in the server.  
 
-🚀 **Things to Try Here** 🚀 
+# Things to Try Here
 
 •  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
 •  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
@@ -195,7 +196,11 @@ This is important to foster a warmer and safer community and will only be visibl
 •  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
 •  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
 
-_Note: This is not a replacement to your physical check in at the venue on Friday._
+_**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
+
+_**Note 2:** If a channel above is displayed as "No Access", it means it's still not publicly available._
+
+_**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
 ‎ 
 """
         # Send new verification message otherwise
@@ -349,7 +354,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             validated_email = validation.email            
 
             # Hit Shell-Discord endpoint #1
-            await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
+            bot_reply = await interaction.followup.send("Taking a look at our database... Hang on a second~! <:ablobsmile:1060827611506417765>", ephemeral=True)
             response = get_response_from_api_send_email(validated_email, interaction.user.id)
             
             try:
@@ -372,7 +377,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                         description=description,
                         color=color,
                     )
-                    await interaction.followup.send(embed=embed_response, ephemeral=True)
+                    await bot_reply.edit(content='', embed=embed_response)
                     return
 
                 else:
@@ -383,7 +388,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     )
                     embed_response.set_footer(text="Completing this process will change your server nickname to your real name and unlock the rest of the channels for ShellHacks'23.")
                     button = VerifyControls(validated_email)
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    await bot_reply.edit(content='', embed=embed_response, view=button)
                     return
             # ERROR HANDLING
             elif response.status_code == 404:
@@ -419,13 +424,13 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             embed_response_for_admin.add_field(name="User Info", value=f'Email: {validated_email}', inline=False)
             embed_response_for_admin.add_field(name="Server Response", value=f'{response.status_code}—{response.reason}: {response.text}', inline=False)
             bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
-            await bot_log_channel.send(f'{(shellhacks_support_role.mention + ", an") if response.status_code != 404 else "An "} error has been encountered by {interaction.user.mention} in {interaction.channel.mention} during **Step 1**:',embed=embed_response_for_admin)
+            await bot_log_channel.send(f'{(shellhacks_support_role.mention + ", an error has been encountered by " + interaction.user.mention) if response.status_code != 404 else "Looks like " + interaction.user.mention + " is having a hard time with their email"} in {interaction.channel.mention} during **Step 1**:',embed=embed_response_for_admin)
         embed_response = discord.Embed(title=self.response_title,
             description=self.response_description,
             color=discord.Color.red(),
         )
         embed_response.set_footer(text=self.response_footer)
-        await interaction.followup.send(embed=embed_response, ephemeral=True)         
+        await bot_reply.edit(content='', embed=embed_response)         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
         shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         print(traceback.format_exc())

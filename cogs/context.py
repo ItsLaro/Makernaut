@@ -121,15 +121,13 @@ class BotContext(commands.Cog):
         author = message.author
         content = message.content.lower()
         channel = message.channel
+        # we do not want the bot to reply to itself
+        if author.id == self.bot.user.id:
+            return
         
         if channel.id in allowed_channel_ids:
-            # we do not want the bot to reply to itself
-            if author.id == self.bot.user.id:
-                return
-
             if (('hello' in content) or ('hi' in content) or ('hey' in content)) and (("makernaut" in content) or ("makernaut!" in content)):
                 try:
-                    print('Inside Bot Context: ' + message.content)
                     emoji = '\N{WHITE HEAVY CHECK MARK}'
                     await message.add_reaction(emoji)
                     await message.channel.send('Hello {0.author.mention}'.format(message))
@@ -164,15 +162,12 @@ class BotContext(commands.Cog):
         matching_real_nitro = re.findall(pattern=self.real_nitro_pattern, string=content) 
 
         if matching_mentions_nitro:
-            print("Discord/Nitro talk")
             if matching_url:
 
                 if matching_real_nitro:
-                    print("Real Discord URL")
                     pass # Real Discord link
 
                 elif (matching_gifs):
-                    print("Included Media")
                     pass # Kinda sus, but just media
 
                 else: 
