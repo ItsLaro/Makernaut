@@ -479,7 +479,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                 await interaction.user.add_roles(shellhacks_hacker_role)
                 if data['first_name'] is not None and data['last_name'] is not None:
                     try:
-                        await interaction.user.edit(nick=f"{data['first_name']} {data['last_name'].split()}")
+                        await interaction.user.edit(nick=f"{data['first_name']} {data['last_name']}")
                     except discord.DiscordException:
                         self.reponse_footer='There was an error setting your server nickname. We encourage you to try and set it yourself. If you need assistance, reach out to @Shellhacks - Discord Support'
                         embed_admin_response = discord.Embed(
