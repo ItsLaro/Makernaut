@@ -59,7 +59,7 @@ sponsor_info = {
     "Google": "Google is a multinational technology company renowned for its search engine, online advertising, cloud computing, and hardware products. They drive innovation and connect people with information worldwide.",
     "CodePath": "CodePath is an educational platform that offers mobile app development courses and resources to empower students and professionals with in-demand coding skills. They bridge the gap between education and industry needs.",
     "Adobe": "Adobe is a multinational software company known for its creative and multimedia software products, including Photoshop, Illustrator, and Adobe Creative Cloud. They empower creatives and businesses to bring their visions to life.",
-    "Nvidia": "NVIDIA is a technology leader known for its graphics processing units (GPUs). They play a crucial role in advancing artificial intelligence, gaming, and scientific computing, delivering breakthrough performance and innovation.",
+    "NVIDIA": "NVIDIA is a technology leader known for its graphics processing units (GPUs). They play a crucial role in advancing artificial intelligence, gaming, and scientific computing, delivering breakthrough performance and innovation.",
     "MLT": "MLT (Management Leadership for Tomorrow) is a nonprofit organization dedicated to advancing diversity and leadership in business and technology. They provide mentorship and professional development programs to underrepresented talent.",
     "Miami Dade County": "Miami-Dade County is a vibrant and culturally diverse county in Florida. It is known for its beautiful beaches, dynamic arts scene, and thriving business community, making it a hub of creativity and opportunity.",
     "Chevron": "Chevron is a leading American multinational energy corporation engaged in the exploration, production, and refining of oil and gas. They are committed to powering the world with energy solutions that drive progress and sustainability."
@@ -291,10 +291,10 @@ class HackathonWorkshopTrack:
         self.load_png()
 
     def load_png(self):
-        png_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Workshops", f"{self.name}.png")
-        if os.path.exists(png_path):
-            with open(png_path, "rb") as png_file:
-                self.image = discord.File(png_file)
+        svg_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Workshops", f"{self.name}.svg")
+        if os.path.exists(svg_path):
+            with open(svg_path, "rb") as svg_file:
+                self.image = discord.File(svg_file)
 
 class InitiateControls (View):
     def __init__(self):
