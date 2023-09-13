@@ -430,7 +430,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             color=discord.Color.red(),
         )
         embed_response.set_footer(text=self.response_footer)
-        await bot_reply.edit(content='', embed=embed_response)         
+        await interaction.followup.send(content='', embed=embed_response)         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
         shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         print(traceback.format_exc())
