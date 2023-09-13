@@ -29,12 +29,12 @@ VERIFY_CHANNEL_ID = 1148791017999433788 if config.isProd else 114881863731931956
 BOT_LOG_CHANNEL_ID = 626541886533795850 if config.isProd else 1065042159679578154
 ANNOUNCEMENT_CHANNEL_ID = 1148793595780939786 if config.isProd else 1148818637319319562
 TEAM_BUILDING_CHANNEL_ID = 1148794152725790820 if config.isProd else 1148818637319319562
-WORKSHOPS_CHANNEL_ID = 1149087732862287903 if config.isProd else 1148818637319319562
+WORKSHOPS_CHANNEL_ID = 1149087732862287903 if config.isProd else 1148832420506906644
 ACTIVITIES_CHANNEL_ID = 1148794929481523292 if config.isProd else 1148818637319319562
 SOCIAL_CHANNEL_ID = 1148799505806925946 if config.isProd else 1148818637319319562
 ASK_MLH_CHANNEL_ID = 1148794726514970735 if config.isProd else 1148818637319319562
 MENTORSHIP_CHANNEL_ID = 1148792715006459974 if config.isProd else 1148818637319319562
-SPONSOR_CHANNEL_ID = 1148792027715223583 if config.isProd else 1148818637319319562
+SPONSOR_CHANNEL_ID = 1148792027715223583 if config.isProd else 1148832420506906644
 
 HACKER_GUIDE_SHORTENED_URL = 'https://www.notion.so/weareinit/Hacker-Guide-7deb058ff624449a98391c910f7ad0bd?pvs=4'
 VERIFICATION_TOKEN_LENGTH = 4
@@ -236,7 +236,7 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
         for sponsor in reversed(sponsor_object_list):
             if sponsor is not None:
                 print(sponsor.name)
-                await sponsors_forum_channel.create_thread(name=sponsor.name, content=f'# {sponsor.description}', file=sponsor.image)     
+                await sponsors_forum_channel.create_thread(content=f'# {sponsor.description}', name=sponsor.name, file=sponsor.image)     
         await interaction.followup.send(f"{len(sponsors_list)} sponsor subthreads created in {sponsors_forum_channel.mention}", ephemeral=True)
 
     @app_commands.command(name="tracks", description="Creates threads for all workshop tracks")
@@ -261,7 +261,7 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
             if track is not None:
                 print(track.name)
                 await workshops_forum_channel.create_thread(name=track.name, content=f'# {track.description}', file=track.image)     
-        await interaction.followup.send(f"{len(workshop_list)} sponsor subthreads created in {workshops_forum_channel.mention}", ephemeral=True)
+        await interaction.followup.send(f"{len(workshop_list)} workshop subthreads created in {workshops_forum_channel.mention}", ephemeral=True)
 
     @app_commands.command(name="guide", description="Publicly Sends the hacker guide")
     async def guide(self, interaction: discord.Interaction):
@@ -430,7 +430,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             color=discord.Color.red(),
         )
         embed_response.set_footer(text=self.response_footer)
-        await interaction.followup.send(content='', embed=embed_response)         
+        await interaction.followup.send(content='', embed=embed_response, ephemeral=True)         
     async def on_error(self, interaction: discord.Interaction, error : Exception):
         shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         print(traceback.format_exc())
