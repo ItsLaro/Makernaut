@@ -497,7 +497,7 @@ class Roles(commands.GroupCog, name="roles"):
     @ commands.has_permissions(administrator=True)
     async def adjoin(self, interaction: discord.Interaction, old_role: discord.Role, new_role: discord.Role):
         '''
-        Used to replace a role for another on every user.\nEx: ?replacerole ShellHacks Hacker | ShellHacks 2018 Hacker
+        Used to add a role on every user that has a role.\nEx: ?adjoin @ShellHacks Organizer | @FIU Eboard
         '''
         is_success = False
         response_title = f"<a:utilfailure:809713365088993291> Failed"

@@ -33,7 +33,7 @@ WORKSHOPS_CHANNEL_ID = 1149087732862287903 if config.isProd else 114883242050690
 ACTIVITIES_CHANNEL_ID = 1148794929481523292 if config.isProd else 1148818637319319562
 SOCIAL_CHANNEL_ID = 1148799505806925946 if config.isProd else 1148818637319319562
 ASK_MLH_CHANNEL_ID = 1148794726514970735 if config.isProd else 1148818637319319562
-MENTORSHIP_CHANNEL_ID = 1148792715006459974 if config.isProd else 1148818637319319562
+SUPPORT_CHANNEL_ID = 1152135081750712320 if config.isProd else 1152135403332194346
 SPONSOR_CHANNEL_ID = 1148792027715223583 if config.isProd else 1148832420506906644
 
 HACKER_GUIDE_SHORTENED_URL = 'https://www.notion.so/weareinit/Hacker-Guide-7deb058ff624449a98391c910f7ad0bd?pvs=4'
@@ -114,6 +114,7 @@ def get_response_from_api_send_email(email, discord_id):
         json=data, 
         headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',}, 
     )
+    print(res.text)
     return res
 
 def get_response_from_api_verify_discord(email, discord_id, discord_username, verification_code ):
@@ -145,75 +146,108 @@ class ShellHacks(commands.GroupCog, name="shell"):
         self.activities_channel = self.bot.get_channel(ACTIVITIES_CHANNEL_ID)
         self.social_channel = self.bot.get_channel(SOCIAL_CHANNEL_ID)
         self.ask_mlh_channel = self.bot.get_channel(ASK_MLH_CHANNEL_ID)
-        self.mentorship_channel = self.bot.get_channel(MENTORSHIP_CHANNEL_ID)
+        self.support_channel = self.bot.get_channel(SUPPORT_CHANNEL_ID)
         self.sponsor_channel = self.bot.get_channel(SPONSOR_CHANNEL_ID)
 
     async def cog_load(self):
-        embed_title = "Link your Discord with ShellHacks 2023!"
 
+        must_send_verification_message = True
+        must_send_support_message = True
+
+        ### SHELLHACKS VERIFICATION MESSAGE SETUP ###
+
+        embed_title = "Link your Discord with ShellHacks 2023!"
         # If message already exists, we leave channel alone
         async for message in self.verification_channel.history():
             if message.author.id == self.bot.user.id and len(message.embeds) > 0 and message.embeds[0].title == embed_title:
-                return
+                must_send_verification_message = False
+        
+        if must_send_verification_message: 
+            message_1 = f"""
+    ‎ 
 
-        message_1 = f"""
-‎ 
-# Welcome to the **ShellHacks 2023**! 🎉 
+    _**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
+    _**Note 2:** If a channel below is displayed as "No Access", it means it's still not publicly available._
+    _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
 
-Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
+    # Welcome to the **ShellHacks 2023**! 🎉 
 
-# At Shellhacks, you will: 
-•  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
+    Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
 
-•  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
+    # At Shellhacks, you will: 
+    •  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
 
-•  📢 Network with recruiters from top tech companies like Microsoft, Xbox, Google, Waymo, Meta, NVIDIA, Adobe, and more at our sponsor fair and possibly land an internship or job!
+    •  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
 
-•  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
+    •  📢 Network with recruiters from top tech companies like Microsoft, Xbox, Google, Waymo, Meta, NVIDIA, Adobe, and more at our sponsor fair and possibly land an internship or job!
 
-•  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Cup Stacking!
+    •  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
 
-•  👕 Grab tons of cool swag such as t-shirts, bags, stickers, and more!
+    •  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Cup Stacking!
 
-•  🥘 Enjoy great food - brunch, lunch, dinner, and snacks are provided the whole weekend!
-‎ 
-        """
+    •  👕 Grab tons of cool swag such as t-shirts, bags, stickers, and more!
 
-        message_2 = f"""
-# Link My Discord? 
+    •  🥘 Enjoy great food - brunch, lunch, dinner, and snacks are provided the whole weekend!
+    ‎ 
+            """
 
-Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
-Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
+            message_2 = f"""
+    # Link My Discord? 
 
-In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
-This is important to foster a warmer and safer community and will only be visible to others in the server.  
+    Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
+    Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
 
-# Things to Try Here
+    In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
+    This is important to foster a warmer and safer community and will only be visible to others in the server.  
 
-•  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
-•  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
-•  On the Ask MLH channel ({self.ask_mlh_channel.mention}) you'll be able to ask hackathon related inquiries to MLH staff and use the Mentorship channel ({self.mentorship_channel.mention}) to open a ticket where a mentor can assit you. 
-•  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
-•  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
+    # Things to Try Here
 
-_**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
+    •  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
+    •  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
+    •  You can use the ({self.support_channel.mention}) to submit a ticket where a mentor can assist you, or ask hackathon related inquiries to MLH staff or our Organizers.
+    •  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
+    •  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
 
-_**Note 2:** If a channel above is displayed as "No Access", it means it's still not publicly available._
 
-_**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
-‎ 
-"""
-        # Send new verification message otherwise
-        embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by linking your Discord account with your Shellhacks'23 account."
-        embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
-        embed_response.add_field(name="Not sure what ShellHacks is?", value=f"Learn more at https://www.shellhacks.net/")
+    ‎ 
+    """
+            # Send new verification message otherwise
+            embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by linking your Discord account with your Shellhacks'23 account."
+            embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
+            embed_response.add_field(name="Not sure what ShellHacks is?", value=f"Learn more at https://www.shellhacks.net/")
 
-        button = InitiateControls()
-        with open('assets/SH_Animated_Logo.gif', 'rb') as file:
-            gif = discord.File(file)
-            await self.verification_channel.send(file=gif)
-        await self.verification_channel.send(content=message_1) 
-        await self.verification_channel.send(content=message_2, embed=embed_response, view=button) 
+            verification_button = InitiateControls()
+            with open('assets/SH_Animated_Logo.gif', 'rb') as file:
+                gif = discord.File(file)
+                await self.verification_channel.send(file=gif)
+            await self.verification_channel.send(content=message_1) 
+            await self.verification_channel.send(content=message_2, embed=embed_response, view=verification_button) 
+
+
+        ### SHELLHACKS VERIFICATION MESSAGE SETUP ###
+        embed_title = "Get Help!"
+        # If message already exists, we leave channel alone
+        async for message in self.support_channel.history():
+            if message.author.id == self.bot.user.id and len(message.embeds) > 0 and message.embeds[0].title == embed_title:
+                must_send_support_message = False
+
+        if must_send_support_message:
+            support_buttons = TicketControls()
+            support_message = ''' 
+
+**Mentorship Request:** Connect with a mentor to obtain guidance in your technical endevours.
+
+**ShellHacks Inquiry:** Chat with a member of the Organizing team about a doubt or need.
+
+**Ask MLH:** Reach out to the MLH staff at ShellHacks to learn more about their policies or even borrow hardware.
+
+**Discord Support:** Having difficulties here on Discord? Encountered a bug? Report it to us.  
+
+    '''
+            embed_description = "To open a ticket and get help, choose one of the tickets below. Clicking on a button, will create a private thread with you and the relevant contacts"
+            embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
+            await self.support_channel.send(content=support_message, embed=embed_response, view=support_buttons) 
+
    
     #Commands
     @app_commands.command(name="sponsors", description="Creates threads for all sponsors")
@@ -370,7 +404,18 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
                     shellhacks_support_role = interaction.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
                     if shellhacks_hacker_role not in interaction.user.roles:     
-                        await interaction.user.add_roles(shellhacks_hacker_role)             
+                        await interaction.user.add_roles(shellhacks_hacker_role)
+                        try:
+                            await interaction.user.edit(nick=f"{data['first_name']} {data['last_name']}")
+                        except discord.DiscordException:
+                            self.reponse_footer='There was an error setting your server nickname. We encourage you to try and set it yourself. If you need assistance, reach out to @Shellhacks - Discord Support'
+                            embed_admin_response = discord.Embed(
+                                title="Couldn't set server nickname",
+                                description=f"{interaction.user.display_name} ({interaction.user.mention}) got verified but could not be assigned \"{data['first_name']} {data['last_name']}\" as their nickname",
+                                color=discord.Color.red(),
+                            )
+                            bot_log_channel = interaction.user.guild.get_channel(BOT_LOG_CHANNEL_ID)
+                            await bot_log_channel.send(f"{shellhacks_support_role.mention}, a discord error was observed: ", embed=embed_admin_response)
                         description += f" However, seems like you were missing the appropiate role here on Discord. I've gone ahead and attempted to fix that for you! If you still don't get access, please reach out to someone with the {shellhacks_support_role.mention} role"
                     embed_response = discord.Embed(
                         title=title,
@@ -484,7 +529,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                         self.reponse_footer='There was an error setting your server nickname. We encourage you to try and set it yourself. If you need assistance, reach out to @Shellhacks - Discord Support'
                         embed_admin_response = discord.Embed(
                             title="Couldn't set server nickname",
-                            description=f"{interaction.user.display_name} ({interaction.user.mention}) got verified but could not be assigned \"{data['first_name'].split()[0]} {data['last_name'].split()[0]}\" as their nickname",
+                            description=f"{interaction.user.display_name} ({interaction.user.mention}) got verified but could not be assigned \"{data['first_name']} {data['last_name']}\" as their nickname",
                             color=discord.Color.red(),
                         )
                         await bot_log_channel.send(f"{shellhacks_support_role.mention}, a discord error was observed: ", embed=embed_admin_response)
@@ -549,6 +594,49 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                     color=color,
         )
         await bot_log_channel.send(f"{shellhacks_support_role.mention}, an error was caught: ", embed=embed_response)
+
+class TicketControls (View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.MODERATOR_ROLE_ID = 399551100799418370 if config.isProd else 1065042154407338039
+        self.MENTOR_ROLE_ID = 888959725037846578 if config.isProd else 1065042154289897544
+        self.ORGANIZER_ROLE_ID = 888960305693069402 if config.isProd else 1065042154289897546
+        self.MLH_ROLE_ID = 1152126734309785610 if config.isProd else 1152165574760202291
+        self.DISCORD_SUPPORT_ROLE_ID = 1150551214845603880 if config.isProd else 1150550766927495309
+
+    async def create_private_thread(self, interaction, reason, cced_role):
+        moderator_role = interaction.guild.get_role(self.MODERATOR_ROLE_ID)
+        thread = await interaction.channel.create_thread(
+            name=f"{interaction.user.nick}'s {reason} Ticket",
+            reason=reason
+        )
+        message = f'''
+{interaction.user.mention}, this is your private thread for {reason}. This is **only** visible by:
+- **YOU**
+- {cced_role.mention}s
+- Our admins and {moderator_role.mention}s
+
+Someone will be here to help you shortly. <a:wumphug:819391710878236712>
+        '''
+        await thread.send(message)
+        await interaction.response.send_message(f"A thread for your **{reason}** ticket has been created! Find it under this channel in the [Channel List on the left](https://media.discordapp.net/attachments/1152135403332194346/1152271772155125860/image.png?width=568&height=213) or by clicking the [Threads Icon at the top-right](https://media.discordapp.net/attachments/1152135403332194346/1152243706892660838/image.png?width=379&height=117)", ephemeral=True)
+
+    @discord.ui.button(label='Mentorship Request', style=discord.ButtonStyle.green ,emoji="🎫", custom_id='shellhacks_ticketing:mentorship_button')
+    async def open_mentorship_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        mentor_role = interaction.guild.get_role(self.MENTOR_ROLE_ID)
+        await self.create_private_thread(interaction, "Mentorship Request", mentor_role)
+    @discord.ui.button(label='ShellHacks Inquiry', style=discord.ButtonStyle.red ,emoji="🏖️", custom_id='shellhacks_ticketing:shellhacks_button')
+    async def open_shellhacks_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        organizer_role = interaction.guild.get_role(self.ORGANIZER_ROLE_ID)
+        await self.create_private_thread(interaction, "Shellhacks Inquiry", organizer_role)
+    @discord.ui.button(label='Ask MLH', style=discord.ButtonStyle.gray ,emoji="🎟️", custom_id='shellhacks_ticketing:mlh_button')
+    async def open_mlh_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        mlh_role= interaction.guild.get_role(self.MLH_ROLE_ID)
+        await self.create_private_thread(interaction, "Ask MLH", mlh_role)
+    @discord.ui.button(label='Discord Support', style=discord.ButtonStyle.blurple ,emoji="🎴", custom_id='shellhacks_ticketing:discord_button')
+    async def open_discord_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        discord_role = interaction.guild.get_role(self.DISCORD_SUPPORT_ROLE_ID)
+        await self.create_private_thread(interaction, "Discord Support", discord_role)
 
 async def setup(bot):
     await bot.add_cog(ShellHacks(bot)) 
