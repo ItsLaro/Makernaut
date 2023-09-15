@@ -164,52 +164,51 @@ class ShellHacks(commands.GroupCog, name="shell"):
         
         if must_send_verification_message: 
             message_1 = f"""
-    ‎ 
+‎ 
 
-    _**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
-    _**Note 2:** If a channel below is displayed as "No Access", it means it's still not publicly available._
-    _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
+# Welcome to the **ShellHacks 2023**! 🎉 
 
-    # Welcome to the **ShellHacks 2023**! 🎉 
+Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
 
-    Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
+# At Shellhacks, you will: 
+•  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
 
-    # At Shellhacks, you will: 
-    •  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
+•  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
 
-    •  🔨 Build innovative projects with fellow students to gain experience you can add to your resume and make you a stronger candidate!
+•  📢 Network with recruiters from top tech companies like Microsoft, Xbox, Google, Waymo, Meta, NVIDIA, Adobe, and more at our sponsor fair and possibly land an internship or job!
 
-    •  📢 Network with recruiters from top tech companies like Microsoft, Xbox, Google, Waymo, Meta, NVIDIA, Adobe, and more at our sponsor fair and possibly land an internship or job!
+•  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
 
-    •  🚀 Win amazing prizes including MacBooks, iPads, PS5s, and more tech gadgets!
+•  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Cup Stacking!
 
-    •  🎉 Participate in fun activities such as our Smash Tournament, Women in Tech Meetup, and Cup Stacking!
+•  👕 Grab tons of cool swag such as t-shirts, bags, stickers, and more!
 
-    •  👕 Grab tons of cool swag such as t-shirts, bags, stickers, and more!
-
-    •  🥘 Enjoy great food - brunch, lunch, dinner, and snacks are provided the whole weekend!
+•  🥘 Enjoy great food - brunch, lunch, dinner, and snacks are provided the whole weekend!
     ‎ 
             """
 
             message_2 = f"""
-    # Link My Discord? 
+# Link My Discord? 
 
-    Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
-    Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
+Despite being fully in person, Discord remains as one of our main forms of instant communication during the event. Not only that, it's also the perfect place to meet, socialize and coordinate with fellow hackers before and during the event. 
+Only hackers that are *Confirmed* or *Checked In* will be able to complete this process and gain access to the entirety of the channels designed for ShellHacks.
 
-    In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
-    This is important to foster a warmer and safer community and will only be visible to others in the server.  
+In addition to associating your Discord user with your ShellHacks account, the name on the application will be set as your server's nickname. 
+This is important to foster a warmer and safer community and will only be visible to others in the server.  
 
-    # Things to Try Here
+_**Note 1:** This is not a replacement to your physical check in at the venue on Friday._
+_**Note 2:** If a channel below is displayed as "No Access", it means it's still not publicly available._
+_**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from us soon!_
 
-    •  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
-    •  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
-    •  You can use the ({self.support_channel.mention}) to submit a ticket where a mentor can assist you, or ask hackathon related inquiries to MLH staff or our Organizers.
-    •  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
-    •  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
+# Things to Try Here
 
+•  An Annoucement channel ({self.announcement_channel.mention}) will be used to broadcast important information exclusive for those already at ShellHacks.
+•  Still don't have a team? Missing one or two members? Head over to the Team Building channel ({self.team_building_channel.mention}), where you can join forces with fellow hacker.
+•  You can use the ({self.support_channel.mention}) to submit a ticket where a mentor can assist you, or ask hackathon related inquiries to MLH staff or our Organizers.
+•  In the Sponsor channel ({self.sponsor_channel.mention}) you'll find a digital space to connect with our sponsors.
+•  Some of these channels will only become available closer to the event, including additional ones for workshops, activities and other social spaces.
 
-    ‎ 
+‎ 
     """
             # Send new verification message otherwise
             embed_description = "Have you confirmed your attendance? Gain access to the rest of the ShellHacks channels by linking your Discord account with your Shellhacks'23 account."
@@ -325,10 +324,10 @@ class HackathonWorkshopTrack:
         self.load_png()
 
     def load_png(self):
-        svg_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Workshops", f"{self.name}.svg")
-        if os.path.exists(svg_path):
-            with open(svg_path, "rb") as svg_file:
-                self.image = discord.File(svg_file)
+        png_path = os.path.join(os.path.dirname(__file__), "..", "assets", "SH23_Workshops", f"{self.name}.png")
+        if os.path.exists(png_path):
+            with open(png_path, "rb") as png_file:
+                self.image = discord.File(png_file)
 
 class InitiateControls (View):
     def __init__(self):
@@ -616,7 +615,7 @@ class TicketControls (View):
 - {cced_role.mention}s
 - Our admins and {moderator_role.mention}s
 
-Someone will be here to help you shortly. <a:wumphug:819391710878236712>
+Someone will be here to help you shortly. <a:wumpusblob:799276931294953482>
         '''
         await thread.send(message)
         await interaction.response.send_message(f"A thread for your **{reason}** ticket has been created! Find it under this channel in the [Channel List on the left](https://media.discordapp.net/attachments/1152135403332194346/1152271772155125860/image.png?width=568&height=213) or by clicking the [Threads Icon at the top-right](https://media.discordapp.net/attachments/1152135403332194346/1152243706892660838/image.png?width=379&height=117)", ephemeral=True)
