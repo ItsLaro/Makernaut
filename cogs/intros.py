@@ -64,6 +64,7 @@ class Intros(commands.Cog):
             pass 
 
     async def setIntroSticky(self):
+        latest_message = None
         async for message in self.intro_channel.history():
             latest_message = message
             break
@@ -79,6 +80,7 @@ class Intros(commands.Cog):
             self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
     
     async def setWinitSticky(self):
+        latest_message = None
         async for message in self.winit_channel.history():
             latest_message = message
             break
