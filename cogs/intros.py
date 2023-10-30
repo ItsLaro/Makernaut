@@ -15,8 +15,11 @@ class Intros(commands.Cog):
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
         self.MODERATOR_ROLE_ID = 399551100799418370 if config.isProd else 1065046848747872368
         self.INTRO_CHANNEL_ID = 881347138636894218 if config.isProd else 1065042157800542301
+        self.WINIT_CHANNEL_ID = 1168626157911027883 if config.isProd else 1168626341000777739
         self.intro_channel = self.bot.get_channel(self.INTRO_CHANNEL_ID)
+        self.winit_channel = self.bot.get_channel(self.WINIT_CHANNEL_ID)
         self.bot_intro_message = None
+        self.bot_winit_message = None
         
         self.BOT_INTRO_TITLE_TEXT = "Nice to meet you~!"
         self.BOT_INTRO_BODY_TEXT = """ 
@@ -33,11 +36,35 @@ class Intros(commands.Cog):
         self.bot_intro_embed = discord.Embed(title=self.BOT_INTRO_TITLE_TEXT, description=self.BOT_INTRO_BODY_TEXT, color=self.YELLOW_HEX)
         # self.bot_intro_embed.set_thumbnail(url="https://i.imgur.com/7IyphRI.png")
 
-  
+        self.BOT_WINIT_TITLE_TEXT = "We’re **INIT** to **Win It**~! 💰"
+        self.BOT_WINIT_BODY_TEXT = """ 
+            We want to celebrate **YOUR** accomplishments! Did you recently get an **internship** offer, land a **full-time** **job**, earn a **scholarship**, **graduate**, or simply accomplish something you’re really proud of? Post a message here and share it with the community!
+
+            We also encourage you to celebrate and support your fellow INIT members by reacting to their messages! If you’d like to congratulate them with a written message, please do it by starting a thread (hover over their message and click “create thread” on the right).
+        """
+        self.BOT_WINIT_FOOTER = "P.S. Members who share their accomplishments will also have a chance to be featured on our newsletter and social media channels! A great opportunity for you to build your brand and expand your network 😎"
+        self.YELLOW_HEX = 0xFFBF00  
+        self.bot_winit_embed = discord.Embed(title=self.BOT_WINIT_TITLE_TEXT, description=self.BOT_WINIT_BODY_TEXT, color=self.YELLOW_HEX)
+        self.bot_winit_embed.set_footer(text=self.BOT_WINIT_FOOTER)
+    
     async def cog_load(self):
-        channel = self.intro_channel
-        latest_message = None
-        async for message in channel.history():
+       await self.setIntroSticky()
+       await self.setWinitSticky()
+            
+    @commands.Cog.listener()
+    async def on_message(self, payload):
+        try:
+            if self.bot_intro_message is not None and payload.channel == self.intro_channel:
+                await self.bot_intro_message.delete()
+                self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
+            if self.bot_winit_message is not None and payload.channel == self.winit_channel:
+                await self.bot_winit_message.delete()
+                self.bot_winit_message = await self.winit_channel.send(embed=self.bot_winit_embed)
+        except discord.errors.NotFound:
+            pass 
+
+    async def setIntroSticky(self):
+        async for message in self.intro_channel.history():
             latest_message = message
             break
 
@@ -45,17 +72,26 @@ class Intros(commands.Cog):
             self.bot_intro_message = latest_message
         else:
             # We clean channel for stale messages
-            async for message in channel.history():
+            async for message in self.intro_channel.history():
                 if message.author.id == self.bot.user.id:
                     await message.delete()
             # Send a new intro message
             self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
-            
-    @commands.Cog.listener()
-    async def on_message(self, payload):
-        if payload.channel == self.intro_channel:
-            await self.bot_intro_message.delete()
-            self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
+    
+    async def setWinitSticky(self):
+        async for message in self.winit_channel.history():
+            latest_message = message
+            break
+        if latest_message and latest_message.author.id == self.bot.user.id:
+            self.bot_winit_message = latest_message
+        else:
+            # We clean channel for stale messages
+            async for message in self.winit_channel.history():
+                if message.author.id == self.bot.user.id:
+                    await message.delete()
+            # Send a new intro message
+            self.bot_winit_message = await self.winit_channel.send(embed=self.bot_winit_embed)
 
+    
 async def setup(bot):
     await bot.add_cog(Intros(bot)) 
