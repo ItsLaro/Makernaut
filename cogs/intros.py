@@ -53,15 +53,15 @@ class Intros(commands.Cog):
             
     @commands.Cog.listener()
     async def on_message(self, payload):
-        try:
-            if self.bot_intro_message is not None and payload.channel == self.intro_channel:
-                await self.bot_intro_message.delete()
-                self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
-            if self.bot_winit_message is not None and payload.channel == self.winit_channel:
-                await self.bot_winit_message.delete()
-                self.bot_winit_message = await self.winit_channel.send(embed=self.bot_winit_embed)
-        except discord.errors.NotFound:
-            pass 
+        if payload.author.id == self.bot.user.id:
+            return
+        if self.bot_intro_message is not None and payload.channel == self.intro_channel:
+            await self.bot_intro_message.delete()
+            self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
+        if self.bot_winit_message is not None and payload.channel == self.winit_channel:
+            await self.bot_winit_message.delete()
+            self.bot_winit_message = await self.winit_channel.send(embed=self.bot_winit_embed)
+
 
     async def setIntroSticky(self):
         latest_message = None
