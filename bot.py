@@ -10,6 +10,7 @@ from cogs.alumni_verification import InitiateControls as AlumniVerificationIniti
 # from cogs.shellhacks import TicketControls as ShellHacksTicketControls
 from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.alumni import SelectView
+from cogs.campus import CampusRoleSelectControls
 from helpers.emojis import alphabet
 
 load_dotenv()
@@ -30,6 +31,7 @@ class Gui(commands.Bot):
         self.add_view(SelectView(company_sorted_combined_options_and_roles))
         profession_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix('Alumni Role - ')
         self.add_view(SelectView(profession_sorted_combined_options_and_roles))
+        self.add_view(CampusRoleSelectControls())
 
     async def on_ready(self):
         
