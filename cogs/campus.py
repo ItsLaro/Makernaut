@@ -68,7 +68,7 @@ class Campus(commands.Cog):
         mdc_campus_channel = self.bot.get_channel(MDC_CAMPUS_CHANNEL_ID)
 
         embed_title = "Select Your Campus To Gain Access"
-        embed_description = "By selecting your campus below, you will only get be notified about events taking place in your campus of choice. You can select more than one."
+        embed_description = "Select one of the campuses below to gain access to the rest of the MDC category. You will only get notified about events taking place at your campus of choice. You can select more than one campus."
 
         # If message already exists, we leave the channel alone
         async for message in mdc_campus_channel.history():
