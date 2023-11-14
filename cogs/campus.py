@@ -15,18 +15,18 @@ class CampusRoleSelectControls (View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Wolfson", style=discord.ButtonStyle.primary, custom_id='guilds:campus_wolfson_button')
-    async def wolfson(self, interaction: discord.Interaction, button: discord.ui.Button):
-        role = interaction.guild.get_role(WOLFSON_ROLE_ID)
-        campus_name = WOLFSON_CAMPUS_NAME
+    @discord.ui.button(label="Kendall", style=discord.ButtonStyle.primary, custom_id='guilds:campus_kendall_button')
+    async def kendall(self, interaction: discord.Interaction, button: discord.ui.Button):
+        role = interaction.guild.get_role(KENDALL_ROLE_ID)
+        campus_name = KENDALL_CAMPUS_NAME
 
         if(role not in interaction.user.roles):
             await interaction.user.add_roles(role)
             response = f"Selected {campus_name}"
         else:
             await interaction.user.remove_roles(role)
-            response = f"Removed {campus_name}"
-
+            response = f"Removed {campus_name}"    
+        
         await interaction.response.send_message(response, ephemeral=True)
     
     @discord.ui.button(label="North", style=discord.ButtonStyle.primary, custom_id='guilds:campus_north_button')
@@ -42,18 +42,19 @@ class CampusRoleSelectControls (View):
             response = f"Removed {campus_name}"
         
         await interaction.response.send_message(response, ephemeral=True)
-    @discord.ui.button(label="Kendall", style=discord.ButtonStyle.primary, custom_id='guilds:campus_kendall_button')
-    async def kendall(self, interaction: discord.Interaction, button: discord.ui.Button):
-        role = interaction.guild.get_role(KENDALL_ROLE_ID)
-        campus_name = KENDALL_CAMPUS_NAME
+
+    @discord.ui.button(label="Wolfson", style=discord.ButtonStyle.primary, custom_id='guilds:campus_wolfson_button')
+    async def wolfson(self, interaction: discord.Interaction, button: discord.ui.Button):
+        role = interaction.guild.get_role(WOLFSON_ROLE_ID)
+        campus_name = WOLFSON_CAMPUS_NAME
 
         if(role not in interaction.user.roles):
             await interaction.user.add_roles(role)
             response = f"Selected {campus_name}"
         else:
             await interaction.user.remove_roles(role)
-            response = f"Removed {campus_name}"    
-        
+            response = f"Removed {campus_name}"
+
         await interaction.response.send_message(response, ephemeral=True)
         
 class Campus(commands.Cog):
@@ -67,8 +68,8 @@ class Campus(commands.Cog):
         
         mdc_campus_channel = self.bot.get_channel(MDC_CAMPUS_CHANNEL_ID)
 
-        embed_title = "Select Your Campus To Gain Access"
-        embed_description = "Select one of the campuses below to gain access to the rest of the MDC category. You will only get notified about events taking place at your campus of choice. You can select more than one campus."
+        embed_title = "Select Your MDC Campus"
+        embed_description = "Please select one or more campuses that you attend to gain access to the rest of the MDC category. Selecting a campus will notify you of announcements and events taking place at that campus. You can remove a campus by clicking on it again."
 
         # If message already exists, we leave the channel alone
         async for message in mdc_campus_channel.history():
