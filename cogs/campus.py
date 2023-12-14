@@ -2,8 +2,10 @@ import discord
 import config
 from discord.ext import commands
 from discord.ui import View
+from discord import app_commands
 
 MDC_CAMPUS_CHANNEL_ID = 1171794121841713152 if config.isProd else 1172995616369021089
+MDC_ROLE_ID = 1061212832118608037 if config.isProd else 1065042154369585265
 WOLFSON_ROLE_ID = 1173052704898158622 if config.isProd else 1173048170670993438
 NORTH_ROLE_ID = 1173052863069573190 if config.isProd else 1173048218746101760
 KENDALL_ROLE_ID = 1173052902034636811 if config.isProd else 1173048247217037373
@@ -57,13 +59,13 @@ class CampusRoleSelectControls (View):
 
         await interaction.response.send_message(response, ephemeral=True)
         
-class Campus(commands.Cog):
+class Campus(commands.GroupCog, name="campus"):
     '''
     Commands specifically designed to tackle logistical needs for our Executive Board
     '''
-
     def __init__(self, bot):
         self.bot = bot    
+
     async def cog_load(self):
         
         mdc_campus_channel = self.bot.get_channel(MDC_CAMPUS_CHANNEL_ID)
@@ -81,16 +83,47 @@ class Campus(commands.Cog):
         controls = CampusRoleSelectControls() ## TODO: CampusRoleSelectControls
         await mdc_campus_channel.send(embed=embed, view=controls)
             
-    @commands.Cog.listener()
-    async def on_message(self, payload):
-        if payload.author.id == self.bot.user.id:
-            return
-        if self.bot_intro_message is not None and payload.channel == self.intro_channel:
-            await self.bot_intro_message.delete()
-            self.bot_intro_message = await self.intro_channel.send(embed=self.bot_intro_embed)
-        if self.bot_winit_message is not None and payload.channel == self.winit_channel:
-            await self.bot_winit_message.delete()
-            self.bot_winit_message = await self.winit_channel.send(embed=self.bot_winit_embed)
-    
-async def setup(bot):
-    await bot.add_cog(Campus(bot)) 
+    @app_commands.command(name="remind_mdc",
+                        description="Used to inquire about a role.")
+    @commands.has_permissions(administrator=True)
+    async def remind_MDC(self, interaction: discord.Interaction):
+        '''
+        Used to send reminder to all inactive MDC students to select a campus
+        '''   
+        mdc_campus_channel = self.bot.get_channel(MDC_CAMPUS_CHANNEL_ID)
+
+        embed_title = "IMPORTANT: Select Your MDC Campus on the INIT server"
+        embed_description = "This is a reminder to please select your campus at MDC. You need to select the campus (or campuses) that you attend to gain access to the rest of the MDC category here on Discord. Selecting a campus will notify you of announcements and events taking place at that campus. You can remove a campus by clicking on it again."
+        action_call = f'Please go to {mdc_campus_channel.mention} to make a selection.'
+        embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
+
+        mdc_base_role = interaction.guild.get_role(MDC_ROLE_ID)
+        mdc_kendall_role = interaction.guild.get_role(KENDALL_ROLE_ID)
+        mdc_north_role = interaction.guild.get_role(NORTH_ROLE_ID)
+        mdc_wolfson_role = interaction.guild.get_role(WOLFSON_ROLE_ID)
+        campus_roles = [mdc_kendall_role, mdc_north_role, mdc_wolfson_role]
+
+        number_activated_campus_members = 0
+        number_undecided_campus_members = 0
+        for member in interaction.guild.members:
+            member_roles = member.roles
+            if mdc_base_role in member_roles and any(i in campus_roles for i in member_roles):
+                number_activated_campus_members+=1
+            elif mdc_base_role in member_roles:
+                number_undecided_campus_members+=1
+                try:
+                    user_inbox = await interaction.user.create_dm()
+                    await user_inbox.send(embed=embed)
+                    await user_inbox.send(action_call)
+                except BaseException:
+                    pass
+        response = f'''
+No. of MDC students with campus selected: {number_activated_campus_members}
+No. of MDC students pending selection: {number_undecided_campus_members}
+        '''
+        await interaction.response.send_message(response)
+
+
+
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Campus(bot))
