@@ -92,10 +92,11 @@ class Campus(commands.GroupCog, name="campus"):
         '''   
         mdc_campus_channel = self.bot.get_channel(MDC_CAMPUS_CHANNEL_ID)
 
-        embed_title = "IMPORTANT: Select Your MDC Campus on the INIT server"
-        embed_description = "This is a reminder to please select your campus at MDC. You need to select the campus (or campuses) that you attend to gain access to the rest of the MDC category here on Discord. Selecting a campus will notify you of announcements and events taking place at that campus. You can remove a campus by clicking on it again."
-        action_call = f'Please go to {mdc_campus_channel.mention} to make a selection.'
-        embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
+        # embed_title = "IMPORTANT: Select Your MDC Campus on the INIT server"
+        # embed_description = "This is a reminder to please select your campus at MDC. You need to select the campus (or campuses) that you attend to gain access to the rest of the MDC category here on Discord. Selecting a campus will notify you of announcements and events taking place at that campus. You can remove a campus by clicking on it again."
+        # action_call = f'Please go to {mdc_campus_channel.mention} to make a selection.'
+        goodbye_message = f'Thank you! Have and amazing weekend! <:ablobheart:1063101988918804551>'
+        # embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
 
         mdc_base_role = interaction.guild.get_role(MDC_ROLE_ID)
         mdc_kendall_role = interaction.guild.get_role(KENDALL_ROLE_ID)
@@ -120,21 +121,26 @@ class Campus(commands.GroupCog, name="campus"):
                 number_undecided_campus_members+=1
                 try:
                     user_inbox = await member.create_dm()
-                    await user_inbox.send(embed=embed)
-                    await user_inbox.send(action_call)
+                    # await user_inbox.send(embed=embed)
+                    await user_inbox.send(goodbye_message)
                     list_undecided_reached_campus_members.append(member.mention)
                 except BaseException:
                     number_undecided_unreachable_campus_members+=1
                     list_undecided_unreachable_campus_members.append(member.mention)
                     pass
-        response = f'''
+        response1 = f'''
 No. of MDC students with campus selected: {number_activated_campus_members}
 No. of MDC students pending selection: {number_undecided_campus_members}
 No. of MDC students pending selection that could not be reached: {number_undecided_unreachable_campus_members}
-List of reached out students: {','.join(list_undecided_reached_campus_members)}
-List of unreachable students: {','.join(list_undecided_unreachable_campus_members)}
-        '''
-        await interaction.followup.send(response)
+'''
+        response2 = f"List of reached out students: {', '.join(list_undecided_reached_campus_members)[:1800]}"
+        response3 = f"List of unreachable students: {', '.join(list_undecided_unreachable_campus_members)[:1800]}"       
+        print(response1)
+        await interaction.followup.send(response1)
+        print(response2)
+        await interaction.followup.send(response2)
+        print(response3)
+        await interaction.followup.send(response3)
 
 
 
