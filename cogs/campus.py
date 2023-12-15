@@ -105,6 +105,13 @@ class Campus(commands.GroupCog, name="campus"):
 
         number_activated_campus_members = 0
         number_undecided_campus_members = 0
+        number_undecided_unreachable_campus_members = 0
+
+        list_undecided_reached_campus_members = []
+        list_undecided_unreachable_campus_members = []
+
+        await interaction.response.defer()
+
         for member in interaction.guild.members:
             member_roles = member.roles
             if mdc_base_role in member_roles and any(i in campus_roles for i in member_roles):
@@ -112,16 +119,22 @@ class Campus(commands.GroupCog, name="campus"):
             elif mdc_base_role in member_roles:
                 number_undecided_campus_members+=1
                 try:
-                    user_inbox = await interaction.user.create_dm()
+                    user_inbox = await member.create_dm()
                     await user_inbox.send(embed=embed)
                     await user_inbox.send(action_call)
+                    list_undecided_reached_campus_members.append(member.mention)
                 except BaseException:
+                    number_undecided_unreachable_campus_members+=1
+                    list_undecided_unreachable_campus_members.append(member.mention)
                     pass
         response = f'''
 No. of MDC students with campus selected: {number_activated_campus_members}
 No. of MDC students pending selection: {number_undecided_campus_members}
+No. of MDC students pending selection that could not be reached: {number_undecided_unreachable_campus_members}
+List of reached out students: {','.join(list_undecided_reached_campus_members)}
+List of unreachable students: {','.join(list_undecided_unreachable_campus_members)}
         '''
-        await interaction.response.send_message(response)
+        await interaction.followup.send(response)
 
 
 
