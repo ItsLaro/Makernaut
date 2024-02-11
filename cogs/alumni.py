@@ -71,7 +71,7 @@ class Alumni(commands.GroupCog, name="professional"):
         profession_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix(PROFESSION_PREFIX)
         profession_roles_dropdown_menu_view = SelectView(profession_sorted_combined_options_and_roles)
 
-        image_url = "https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450"
+        image_url = "https://media.discordapp.net/attachments/1112898501714649088/1206182620971405322/Screenshot_18.png?ex=65db141a&is=65c89f1a&hm=375258705e39fe78da47bde19c3d2016eca30af4924980ff5485e0d5490a86b8&=&format=webp&quality=lossless&width=810&height=227"
         await alumni_roles_channel.send(content=image_url) 
 
         await alumni_roles_channel.send(content=response_message) 
