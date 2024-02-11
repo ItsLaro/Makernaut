@@ -53,7 +53,7 @@ class Alumni(commands.GroupCog, name="alumni"):
 
         ## Embed ##
         title = "# Tell us more about you!"
-        body = " ## If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. "
+        body = " ### If you're curently working in the industry and feel comfortable disclosing, please choose your company and professional role from the menu below. "
         footnote = "If your company or role aren't listed, please reach out to a member of the team so we can have it added."
         response_message = f"{title}\n{body}\n{footnote}"
 
