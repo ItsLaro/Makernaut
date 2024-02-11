@@ -8,8 +8,8 @@ from helpers.emojis import alphabet
 YELLOW_COLOR = 0xFFBF00  
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
 DROPDOWN_OPTION_LIMIT = 25
-COMPANY_PREFIX = 'Alumni Company - '
-PROFESSION_PREFIX =  'Alumni Role - '
+COMPANY_PREFIX = 'Company - '
+PROFESSION_PREFIX =  'Professional Role - '
 class DropdownMenu (Select):
     def __init__(self, options, roles, placeholder, custom_id):
         self.roles = roles
@@ -35,9 +35,9 @@ class SelectView(discord.ui.View):
         options_and_roles_paginated_matrix = split_list(options_and_roles, DROPDOWN_OPTION_LIMIT)
         for index, key in enumerate(options_and_roles_paginated_matrix):
             page = options_and_roles_paginated_matrix[key]
-            self.add_item(DropdownMenu([entry['option'] for entry in page], [entry['role'] for entry in page], f"Select an Answer [{key}]", f"alumni:roles_dropdown_{index}_{key}"))
+            self.add_item(DropdownMenu([entry['option'] for entry in page], [entry['role'] for entry in page], f"Select an Answer [{key}]", f"professional:roles_dropdown_{index}_{key}"))
 
-class Alumni(commands.GroupCog, name="alumni"):
+class Alumni(commands.GroupCog, name="professional"):
     '''
     Provides functionality specific to the INIT Professional chapter category.
     '''
