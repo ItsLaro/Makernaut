@@ -233,7 +233,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
 
             elif "Discord ID" in user_record['fields']:
                 title = '<a:utilsuccess:809713352061354016> Already Verified!'
-                description = 'Your INIT Alumni Chapter Membership had been previously verified!'
+                description = 'Your INIT Professional Chapter Membership had been previously verified!'
                 color = discord.Color.green()
 
                 init_aa_verified_role = interaction.guild.get_role(INIT_AA_VERIFIED_ROLE_ID)
@@ -312,7 +312,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
 
             # Send success response
             title = '<a:utilsuccess:809713352061354016> Verified!'
-            self.response_description = 'Your INIT Alumni Chapter is now confirmed on Discord'
+            self.response_description = 'Your INIT Professional Chapter is now confirmed on Discord'
             color = discord.Color.green()
             embed_response = discord.Embed(title=title,
                         description=self.response_description,

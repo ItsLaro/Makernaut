@@ -74,7 +74,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
 
             elif "Discord ID" in user_record['fields']:
                 title = '<a:utilsuccess:809713352061354016> Already Verified!'
-                description = 'Your INIT Alumni Chapter Membership had been previously verified!'
+                description = 'Your INIT Professional Chapter Membership had been previously verified!'
                 color = discord.Color.green()
 
                 init_aa_verified_role = interaction.guild.get_role(INIT_AA_VERIFIED_ROLE_ID)
@@ -153,7 +153,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
 
             # Send success response
             title = '<a:utilsuccess:809713352061354016> Verified!'
-            self.response_description = 'Your INIT Alumni Chapter is now confirmed on Discord'
+            self.response_description = 'Your INIT Professional Chapter is now confirmed on Discord'
             color = discord.Color.green()
             embed_response = discord.Embed(title=title,
                         description=self.response_description,
@@ -174,7 +174,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
         print(traceback.format_exc())
         response = await interaction.response.send_message(embed=embed_response, ephemeral=True)        
 
-class Verification(commands.GroupCog):
+class AlumniVerification(commands.GroupCog):
 
     '''
     Links Discord users to their identity with the INIT National database.
@@ -188,7 +188,7 @@ class Verification(commands.GroupCog):
         ALUMNI_VERIFY_CHANNEL_ID = 1087566994682949672 if config.isProd else 1087566806820077659
         alumni_verification_channel = self.bot.get_channel(ALUMNI_VERIFY_CHANNEL_ID)
 
-        embed_title = "Verify your INIT Alumni Chapter Membership!"
+        embed_title = "Verify your INIT Professional Chapter Membership!"
 
         # If message already exists, we leave channel alone
         async for message in alumni_verification_channel.history():
@@ -197,39 +197,39 @@ class Verification(commands.GroupCog):
 
         message = """
 ‎ 
-Welcome to the **INIT Alumni Chapter** side of our Discord! 🎉 
+# Welcome to the INIT Professional Chapter side of our Discord! 🎉 
 
-Our mission is to provide alumni with opportunities to grow their network, develop their careers, and give back to the community. We want to foster a community of alumni that empowers them to succeed in the tech industry and make an impact in their community. All alumni from any school who are interested in technology are welcome to join our chapter! 🤗
+Our mission is to provide professionals with opportunities to grow their network, develop their careers, and give back to the community. We want to foster a community of alumni that empowers them to succeed in the tech industry and make an impact in their community. All professionals and alumni from any school who are interested in technology are welcome to join our chapter! 🤗
 
-🏁 **Our Goals** 🏁 
+## 🏁 Our Goals 🏁 
 
-•  Create a strong network of INIT alumni who support, motivate, and inspire each other to achieve their career goals
-•  Support and guide INIT alumni through their transition from graduation to the workforce and beyond
-•  Provide INIT alumni with career development opportunities that allow them to build their technical and professional skills
-•  Build connections to form result-driven partnerships and promote the work and achievements of INIT
-•  Give back to the INIT community by providing knowledge and resources to help students
+- Create a strong network of INIT professionals who support, motivate, and inspire each other to achieve their career goals
+- Support and guide INIT alumni through their transition from graduation to the workforce and beyond
+- Provide INIT professionals with career development opportunities that allow them to build their technical and professional skills
+- Build connections to form result-driven partnerships and promote the work and achievements of INIT
+- Give back to the INIT community by providing knowledge and resources to help students
 
-🚀 **Our Initiatives** 🚀 
+## 🚀 Our Initiatives 🚀 
 
-•  Career Development
-•  Mentorship
-•  Finance & Budgeting
-•  Social & Networking Opportunities
-•  Volunteering
-•  Giving Back to our INIT student chapters 
+- Career Development
+- Mentorship
+- Finance & Budgeting
+- Social & Networking Opportunities
+- Volunteering
+- Giving Back to our INIT student chapters 
 
-💌 Contact Info & Social Media 💌 
+## 💌 Contact Info & Social Media 💌 
 
-• E-mail address: alumni@weareinit.org
-• Instagram: https://www.instagram.com/init.alumni/
-• LinkedIn: https://www.linkedin.com/company/init-alumni/
+- E-mail address: pro@weareinit.org
+- Instagram: https://www.instagram.com/init.alumni/
+- LinkedIn: https://www.linkedin.com/company/init-alumni/
 ‎ 
         """
 
         # Send new verification message otherwise
-        embed_description = "Are you a member of the INIT Alumni Chapter? Gain access to the alumni section of the server by getting verified through your email."
+        embed_description = "Are you a member of the INIT Professionals Chapter? Gain access to the this section of the server by getting verified through your email."
         embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
-        embed_response.add_field(name="Not a member?", value=f"You can apply at https://airtable.com/shrri7hDqYq9tFyki now!")
+        embed_response.add_field(name="Not a member?", value=f"You can apply at https://airtable.com/appkfpQOssQZfmORj/shrhC3HdpOb14FMsM now!")
 
         button = InitiateControls()
 
@@ -238,4 +238,4 @@ Our mission is to provide alumni with opportunities to grow their network, devel
 
 
 async def setup(bot):
-    await bot.add_cog(Verification(bot)) 
+    await bot.add_cog(AlumniVerification(bot)) 

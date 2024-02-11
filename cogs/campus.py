@@ -95,7 +95,7 @@ class Campus(commands.GroupCog, name="campus"):
         # embed_title = "IMPORTANT: Select Your MDC Campus on the INIT server"
         # embed_description = "This is a reminder to please select your campus at MDC. You need to select the campus (or campuses) that you attend to gain access to the rest of the MDC category here on Discord. Selecting a campus will notify you of announcements and events taking place at that campus. You can remove a campus by clicking on it again."
         # action_call = f'Please go to {mdc_campus_channel.mention} to make a selection.'
-        goodbye_message = f'Thank you! Have and amazing weekend! <:ablobheart:1063101988918804551>'
+        goodbye_message = f'Thank you! Have an amazing weekend! <:ablobheart:1063101988918804551>'
         # embed = discord.Embed(title=embed_title, description=embed_description, color=discord.Colour.blurple())
 
         mdc_base_role = interaction.guild.get_role(MDC_ROLE_ID)
