@@ -57,16 +57,10 @@ class Alumni(commands.GroupCog, name="alumni"):
         footnote = "If your company or role aren't listed, please reach out to a member of the team so we can have it added."
         response_message = f"{title}\n{body}\n{footnote}"
 
-        company_roles_embed_response_title = 'Where do you currently work?'
-        company_roles_embed_response = discord.Embed(title=company_roles_embed_response_title, description=None, color=YELLOW_COLOR)
-        profession_roles_embed_response_title = "What's your occupation or position?"
-        profession_roles_embed_response = discord.Embed(title=profession_roles_embed_response_title, description=None, color=YELLOW_COLOR)
-
         # If message already exists, we leave channel alone
         async for message in alumni_roles_channel.history():
-            if message.author.id == self.bot.user.id and len(message.embeds) > 0:
-                if(message.embeds[0].title == profession_roles_embed_response_title):
-                    return
+            if message.author.id == self.bot.user.id:
+                return
             else:
                 await alumni_roles_channel.purge()
                 break
@@ -82,9 +76,9 @@ class Alumni(commands.GroupCog, name="alumni"):
 
         await alumni_roles_channel.send(content=response_message) 
 
-        await alumni_roles_channel.send(embed=company_roles_embed_response, view=company_roles_dropdown_menu_view)
+        await alumni_roles_channel.send(content="## Where do you currently work?", view=company_roles_dropdown_menu_view)
 
-        await alumni_roles_channel.send(embed=profession_roles_embed_response, view=profession_roles_dropdown_menu_view)
+        await alumni_roles_channel.send(content="## What's your occupation or position?", view=profession_roles_dropdown_menu_view)
 
     async def fetch_combined_options_and_roles_via_role_prefix(self, prefix):
         roles = await self.upe_guild.fetch_roles()
