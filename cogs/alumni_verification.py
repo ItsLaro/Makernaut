@@ -233,7 +233,7 @@ Our mission is to provide professionals with opportunities to grow their network
 
         button = InitiateControls()
 
-        await alumni_verification_channel.send("https://media.discordapp.net/attachments/825566993754095616/830122620174336011/Artboard_1.png?width=1600&height=450")
+        await alumni_verification_channel.send("https://media.discordapp.net/attachments/1112899073507336213/1206179762142183494/Screenshot_18.png?ex=65db1171&is=65c89c71&hm=6c297fba1e77b84566dacc54044849c1f0ae0afb005d921cfd3e39c2b89ad5cb&=&format=webp&quality=lossless&width=1080&height=303")
         await alumni_verification_channel.send(content=message, embed=embed_response, view=button) 
 
 

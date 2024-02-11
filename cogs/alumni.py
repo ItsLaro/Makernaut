@@ -95,6 +95,7 @@ class Alumni(commands.GroupCog, name="professional"):
         company_options=[]
         for index, role in enumerate(sorted_company_roles):
             role_name = role.name[prefix_length:]
+            emoji_codepoint = alphabet[role_name[0].upper()]
             company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index % DROPDOWN_OPTION_LIMIT))
         company_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, sorted_company_roles)]
         return company_sorted_combined_options_and_roles
