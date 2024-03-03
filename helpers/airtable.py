@@ -3,39 +3,42 @@ import requests
 import discord
 
 # TODO: Organize these constants better
-AIRTABLE_UPE_BASE_ID='appIYzWDeROTPg8Yv'
-AIRTABLE_UPE_MEMBERSHIP_TABLE_ID='tbluUiP1zIUtP2uwS'
-AIRTABLE_UPE_AA_BASE_ID='appmBfrXhvebmMnbq'
-AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID='tblGjYHulggH2gGPJ'
+AIRTABLE_INIT_BASE_ID='appIYzWDeROTPg8Yv'
+AIRTABLE_INIT_MEMBERSHIP_TABLE_ID='tbluUiP1zIUtP2uwS'
+AIRTABLE_INIT_PRO_BASE_ID='appLZ8fe3NAkBqvhY'
+AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID='tbluGowfHrBkfpNdP'
+AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_VIEW_ID='viw8T2QkqLMS79GAX'
 
 def get_record_by_email(email):
-    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
 
-    endpoint = f'https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}'
+    endpoint = f'https://api.airtable.com/v0/{AIRTABLE_INIT_PRO_BASE_ID}/{AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID}'
+    print(endpoint)
+    print(f'Authorization: Bearer {AIRTABLE_API_KEY}')
+
     headers = {
         'Authorization': f'Bearer {AIRTABLE_API_KEY}', 
-        'Content-Type': 'application/json'
     }
     
     # Params
     ACCEPTED_VIEW = "Accepted"
-    FIELDS = ["Name", "Email", "Discord ID"]
-    FORMULA = f"{{Email}}='{email}'"
+    FIELDS = ["First Name", "E-mail Address", "Discord ID"]
+    FORMULA = f"{{E-mail Address}}='{email}'"
     params = {"view": ACCEPTED_VIEW, "fields": FIELDS, "filterByFormula": FORMULA} 
 
     response = requests.get(endpoint, headers=headers, params=params)
+    print(response.status_code, response.reason, response.text)
     data = response.json()
     record = data.get("records")
 
     return record[0] if len(record) else None
 
 def store_token_by_record(record, token: str):
-    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
 
-    url = f"https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}/{record['id']}"
+    url = f"https://api.airtable.com/v0/{AIRTABLE_INIT_PRO_BASE_ID}/{AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID}/{record['id']}"
     headers = {
         "Authorization": f"Bearer {AIRTABLE_API_KEY}",
-        "Content-Type": "application/json",
     }
     data = {
         "fields": {
@@ -48,9 +51,9 @@ def store_token_by_record(record, token: str):
     return response.status_code == 200
 
 def verify_discord_user(record, discord_user: discord.User):
-    AIRTABLE_API_KEY = os.environ['AIRTABLE_UPE_API_KEY']
+    AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
     
-    url = f"https://api.airtable.com/v0/{AIRTABLE_UPE_AA_BASE_ID}/{AIRTABLE_UPE_AA_MEMBERSHIP_TABLE_ID}/{record['id']}"
+    url = f"https://api.airtable.com/v0/{AIRTABLE_INIT_PRO_BASE_ID}/{AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID}/{record['id']}"
     headers = {
         "Authorization": f"Bearer {AIRTABLE_API_KEY}",
         "Content-Type": "application/json",
