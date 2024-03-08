@@ -22,8 +22,8 @@ GMAIL_APP_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def send_verification_SMTP_email(recipient):
-    SUBJECT = "🟡 INIT: Alumni Association Verification Code"
-    SENDER = "team@weareinit.org"
+    SUBJECT = "🟡 INIT: Professional Chapter Verification Code"
+    SENDER = "pro@weareinit.org"
     # Trying to send email
     try:
         msg = MIMEMultipart()
@@ -40,7 +40,7 @@ def send_verification_SMTP_email(recipient):
 
         msg.attach(MIMEText(updatedhtml, "html"))
         msg['Subject'] = SUBJECT
-        msg['From'] = 'INIT Team'
+        msg['From'] = 'INIT Professional Team'
         msg['To'] = recipient
         smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         smtp_server.login(SENDER, GMAIL_APP_PASSWORD)
@@ -54,4 +54,4 @@ def send_verification_SMTP_email(recipient):
 
 if __name__ == "__main__":
     recipient = "ivan@weareinit.org"
-    send_SMTP_email(recipient)
+    send_verification_SMTP_email(recipient)

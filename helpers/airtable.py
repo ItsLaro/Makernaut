@@ -3,31 +3,25 @@ import requests
 import discord
 
 # TODO: Organize these constants better
-AIRTABLE_INIT_BASE_ID='appIYzWDeROTPg8Yv'
-AIRTABLE_INIT_MEMBERSHIP_TABLE_ID='tbluUiP1zIUtP2uwS'
-AIRTABLE_INIT_PRO_BASE_ID='appLZ8fe3NAkBqvhY'
-AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID='tbluGowfHrBkfpNdP'
-AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_VIEW_ID='viw8T2QkqLMS79GAX'
+AIRTABLE_INIT_PRO_BASE_ID='appkfpQOssQZfmORj'
+AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID='tbl1ySW5NE9FySZh8'
 
 def get_record_by_email(email):
     AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
 
     endpoint = f'https://api.airtable.com/v0/{AIRTABLE_INIT_PRO_BASE_ID}/{AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID}'
-    print(endpoint)
-    print(f'Authorization: Bearer {AIRTABLE_API_KEY}')
 
     headers = {
         'Authorization': f'Bearer {AIRTABLE_API_KEY}', 
     }
     
     # Params
-    ACCEPTED_VIEW = "Accepted"
+    ACCEPTED_VIEW = "viwaHiScZjzjko9NG"
     FIELDS = ["First Name", "E-mail Address", "Discord ID"]
     FORMULA = f"{{E-mail Address}}='{email}'"
     params = {"view": ACCEPTED_VIEW, "fields": FIELDS, "filterByFormula": FORMULA} 
 
     response = requests.get(endpoint, headers=headers, params=params)
-    print(response.status_code, response.reason, response.text)
     data = response.json()
     record = data.get("records")
 
@@ -67,5 +61,6 @@ def verify_discord_user(record, discord_user: discord.User):
     }
 
     response = requests.patch(url, headers=headers, json=data)
+    print(response.status_code, response.reason, response.text)
 
     return response.status_code == 200
