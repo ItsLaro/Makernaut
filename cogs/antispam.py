@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from xmlrpc.client import boolean
 import discord
 from discord.ext import commands
@@ -21,47 +22,52 @@ class BotContext(commands.Cog):
         self.GENERAL_BOTSPAM_CHANNEL_ID = 401577290863083531    
         self.log_channel = self.bot.get_channel(self.BOT_LOGS_CHANNEL_ID)
 
-        self.EVERYONE_ROLE_ID = 245393533391863808
-        self.CODE_INTEREST_ROLE_ID = 798068011667161128
-        self.MAKE_INTEREST_ROLE_ID = 798068011667161128
-        self.INFOTECH_INTEREST_ROLE_ID = 798068011667161128
-        self.DESIGN_INTEREST_ROLE_ID = 798068011667161128
-        self.LEAP_INTEREST_ROLE_ID = 798068011667161128
-        self.IGNITE_INTEREST_ROLE_ID = 798068011667161128
-        self.SPARKDEV_INTEREST_ROLE_ID = 798068011667161128
-        self.SHELLHACKS_INTEREST_ROLE_ID = 798068011667161128
-        self.DISCOVER_INTEREST_ROLE_ID = 798068011667161128
+        # ROLE IDS
+        self.FOUNDING_FATHER = 795860784138813520
+        self.NATIONAL_BOARD = 831044126194794526
+        self.MASCOT = 1069296675853701283
+        self.NATIONAL_EXECUTIVE_DIRECTOR = 1082177728985440297
+        self.NATIONA_COMMUNITY_MANAGER = 1128469572958290092
+        self.CHAPTER_PRESIDENT = 746916839287947295
+        self.CHAPTER_VICE = 746917575417397310
+        self.MODERATOR = 399551100799418370 
+        self.PRO = 1061382576004157571
+        self.FIU = 399558426511802368
+        self.MDC_WOLFSON = 1061378521093656577
+        self.MDC_NORTH = 1150550918991978616
+        self.MDC_KENDALL = 1151700581413564416
+        self.UM = 1221999581483634719
+        self.FMU = 1061378513501950034
 
-        self.ALUMNI_ROLE_ID = 523310392030658573
-        self.PAST_SPARKDEV_ROLE_ID = 797573229493354616
-        self.SHELLHACKS_2022_ROLE_ID = 933128149938626661
-        self.SHELLHACKS_2021_ROLE_ID = 888957354417192960
-        self.SHELLHACKS_2020_ROLE_ID = 523306020538286080
+        # TESTING ROLE IDS
+        self.TESTING_PRESIDENT = 1065042154407338041
     
-        self.UNPROTECTED_ROLES_IDS = [ 
-            self.EVERYONE_ROLE_ID,
-            self.CODE_INTEREST_ROLE_ID, 
-            self.MAKE_INTEREST_ROLE_ID, 
-            self.INFOTECH_INTEREST_ROLE_ID, 
-            self.DESIGN_INTEREST_ROLE_ID, 
-            self.LEAP_INTEREST_ROLE_ID, 
-            self.IGNITE_INTEREST_ROLE_ID, 
-            self.SPARKDEV_INTEREST_ROLE_ID, 
-            self.SHELLHACKS_INTEREST_ROLE_ID, 
-            self.DISCOVER_INTEREST_ROLE_ID,
-            self.ALUMNI_ROLE_ID, 
-            self.PAST_SPARKDEV_ROLE_ID,
-            self.SHELLHACKS_2022_ROLE_ID,
-            self.SHELLHACKS_2021_ROLE_ID,
-            self.SHELLHACKS_2020_ROLE_ID,
+        self.PROTECTED_ROLES_IDS = [ 
+            self.FOUNDING_FATHER,
+            self.NATIONAL_BOARD,
+            self.MASCOT,
+            self.NATIONAL_EXECUTIVE_DIRECTOR,
+            self.NATIONA_COMMUNITY_MANAGER,
+            self.CHAPTER_PRESIDENT,
+            self.CHAPTER_VICE,
+            self.MODERATOR, 
+            self.PRO,
+            self.FIU,
+            self.MDC_WOLFSON,
+            self.MDC_NORTH,
+            self.MDC_KENDALL,
+            self.UM,
+            self.FMU,
+        ] if config.isProd else [
+            self.TESTING_PRESIDENT
         ]
 
         #Colors HEX
         self.BLUE_HEX = 0x3895D3
 
-        self.UNPROTECTED_ROLES = []
-        for role_id in self.UNPROTECTED_ROLES_IDS:
-            self.UNPROTECTED_ROLES.append(self.upe_guild.get_role(role_id))
+        self.PROTECTED_ROLES = []
+        for role_id in self.PROTECTED_ROLES_IDS:
+            self.PROTECTED_ROLES.append(self.upe_guild.get_role(role_id))
 
         self.url_pattern = r'''(?xi)
             \b
@@ -110,91 +116,98 @@ class BotContext(commands.Cog):
         self.mentions_nitro_pattern = r'\W*(discord)\W*|\W*(nitro)\W*'
         self.real_nitro_pattern = r'\W*\b(discord.com)|\W*\b(discordapp.com)\W*|\W*\b(https:\/\/discord.net)\W*'
 
+    async def member_joined_recently(self, member):
+        # Get the current time
+        current_dateTime =datetime.now(timezone.utc)
+
+        # Calculate the time 12 hours ago
+        twelve_hours_ago = current_dateTime - timedelta(hours=12)
+        
+        # Check if the member's join time is within the last 12 hours
+        if member.joined_at >= twelve_hours_ago:
+            return True
+        else:
+            return False
+    
+    def member_has_protected_roles(self, member):
+        is_protected = False
+        for role in member.roles:
+            if role in self.PROTECTED_ROLES:
+                is_protected = True
+            else:
+                pass
+        return is_protected
+
+    async def is_user_sus(self, member):
+        return await self.member_joined_recently(member) and not self.member_has_protected_roles(member)
+    
+    def mentions_everyone(self, message):
+        return any(m in message.content for m in ["@here", "@everyone"])
+    
+    async def delete_message_and_ban_user(self, message, author):                        
+            await message.delete()
+
+            SPAM_REPORT_TITLE = "You have been banned..."
+            SPAM_REPORT_DESCRIPTION = f"You have been banned from the INIT server as per my automated malicious content detection."
+            EMBED_COLOR = 0xD2222D   
+            embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=EMBED_COLOR)
+            embed_response.add_field(name="For the following message:", value=f'"{message.content}"', inline=False)
+            embed_response.add_field(name="Now what?", value=f'If you feel this was a mistake or would like to make an appeal please reach out to one of the moderators', inline=False)
+            embed_response.set_footer(text='If you fail to get ahold of anyone, please send a DM to "Laro" or reach out by email at ivan@weareinit.org with your information')
+            user_inbox = await author.create_dm()
+            await user_inbox.send(embed=embed_response)
+            
+            await author.ban(reason = f"Automated Ban for content: {message.content}")
+
+    async def log_outcome(self, message, author, is_ban):
+        SPAM_REPORT_TITLE = "Spam Detected" if is_ban else "Suspicious Message Detected"
+        SPAM_REPORT_DESCRIPTION = f"Please review carefully!" if is_ban else "Take action accordingly"
+        EMBED_COLOR = 0xD2222D if is_ban else 0xFFBF00   
+
+        embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=EMBED_COLOR)
+        embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)
+        embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
+        embed_response.add_field(name="URL", value=f'{message.jump_url}', inline=False)
+        embed_response.add_field(name="Resolution", value= "Message **deleted** and member **banned**!" if is_ban else "Nothing! Please Review", inline=False)  
+        await self.log_channel.send(content=f"<@&{self.MODERATOR_ROLE_ID}>", embed=embed_response)
+
     #Events
     @commands.Cog.listener()
     async def on_message(self, message):
         '''
-        Allows bot to reply to social messages 
+        Allows bot to parse messages
         '''
-        allowed_channel_ids = [self.EBOARD_BOTSPAM_CHANNEL_ID, self.GENERAL_BOTSPAM_CHANNEL_ID]
-
         author = message.author
         content = message.content.lower()
-        channel = message.channel
         # we do not want the bot to reply to itself
         if author.id == self.bot.user.id:
             return
-        
-        if channel.id in allowed_channel_ids:
-            if (('hello' in content) or ('hi' in content) or ('hey' in content)) and (("makernaut" in content) or ("makernaut!" in content)):
-                try:
-                    emoji = '\N{WHITE HEAVY CHECK MARK}'
-                    await message.add_reaction(emoji)
-                    await message.channel.send('Hello {0.author.mention}'.format(message))
-                except discord.HTTPException:
-                    # sometimes errors occur during this, for example
-                    # maybe you dont have permission to do that
-                    # we dont mind, so we can just ignore them
-                    pass   
-            if 'good bot' in content:
-                try:
-                    emoji = '\N{SPARKLING HEART}'
-                    await message.add_reaction(emoji)
-                    await message.channel.send('Aww, thanks {0.author.mention}. Good human!'.format(message))
-
-                except discord.HTTPException:
-                    # sometimes errors occur during this, for example
-                    # maybe you dont have permission to do that
-                    # we dont mind, so we can just ignore them
-                    pass 
-            if 'bad bot' in content:
-                try: 
-                    await message.channel.send('https://tenor.com/view/pedro-monkey-puppet-meme-awkward-gif-15268759')
-                except discord.HTTPException:
-                    # sometimes errors occur during this, for example
-                    # maybe you dont have permission to do that
-                    # we dont mind, so we can just ignore them
-                    pass 
 
         matching_url = re.findall(pattern=self.url_pattern, string=content)
         matching_gifs = re.findall(pattern=self.gifs_pattern, string=content)
         matching_mentions_nitro = re.findall(pattern=self.mentions_nitro_pattern, string=content) 
         matching_real_nitro = re.findall(pattern=self.real_nitro_pattern, string=content) 
 
-        if matching_mentions_nitro:
-            if matching_url:
-
+        is_sus = await self.is_user_sus(author)
+        if self.mentions_everyone(message):
+                if is_sus: 
+                    await self.delete_message_and_ban_user(message, author)
+                    await self.log_outcome(message, author, True)
+                else:                     
+                    await self.log_outcome(message, author, False)
+        elif matching_url:
+            if matching_mentions_nitro:
                 if matching_real_nitro:
                     pass # Real Discord link
-
                 elif (matching_gifs):
                     pass # Kinda sus, but just media
-
                 else: 
                     # Most likely a scam
-
-                    SPAM_REPORT_TITLE = "Pontential Spam!"
-                    SPAM_REPORT_DESCRIPTION = f"At the moment, I'm no longer removing message automatically since our friend **AutoMod** is more talented and has us covered. Please review and take action accordingly!"
-                    RED_HEX = 0xD2222D  
-                    embed_response = discord.Embed(title=SPAM_REPORT_TITLE, description=SPAM_REPORT_DESCRIPTION, color=RED_HEX)
-                    embed_response.add_field(name="Original Message", value=f'{message.content}', inline=False)
-                    embed_response.add_field(name="Author", value= f"{author.mention}", inline=False)
-                    embed_response.add_field(name="Channel", value=f'{message.channel.mention}', inline=False)
-                    embed_response.add_field(name="URL", value=f'{message.jump_url}', inline=False)                                                
-                    isProtected = False
-                    for role in author.roles:
-                        if role in self.UNPROTECTED_ROLES:
-                            pass
-                        else:
-                            isProtected = True
-
-                    if isProtected:
-                        embed_response.add_field(name="Resolution", value= "Nothing! Please Review", inline=False)
+                    if is_sus: 
+                        await self.delete_message_and_ban_user(message, author)
+                        await self.log_outcome(message, author, True)
                     else:
-                        embed_response.add_field(name="Resolution", value= "Message **deleted** and member **banned**!", inline=False)
-                        await message.delete()
-                        await author.ban(reason = f"Automated Ban: Potential Nitro Scam\nMessage:\n {message.content}")
-                    await self.log_channel.send(content=f"<@&{self.MODERATOR_ROLE_ID}>", embed=embed_response)
+                        await self.log_outcome(message, author, False)
 
 async def setup(bot):
     await bot.add_cog(BotContext(bot)) 
