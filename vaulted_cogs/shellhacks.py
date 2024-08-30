@@ -132,13 +132,41 @@ def get_response_from_api_verify_discord(email, discord_id, discord_username, ve
     )
     return res
 
+def get_list_of_confirmed_hackers():
+    params = {
+        'application_status': 'confirmed',
+        'format': 'json'
+    }
+
+    res = requests.get(
+        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        params=params,
+        headers={'Authorization': SHELLHACKS_API_TOKEN},
+    )
+
+    return res
+
+def get_is_hacker_confirmed(discord_id):
+    params = {
+        'searchParams': str(discord_id),
+        'application_status': 'confirmed'
+    }
+
+    res = requests.get(
+        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        params=params,
+        headers={'Authorization': SHELLHACKS_API_TOKEN},
+    )
+    
+    return res
+
 class ShellHacks(commands.GroupCog, name="shell"):
 
     '''
     ShellHacks 2023 related functionality.
     '''
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.verification_channel = self.bot.get_channel(VERIFY_CHANNEL_ID)
         self.announcement_channel = self.bot.get_channel(ANNOUNCEMENT_CHANNEL_ID)
         self.team_building_channel = self.bot.get_channel(TEAM_BUILDING_CHANNEL_ID)
@@ -249,6 +277,93 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
 
    
     #Commands
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        '''
+        Gives a new user the ShellHacks role if they are confirmed for ShellHacks when they join.
+        '''
+        res = get_is_hacker_confirmed(member.id)
+
+        if res.status_code != 200:
+            return 
+        
+        hacker_role = member.guild.get_role(self.SHELLHACKS_ROLE_ID)
+
+        if not hacker_role:
+            print(f"ShellHacks role with ID {self.SHELLHACKS_ROLE_ID} not found")
+            return   
+         
+        try:            
+            for hacker in res.json()['data']:
+                if hacker['user']['discordUsername'] == str(member.global_name):
+                    await member.add_roles(hacker_role)
+                    break # Global Name is unique (only one hacker will be returned)
+
+        except json.JSONDecodeError as e:
+            print(f"Error parsing JSON: {e}")
+      
+        except discord.DiscordException as e:
+            print(f"Failed to add user role: {e}")
+
+        except Exception as e:
+            print(f"Error occured: {e}")
+        
+        
+    @app_commands.command(name="setHackerRoles", description="Gives ShellHacks Hacker roles to all confirmed Hackers")
+    @commands.has_permissions(admnistrator=True)
+    async def setHackerRoles(self, interaction: discord.Interaction):
+        '''
+        Gives ShellHacks Hacker roles to all confirmed Hackers
+        '''
+        await interaction.response.defer()
+
+        res = get_list_of_confirmed_hackers()
+
+        if res.status_code != 200:
+            await interaction.followup.send(f"Failed to fetch confirmed hackers. Status code: {res.status_code}")
+            return
+
+        try:
+            confirmed_hackers = res.json()['data']
+        except json.JSONDecodeError as e:
+            await interaction.followup.send(f"Error parsing JSON: {e}")
+            return
+
+        hacker_role = interaction.guild.get_role(self.SHELLHACKS_ROLE_ID)
+
+        if not hacker_role:
+            await interaction.followup.send(f"ShellHacks role with ID {self.SHELLHACKS_ROLE_ID} not found")
+            return
+
+        success_count = 0
+        fail_count = 0
+        fail_list = []
+
+        for hacker in confirmed_hackers:
+            discord_username = hacker['user'].get('discordUsername')
+            if not discord_username:
+                continue
+
+            member = discord.utils.find(lambda m: str(m.global_name) == discord_username, interaction.guild.members)
+            if not member:
+                fail_count += 1
+                fail_list.append(discord_username)
+                continue
+
+            try:
+                await member.add_roles(hacker_role)
+                success_count += 1
+            except discord.DiscordException as e:
+                print(f"Failed to add role for {discord_username}: {e}")
+                fail_count += 1
+                fail_list.append(discord_username)
+
+        summary = f"Roles added successfully to {success_count} hackers.\nFailed to add roles to {fail_count} hackers."
+        if fail_count > 0:
+            summary += f"\nFailed usernames: {', '.join(fail_list)}"
+
+        await interaction.followup.send(summary)
+    
     @app_commands.command(name="sponsors", description="Creates threads for all sponsors")
     @commands.has_permissions(administrator=True)
     async def sponsor(self, interaction: discord.Interaction):
