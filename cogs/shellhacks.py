@@ -104,33 +104,33 @@ def generate_hacker_guide_line():
     random_response = random.choice(hackathon_guide_responses)
     return random_response.format(HACKER_GUIDE_SHORTENED_URL)
 
-def get_response_from_api_send_email(email, discord_id):
-    data = {
-        "email": email,
-        "discord_id": str(discord_id)
-    }
-    res = requests.post(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/sendDiscordEmail', 
-        json=data, 
-        headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',}, 
-    )
-    print(res.text)
-    return res
+# def get_response_from_api_send_email(email, discord_id):
+#     data = {
+#         "email": email,
+#         "discord_id": str(discord_id)
+#     }
+#     res = requests.post(
+#         f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/sendDiscordEmail', 
+#         json=data, 
+#         headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',}, 
+#     )
+#     print(res.text)
+#     return res
 
-def get_response_from_api_verify_discord(email, discord_id, discord_username, verification_code ):
-    data = {
-        "email": email,
-        "discord_id": str(discord_id),
-        "discord_username": discord_username,
-        "verification_code": verification_code 
-    }
-    print(discord_username)
-    res = requests.post(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/verifyDiscordAccount', 
-        json=data,
-        headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',},
-    )
-    return res
+# def get_response_from_api_verify_discord(email, discord_id, discord_username, verification_code ):
+#     data = {
+#         "email": email,
+#         "discord_id": str(discord_id),
+#         "discord_username": discord_username,
+#         "verification_code": verification_code 
+#     }
+#     print(discord_username)
+#     res = requests.post(
+#         f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/verifyDiscordAccount', 
+#         json=data,
+#         headers={'Authorization': SHELLHACKS_API_TOKEN, 'Content-Type': 'application/json',},
+#     )
+#     return res
 
 def get_list_of_confirmed_hackers(params):
     res = requests.get(
@@ -149,8 +149,8 @@ def get_is_hacker_confirmed(discord_name):
     }
 
     res = requests.get(
-        # f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
-        f'http://localhost:3000/api/admin/hackers',
+        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        # f'http://localhost:3000/api/admin/hackers',
         params=params,
         headers={'Authorization': SHELLHACKS_API_TOKEN},
     )
