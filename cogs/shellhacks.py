@@ -132,28 +132,25 @@ def get_response_from_api_verify_discord(email, discord_id, discord_username, ve
     )
     return res
 
-def get_list_of_confirmed_hackers():
-    params = {
-        'application_status': 'confirmed',
-        'format': 'json'
-    }
-
+def get_list_of_confirmed_hackers(params):
     res = requests.get(
         f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        # f'http://localhost:3000/api/admin/hackers',
         params=params,
         headers={'Authorization': SHELLHACKS_API_TOKEN},
     )
 
     return res
 
-def get_is_hacker_confirmed(discord_id):
+def get_is_hacker_confirmed(discord_name):
     params = {
-        'searchParams': str(discord_id),
+        'searchParams': str(discord_name),
         'application_status': 'confirmed'
     }
 
     res = requests.get(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        # f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        f'http://localhost:3000/api/admin/hackers',
         params=params,
         headers={'Authorization': SHELLHACKS_API_TOKEN},
     )
@@ -163,7 +160,7 @@ def get_is_hacker_confirmed(discord_id):
 class ShellHacks(commands.GroupCog, name="shell"):
 
     '''
-    ShellHacks 2023 related functionality.
+    ShellHacks 2024 related functionality.
     '''
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -179,7 +176,7 @@ class ShellHacks(commands.GroupCog, name="shell"):
 
     async def cog_load(self):
 
-        must_send_verification_message = True
+        must_send_verification_message = False # Not used in 2024
         must_send_support_message = True
 
         ### SHELLHACKS VERIFICATION MESSAGE SETUP ###
@@ -194,9 +191,9 @@ class ShellHacks(commands.GroupCog, name="shell"):
             message_1 = f"""
 ‎ 
 
-# Welcome to the **ShellHacks 2023**! 🎉 
+# Welcome to the **ShellHacks 2024**, Dino! 🦕  🎉 
 
-Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 15 - 17th) fully person at Florida International University, Biscayne Bay Campus in Miami! ☀️ 
+Florida's Largest Hackathon welcomes you to its seventh iteration, taking place this weekend (September 27th - 29th) fully person at Florida International University, Graham Center in Miami! ☀️ 
 
 # At Shellhacks, you will: 
 •  💻 Attend technical workshops to learn the latest web, mobile, game dev, AI/ML, hardware, IT/Cybersecurity, and UX/UI technologies!
@@ -279,92 +276,168 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
     #Commands
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        '''
-        Gives a new user the ShellHacks role if they are confirmed for ShellHacks when they join.
-        '''
+        
+        bot_log_channel = member.guild.get_channel(BOT_LOG_CHANNEL_ID)
+        shellhacks_support_role = member.guild.get_role(SHELLHACKS_DISCORD_SUPPORT_ROLE_ID)
         res = get_is_hacker_confirmed(member.id)
 
+        if not SHELLHACKS_API_TOKEN:
+            await bot_log_channel.send(embed=discord.Embed(title="Configs. Incomplete", description="SHELLHACKS_API_TOKEN environment variable not set. Ask a moderator to include this variable in the bot deployment so hackers can receive the ShellHacks hacker Role.", color=discord.Color.red()))
+            return
+        
+        embed = discord.Embed()
+        embed.set_author(name=f"Member Join: {member.name}", icon_url=member.default_avatar.url)
+
         if res.status_code != 200:
+            embed.title = "<a:utilfailure:809713365088993291> Failed to fetch hacker info"
+            embed.description = f"Could not fetch hacker info for {member.mention}. This is typically the wrong URL being used. Status Code: {res.status_code}"
+            embed.color = discord.Color.red()
+            await bot_log_channel.send(f"{shellhacks_support_role.mention}, error adding Hacker role: ", embed=embed)
             return 
         
-        hacker_role = member.guild.get_role(self.SHELLHACKS_ROLE_ID)
+        hacker_role = member.guild.get_role(SHELLHACKS_ROLE_ID)
 
         if not hacker_role:
-            print(f"ShellHacks role with ID {self.SHELLHACKS_ROLE_ID} not found")
+            embed.title = "<a:utilfailure:809713365088993291> Role not found"
+            embed.description = f"ShellHacks role with ID {SHELLHACKS_ROLE_ID} not found."
+            embed.color = discord.Color.red()
+            await bot_log_channel.send(f"{shellhacks_support_role.mention}, error adding Hacker role:", embed=embed)
             return   
-         
+        
         try:            
-            for hacker in res.json()['data']:
-                if hacker['user']['discordUsername'] == str(member.global_name):
-                    await member.add_roles(hacker_role)
-                    break # Global Name is unique (only one hacker will be returned)
+            data = res.json()            
+            hacker = data['data'][0]
+            provider_account_id = hacker['user']['accounts'][0]['providerAccountId']
+            
+            if str(provider_account_id) == str(member.id):
+                await member.add_roles(hacker_role)
+                embed.title = "<a:utilsuccess:809713352061354016> Hacker role added"
+                embed.description = f"Added ShellHacks Hacker role to {member.mention}."
+                embed.color = discord.Color.green()
+            else:
+                embed.title = "<a:utilfailure:809713365088993291> New member is not a confirmed hacker"
+                embed.description = f"{member.mention} is not registered as a hacker."
+                embed.color = discord.Color.yellow()
+
+            await bot_log_channel.send(embed=embed)
 
         except json.JSONDecodeError as e:
-            print(f"Error parsing JSON: {e}")
-      
+            embed.title = "<a:utilfailure:809713365088993291> JSON parse error"
+            embed.description = f"Error parsing JSON: `{e}`."
+            embed.color = discord.Color.red()
+            await bot_log_channel.send(f"{shellhacks_support_role.mention}, error adding Hacker role for {member.mention}:", embed=embed)
+        
         except discord.DiscordException as e:
-            print(f"Failed to add user role: {e}")
+            embed.title = "<a:utilfailure:809713365088993291> Discord error observed"
+            embed.description = f"Discord error: `{e}`."
+            embed.color = discord.Color.red()
+            await bot_log_channel.send(f"{shellhacks_support_role.mention}, error adding Hacker role for {member.mention}:", embed=embed)
 
         except Exception as e:
-            print(f"Error occured: {e}")
-        
-        
-    @app_commands.command(name="setHackerRoles", description="Gives ShellHacks Hacker roles to all confirmed Hackers")
-    @commands.has_permissions(admnistrator=True)
-    async def setHackerRoles(self, interaction: discord.Interaction):
-        '''
-        Gives ShellHacks Hacker roles to all confirmed Hackers
-        '''
-        await interaction.response.defer()
+            embed.title = "<a:utilfailure:809713365088993291> Unexpected error"
+            embed.description = e
+            embed.color = discord.Color.red()
+            embed.set_footer(text="Check logs for full traceback")
+            await bot_log_channel.send(f"{shellhacks_support_role.mention}, error adding Hacker role for {member.mention}:", embed=embed)
 
-        res = get_list_of_confirmed_hackers()
+    
+    @app_commands.command(name="set-hacker-roles", description="Gives ShellHacks Hacker roles to all confirmed Hackers")
+    @app_commands.describe(
+        print_not_in_discord="Whether to print all usernames not found in the Discord server",
+        start_cursor="The cursor number to start from (optional, reverse order: 0 is last applicant)"
+    )
+    @app_commands.checks.has_permissions(administrator=True)
+    async def set_hacker_roles(self, interaction: discord.Interaction, print_not_in_discord: bool, start_cursor: int = None):
+        await interaction.response.defer(ephemeral=True)
 
-        if res.status_code != 200:
-            await interaction.followup.send(f"Failed to fetch confirmed hackers. Status code: {res.status_code}")
+        if not SHELLHACKS_API_TOKEN:
+            await interaction.followup.send(embed=discord.Embed(title="Error", description="SHELLHACKS_API_TOKEN environment variable not set. Ask a moderator to include this variable in the bot deployment.", color=discord.Color.red()), ephemeral=True)
             return
 
-        try:
-            confirmed_hackers = res.json()['data']
-        except json.JSONDecodeError as e:
-            await interaction.followup.send(f"Error parsing JSON: {e}")
-            return
+        counts = {"success": 0, "fail": 0, "not_in_discord": 0}
+        fail_list, not_in_discord_list = [], []
+        cursor = str(start_cursor) if start_cursor is not None else None
 
-        hacker_role = interaction.guild.get_role(self.SHELLHACKS_ROLE_ID)
-
+        hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
         if not hacker_role:
-            await interaction.followup.send(f"ShellHacks role with ID {self.SHELLHACKS_ROLE_ID} not found")
+            await interaction.followup.send(embed=discord.Embed(title="Error", description=f"ShellHacks role with ID {SHELLHACKS_ROLE_ID} not found", color=discord.Color.red()), ephemeral=True)
             return
+        
+        while True:
+            params = {"application_status": "confirmed", "format": "json"}
+            if cursor:
+                params["cursor"] = cursor
 
-        success_count = 0
-        fail_count = 0
-        fail_list = []
-
-        for hacker in confirmed_hackers:
-            discord_username = hacker['user'].get('discordUsername')
-            if not discord_username:
-                continue
-
-            member = discord.utils.find(lambda m: str(m.global_name) == discord_username, interaction.guild.members)
-            if not member:
-                fail_count += 1
-                fail_list.append(discord_username)
-                continue
+            res = get_list_of_confirmed_hackers(params)
+            if res.status_code != 200:
+                await interaction.followup.send(f"Failed to fetch confirmed hackers. Status code: {res.status_code}", ephemeral=True)
+                return
 
             try:
-                await member.add_roles(hacker_role)
-                success_count += 1
-            except discord.DiscordException as e:
-                print(f"Failed to add role for {discord_username}: {e}")
-                fail_count += 1
-                fail_list.append(discord_username)
+                data = res.json()
+                confirmed_hackers = data['data']
+                cursor = data.get('nextCursor')
+            except json.JSONDecodeError as e:
+                await interaction.followup.send(f"Error parsing JSON: {e}", ephemeral=True)
+                return
 
-        summary = f"Roles added successfully to {success_count} hackers.\nFailed to add roles to {fail_count} hackers."
-        if fail_count > 0:
-            summary += f"\nFailed usernames: {', '.join(fail_list)}"
+            for hacker in confirmed_hackers:
+                try:
+                    discord_id = hacker['user']['accounts'][0]['providerAccountId']
+                except (KeyError, IndexError):
+                    fail_list.append(f"{hacker}")
+                    continue
+                    
+                discord_username = hacker['user']['discordUsername']
+                member = interaction.guild.get_member(int(discord_id))
+                if not member:
+                    counts["not_in_discord"] += 1
+                    if print_not_in_discord:
+                        not_in_discord_list.append(discord_username)
+                    continue
 
-        await interaction.followup.send(summary)
-    
-    @app_commands.command(name="sponsors", description="Creates threads for all sponsors")
+                if hacker_role not in member.roles:
+                    try:
+                        await member.add_roles(hacker_role)
+                        counts["success"] += 1
+                    except discord.DiscordException as e:
+                        print(f"Failed to add role for <@{discord_id}>: {e}")
+                        counts["fail"] += 1
+                        fail_list.append(f"<@{str(discord_id)}>")
+
+            if not cursor:
+                break
+
+        summary_embed = discord.Embed(title="ShellHacks Hacker Role Assignment", color=discord.Color.blue())
+        summary_embed.add_field(name="Success", value=f"{counts['success']} hackers", inline=False)
+        summary_embed.add_field(name="Failed", value=f"{counts['fail']} hackers", inline=False)
+        summary_embed.add_field(name="Hackers Not in Discord", value=f"{counts['not_in_discord']} hackers", inline=False)
+
+        await interaction.followup.send(embed=summary_embed, ephemeral=True)
+
+        async def send_chunked_embed(title, items, color):
+            chunks = []
+            current_chunk = ""
+            for item in items:
+                if len(current_chunk) + len(item) + 2 > 1900: 
+                    chunks.append(current_chunk)
+                    current_chunk = item
+                else:
+                    current_chunk += ", " + item if current_chunk else item
+            if current_chunk:
+                chunks.append(current_chunk)
+            
+            for i, chunk in enumerate(chunks):
+                embed = discord.Embed(title=f"{title} (Part {i+1})", description=chunk, color=color)
+                await interaction.followup.send(embed=embed, ephemeral=True)
+
+        if counts["fail"] > 0:
+            await send_chunked_embed("Failed Hackers (assign manually)", fail_list, discord.Color.red())
+
+        if print_not_in_discord and counts["not_in_discord"] > 0:
+            await send_chunked_embed("Hackers Not in Discord", not_in_discord_list, discord.Color.gold())
+
+    # @app_commands.command(name="sponsors", description="Creates threads for all sponsors") # Not used in 2024
     @commands.has_permissions(administrator=True)
     async def sponsor(self, interaction: discord.Interaction):
         '''
@@ -387,7 +460,7 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
                 await sponsors_forum_channel.create_thread(content=f'# {sponsor.description}', name=sponsor.name, file=sponsor.image)     
         await interaction.followup.send(f"{len(sponsors_list)} sponsor subthreads created in {sponsors_forum_channel.mention}", ephemeral=True)
 
-    @app_commands.command(name="tracks", description="Creates threads for all workshop tracks")
+    # @app_commands.command(name="tracks", description="Creates threads for all workshop tracks") # Not used in 2024
     @commands.has_permissions(administrator=True)
     async def tracks(self, interaction: discord.Interaction):
         '''
@@ -444,7 +517,7 @@ class HackathonWorkshopTrack:
             with open(png_path, "rb") as png_file:
                 self.image = discord.File(png_file)
 
-class InitiateControls (View):
+class InitiateControls (View): # Not used in 2024
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -452,7 +525,7 @@ class InitiateControls (View):
     async def initiate(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmailSubmitModal()) 
 
-class VerifyControls (View):
+class VerifyControls (View): # Not used in 2024
     def __init__(self, previously_used_email):
         self.previously_used_email = previously_used_email
         super().__init__(timeout=900) #times-out after 15 minutes
@@ -467,7 +540,7 @@ class VerifyControls (View):
             item.disabled = True
         await self.message.edit(view=self)
 
-class EmailSubmitModal(Modal, title='Enter your Email Address'):
+class EmailSubmitModal(Modal, title='Enter your Email Address'): # Not used in 2024
     email = TextInput(
         style=discord.TextStyle.short,
         label="Email Address",
@@ -512,7 +585,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
             if response.status_code == 200:
                 if 'discord_id' in data and data['discord_id'] is not None :         
                     title = '<a:utilsuccess:809713352061354016> Already Verified!'
-                    description = 'Your ShellHacks accound and Discord account had been previously linked!'
+                    description = 'Your ShellHacks account and Discord account had been previously linked!'
                     color = discord.Color.green()
 
                     shellhacks_hacker_role = interaction.guild.get_role(SHELLHACKS_ROLE_ID)
@@ -603,7 +676,7 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
         await bot_log_channel.send(f"{shellhacks_support_role.mention}, an error was caught: ", embed=embed_response)
 
 
-class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
+class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'): # Not used in 2024
     token_input = TextInput(
         style=discord.TextStyle.short,
         label="Verification Code",
@@ -754,3 +827,4 @@ Someone will be here to help you shortly. <a:wumpusblob:799276931294953482>
 
 async def setup(bot):
     await bot.add_cog(ShellHacks(bot)) 
+    
