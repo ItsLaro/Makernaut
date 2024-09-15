@@ -38,45 +38,39 @@ class Utilities(commands.Cog):
         await interaction.channel.purge(limit=abs(number))
 
     @app_commands.command(name="help", description="Provides info about different commands")
-    async def help_command(self, interaction: discord.Interaction, cog: str):
+    async def help_command(self, interaction: discord.Interaction, cog: str = None):
         '''
         Displays this message.
         '''
-        commands.has_permissions(add_reactions=True,embed_links=True)
         try:
             if not cog:
-                help=discord.Embed(title='Command Categories',
-                                description='Use `$help Category` to learn more about them!\n(Category Name Must Be in Title Case, Just Like this Sentence.)')
+                help = discord.Embed(title='Command Categories',
+                                    description='Use `$help Category` to learn more about them!\n(Category Name Must Be in Title Case, Just Like this Sentence.)')
                 cogs_desc = ''
                 for x in self.bot.cogs:
-                    cogs_desc += ('{} - {}'.format(x,self.bot.cogs[x].__doc__)+'\n')
-                help.add_field(name='Categories',value=cogs_desc[0:len(cogs_desc)-1],inline=False)
+                    cogs_desc += ('{} - {}'.format(x, self.bot.cogs[x].__doc__) + '\n')
+                help.add_field(name='Categories', value=cogs_desc[0:len(cogs_desc)-1], inline=False)
                 cmds_desc = ''
                 for y in self.bot.walk_commands():
                     if not y.cog_name and not y.hidden:
-                        cmds_desc += ('{} - {}'.format(y.name,y.help)+'\n')
+                        cmds_desc += ('{} - {}'.format(y.name, y.help) + '\n')
                 await interaction.response.send_message(embed=help, ephemeral=True)
             else:
-                if len(cog) > 1:
-                    help = discord.Embed(title='Error!',description='That is way too many cogs!',color=discord.Color.red())
-                    await interaction.response.send_message(embed=help, ephemeral=True)
-                else:
-                    found = False
-                    for x in self.bot.cogs:
-                        for y in cog:
-                            if x == y:
-                                help=discord.Embed(title=cog[0]+' Command Listing',description=self.bot.cogs[cog[0]].__doc__)
-                                for c in self.bot.get_cog(y).get_commands():
-                                    if not c.hidden:
-                                        help.add_field(name=c.name,value=c.help,inline=False)
-                                found = True
-                    if not found:
-                        help = discord.Embed(title='Error: No category found!',description='What is even a "'+cog[0]+'"?',color=discord.Color.red())
-                    else:
-                        pass
-                    await interaction.response.send_message(embed=help, ephemeral=True)
-        except:
-            pass
+                found = False
+                for x in self.bot.cogs:
+                    if x.lower() == cog.lower():
+                        help = discord.Embed(title=f'{x} Command Listing', description=self.bot.cogs[x].__doc__)
+                        for c in self.bot.get_cog(x).get_commands():
+                            if not c.hidden:
+                                help.add_field(name=c.name, value=c.help, inline=False)
+                        found = True
+                        break
+                if not found:
+                    help = discord.Embed(title='Error: No category found!', description=f'What is even a "{cog}"?', color=discord.Color.red())
+                await interaction.response.send_message(embed=help, ephemeral=True)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            await interaction.response.send_message("An error occurred while processing your request.", ephemeral=True)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Utilities(bot)) 
