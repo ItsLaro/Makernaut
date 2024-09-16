@@ -134,7 +134,7 @@ def generate_hacker_guide_line():
 
 def get_list_of_confirmed_hackers(params):
     res = requests.get(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        f'https://www.{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
         # f'http://localhost:3000/api/admin/hackers',
         params=params,
         headers={'Authorization': SHELLHACKS_API_TOKEN},
@@ -149,7 +149,7 @@ def get_is_hacker_confirmed(discord_name):
     }
 
     res = requests.get(
-        f'https://{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
+        f'https://www.{"" if config.isProd else "dev."}shellhacks.net/api/admin/hackers',
         # f'http://localhost:3000/api/admin/hackers',
         params=params,
         headers={'Authorization': SHELLHACKS_API_TOKEN},
