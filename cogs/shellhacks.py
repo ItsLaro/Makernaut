@@ -145,7 +145,7 @@ def get_list_of_confirmed_hackers(params):
 def get_is_hacker_confirmed(discord_name):
     params = {
         'searchParams': str(discord_name),
-        'application_status': 'confirmed'
+        'application_status': ['confirmed', 'checked_in']
     }
 
     res = requests.get(
@@ -364,13 +364,13 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
             return
         
         while True:
-            params = {"application_status": "confirmed", "format": "json"}
+            params = {"application_status": ["confirmed", "checked_in"], "format": "json"}
             if cursor:
                 params["cursor"] = cursor
 
             res = get_list_of_confirmed_hackers(params)
             if res.status_code != 200:
-                await interaction.followup.send(f"Failed to fetch confirmed hackers. Status code: {res.status_code}", ephemeral=True)
+                await interaction.followup.send(f"Failed to fetch confirmed and checked-in hackers. Status code: {res.status_code}", ephemeral=True)
                 return
 
             try:
