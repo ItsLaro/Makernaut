@@ -193,7 +193,7 @@ class BotContext(commands.Cog):
                 if is_sus: 
                     await self.delete_message_and_ban_user(message, author)
                     await self.log_outcome(message, author, True)
-                else:                     
+                else: 
                     await self.log_outcome(message, author, False)
         elif matching_url:
             if matching_mentions_nitro:

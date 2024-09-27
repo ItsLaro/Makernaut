@@ -256,21 +256,13 @@ _**Note 3:** This is only for Hackers; Sponsors and Mentors, expect to hear from
 
         if must_send_support_message:
             support_buttons = TicketControls()
-            support_message = ''' 
-
-**Mentorship Request:** Connect with a mentor to obtain guidance in your technical endevours.
-
-**ShellHacks Inquiry:** Chat with a member of the Organizing team about a doubt or need.
-
-**Ask MLH:** Reach out to the MLH staff at ShellHacks to learn more about their policies or even borrow hardware.
-
-**Discord Support:** Having difficulties here on Discord? Encountered a bug? Report it to us.  
-
-    '''
-            embed_description = "To open a ticket and get help, choose one of the tickets below. Clicking on a button, will create a private thread with you and the relevant contacts"
+            embed_description = "To open a ticket and get help, choose one of the tickets below. Clicking on a button, will create a private thread with you and the relevant contacts."
             embed_response = discord.Embed(title=embed_title, description=embed_description, color=discord.Color.blurple())
-            await self.support_channel.send(content=support_message, embed=embed_response, view=support_buttons) 
-
+            embed_response.add_field(name='Mentorship Request', value='Connect with a mentor to obtain guidance in your technical endevours.', inline=False)
+            embed_response.add_field(name='ShellHacks Inquiry', value='Chat with a member of the Organizing team about a doubt or need.', inline=False)
+            embed_response.add_field(name='Ask MLH', value='Ask about any of the [MLH prize categories](https://mlh.link/ShellHacks), resources & technical help, judging criteria, [Code of Conduct](https://mlh.io/code-of-conduct) or anything MLH!', inline=False)
+            embed_response.add_field(name='Discord Support', value='Having difficulties here on Discord? Encountered a bug? Report it to us.', inline=False)
+            await self.support_channel.send(embed=embed_response, view=support_buttons) 
    
     #Commands
     @commands.Cog.listener()
@@ -800,7 +792,7 @@ class TicketControls (View):
     async def create_private_thread(self, interaction, reason, cced_role):
         moderator_role = interaction.guild.get_role(self.MODERATOR_ROLE_ID)
         thread = await interaction.channel.create_thread(
-            name=f"{interaction.user.nick}'s {reason} Ticket",
+            name=f"{interaction.user.nick.split()[0] if interaction.user.nick else interaction.user.name.split()[0] }'s {reason} Ticket",
             reason=reason
         )
         message = f'''
