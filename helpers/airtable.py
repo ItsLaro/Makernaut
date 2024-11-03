@@ -3,8 +3,8 @@ import requests
 import discord
 
 # TODO: Organize these constants better
-AIRTABLE_INIT_PRO_BASE_ID='appkfpQOssQZfmORj'
-AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID='tbl1ySW5NE9FySZh8'
+AIRTABLE_INIT_PRO_BASE_ID='appLZ8fe3NAkBqvhY'
+AIRTABLE_INIT_PRO_MEMBERSHIP_TABLE_ID='tbluGowfHrBkfpNdP'
 
 def get_record_by_email(email):
     AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
@@ -16,7 +16,7 @@ def get_record_by_email(email):
     }
     
     # Params
-    ACCEPTED_VIEW = "viwaHiScZjzjko9NG"
+    ACCEPTED_VIEW = "viwu6rzpHULfuCvLo"
     FIELDS = ["First Name", "E-mail Address", "Discord ID"]
     FORMULA = f"{{E-mail Address}}='{email}'"
     params = {"view": ACCEPTED_VIEW, "fields": FIELDS, "filterByFormula": FORMULA} 
