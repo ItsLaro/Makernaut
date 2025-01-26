@@ -36,7 +36,7 @@ def store_token_by_record(record, token: str):
     }
     data = {
         "fields": {
-            "Email Token": token
+            "Discord Email Token": token
         }
     }
 
@@ -54,7 +54,7 @@ def verify_discord_user(record, discord_user: discord.User):
     }
     data = {
         "fields": {
-            "Email Token": '',
+            "Discord Email Token": '',
             "Discord ID": discord_user.id,
             "Discord Username": str(discord_user),
         }
