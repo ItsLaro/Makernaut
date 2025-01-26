@@ -87,20 +87,21 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                     color=color,
                 )
                 embed_response.set_footer(text="If you still don't get access, please reach out to a mod for assistance.")
-                response = await interaction.followup.send(embed=embed_response, ephemeral=True)
+                await interaction.followup.send(embed=embed_response, ephemeral=True)
             else:
                 # Send email with generated verification_token
                 verification_token = send_verification_SMTP_email(validated_email)
                 # Store verification_token in new Airtable column for the record.
                 succeeded = store_token_by_record(user_record, verification_token)
-
+                
+                button = VerifyControls(user_record, verification_token)
+                
                 if succeeded:
                     embed_response = discord.Embed(
                         title="Check your inbox to verify!", 
                         description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog", 
                         color=YELLOW_COLOR,
                     )
-                    button = VerifyControls(user_record, verification_token)
                     await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
                 else:
                     embed_response = discord.Embed(
@@ -159,7 +160,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                         description=self.response_description,
                         color=color,
             )
-            response = await interaction.response.send_message(embed=embed_response, ephemeral=True)
+            interaction.response.send_message(embed=embed_response, ephemeral=True)
         else:
             self.response_description = 'The code did not match. Please try again.' 
             raise Exception()
@@ -172,7 +173,7 @@ class VerificationCodeSubmitModal(Modal, title='Enter Verification Code'):
                     color=color,
         )
         print(traceback.format_exc())
-        response = await interaction.response.send_message(embed=embed_response, ephemeral=True)        
+        await interaction.response.send_message(embed=embed_response, ephemeral=True)        
 
 class AlumniVerification(commands.GroupCog):
 

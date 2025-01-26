@@ -7,7 +7,7 @@ from discord import SelectOption, PartialEmoji
 import config 
 from cogs.alumni_verification import InitiateControls as AlumniVerificationInitiateControls
 # from cogs.shellhacks import InitiateControls as ShellhacksVerificationInitiateControls
-from cogs.shellhacks import TicketControls as ShellHacksTicketControls
+from vaulted_cogs.shellhacks import TicketControls as ShellHacksTicketControls
 # from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.alumni import SelectView, COMPANY_PREFIX, PROFESSION_PREFIX
 from cogs.campus import CampusRoleSelectControls
