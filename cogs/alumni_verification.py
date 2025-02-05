@@ -30,7 +30,7 @@ class VerifyControls (View):
         modal = VerificationCodeSubmitModal(self.user_record, self.verification_token)
         await interaction.response.send_modal(modal) 
     
-    async def on_timeout(self, interaction: discord.Interaction):
+    async def on_timeout(self):
         # after a timeout, clean token from AIRTABLE
         store_token_by_record(self.user_record, '')
 
