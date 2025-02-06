@@ -48,7 +48,6 @@ class Alumni(commands.GroupCog, name="professional"):
         self.MODERATOR_ROLE_ID = 399551100799418370 
         self.UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
-        self.resume_forum = self.bot.get_channel(RESUME_FORUM_CHANNEL_ID)
 
     async def cog_load(self):
         ALUMNI_ROLES_CHANNEL_ID = 1112899073507336213 if config.isProd else 1112898501714649088
