@@ -7,6 +7,8 @@ from helpers.emojis import alphabet
 
 YELLOW_COLOR = 0xFFBF00  
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
+RESUME_REVIEWER_ROLE_ID = 1336827376767602759 if config.isProd else 1336829503401496697
+RESUME_FORUM_CHANNEL_ID = 1019638833702248469 if config.isProd else 1336830053065035948
 DROPDOWN_OPTION_LIMIT = 25
 COMPANY_PREFIX = 'Company - '
 PROFESSION_PREFIX =  'Professional Role - '
@@ -46,6 +48,7 @@ class Alumni(commands.GroupCog, name="professional"):
         self.MODERATOR_ROLE_ID = 399551100799418370 
         self.UPE_GUILD_ID = 245393533391863808 if config.isProd else 1065042153836912714
         self.upe_guild = bot.get_guild(self.UPE_GUILD_ID)
+        self.resume_forum = self.bot.get_channel(RESUME_FORUM_CHANNEL_ID)
 
     async def cog_load(self):
         ALUMNI_ROLES_CHANNEL_ID = 1112899073507336213 if config.isProd else 1112898501714649088
@@ -99,6 +102,32 @@ class Alumni(commands.GroupCog, name="professional"):
             company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index % DROPDOWN_OPTION_LIMIT))
         company_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, sorted_company_roles)]
         return company_sorted_combined_options_and_roles
+
+    @commands.Cog.listener()
+    async def on_thread_create(self, thread):
+        """Event listener for when a new thread is created in the resume review forum"""
+        if thread.parent_id != RESUME_FORUM_CHANNEL_ID:
+            return
+
+        title = "# Resume Review Request"
+        body = f"""### Hey {thread.owner.mention}! The community will review your resume shortly.
+
+        ### Quick Reminders:
+        • Title Format: `<job type>, <your name>`
+        • Screenshots only (no PDFs/links)
+        • Remove personal info"""
+        footnote = "Include your target role to help match with relevant reviewers 🎯"
+        response_message = f"{title}\n{body}\n{footnote}"
+
+        embed = discord.Embed(
+            description=response_message,
+            color=YELLOW_COLOR
+        )
+
+        await thread.send(
+            content=f"<@&{RESUME_REVIEWER_ROLE_ID}>",
+            embed=embed
+        )
 
 async def setup(bot):
     await bot.add_cog(Alumni(bot)) 
