@@ -108,15 +108,24 @@ class Alumni(commands.GroupCog, name="professional"):
         if thread.parent_id != RESUME_FORUM_CHANNEL_ID:
             return
 
-        title = "# Resume Review Request"
-        body = f"""### Hey {thread.owner.mention}! The community will review your resume shortly.
+        title = "# Welcome to the INIT Resume Review Forum!"
+        body = f"""### Hey there {thread.owner.mention}! 
 
-        ### Quick Reminders:
-        • Title Format: `<job type>, <your name>`
-        • Screenshots only (no PDFs/links)
-        • Remove personal info"""
-        footnote = "Include your target role to help match with relevant reviewers 🎯"
-        response_message = f"{title}\n{body}\n{footnote}"
+        Resumes are living documents, and can always be fine-tuned. A great resume is the key to getting your foot in the door for life-changing opportunities. 
+        
+        ### Reminders:
+        • Format your title as: `[Target Position] - Your Name`
+        • Upload resume as high-quality screenshots (no PDFs or external links)
+        • Remove all personal information (phone, address, email)
+        
+        ### Review Process:
+        • Be specific about your target role and industry
+        • Mention any specific areas you'd like feedback on
+        • Expect feedback within 24-48 hours
+        • Ask clarifying questions about the feedback received
+        • Consider multiple iterations for best results"""
+        footnote = "Remember to maintain a positive attitude and be open to constructive feedback. We're here to help you succeed! 🎯"
+        response_message = f"{title}\n{body}\n\n{footnote}"
 
         embed = discord.Embed(
             description=response_message,
