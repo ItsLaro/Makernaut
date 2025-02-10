@@ -2,8 +2,7 @@ import config
 import discord
 import traceback
 from discord.ext import commands
-from discord import app_commands
-from discord.ui import TextInput, View, Button, Modal
+from discord.ui import TextInput, View, Modal
 from email_validator import validate_email, EmailNotValidError
 from helpers.airtable import get_record_by_email, store_token_by_record, verify_discord_user
 from helpers.mail.email_sender import send_verification_SMTP_email
