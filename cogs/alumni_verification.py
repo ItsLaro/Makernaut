@@ -23,6 +23,7 @@ class VerifyControls (View):
     def __init__(self, user_record, verification_token):
         self.verification_token = verification_token
         self.user_record = user_record
+        self.message = None  # Store message reference
         super().__init__(timeout=600) #times-out after 10 minutes
 
     @discord.ui.button(label='Verify', style=discord.ButtonStyle.secondary, emoji='🔑')
@@ -31,12 +32,14 @@ class VerifyControls (View):
         await interaction.response.send_modal(modal) 
     
     async def on_timeout(self):
-        # after a timeout, clean token from AIRTABLE
+        # after a timeout, clean token from AIRTABLE and disables buttons
         store_token_by_record(self.user_record, '')
 
         for item in self.children:
             item.disabled = True
-        await self.message.edit(view=self)
+
+        if self.message:
+            await self.message.edit(view=self)
 
 class EmailSubmitModal(Modal, title='Enter your Email Address'):
     email = TextInput(
@@ -102,14 +105,16 @@ class EmailSubmitModal(Modal, title='Enter your Email Address'):
                         description="I've sent a code to the email address you provided. Please click below and enter the code in the dialog", 
                         color=YELLOW_COLOR,
                     )
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    message = await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    button.message = message      
                 else:
                     embed_response = discord.Embed(
                         title="<a:utilfailure:809713365088993291> Something unexpected happened...", 
                         description="Please try again. The developers have been notified of this.", 
                         color=discord.Color.red(),
                     )
-                    await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    message = await interaction.followup.send(embed=embed_response, view=button, ephemeral=True)
+                    button.message = message    
                 
         except EmailNotValidError as e:
             # Email is not valid.
