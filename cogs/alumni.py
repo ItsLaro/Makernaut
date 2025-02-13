@@ -7,6 +7,8 @@ from helpers.emojis import alphabet
 
 YELLOW_COLOR = 0xFFBF00  
 INIT_AA_VERIFIED_ROLE_ID = 1087057030759596122 if config.isProd else 1088343704290480158
+RESUME_REVIEWER_ROLE_ID = 1336827376767602759 if config.isProd else 1336829503401496697
+RESUME_FORUM_CHANNEL_ID = 1019638833702248469 if config.isProd else 1336830053065035948
 DROPDOWN_OPTION_LIMIT = 25
 COMPANY_PREFIX = 'Company - '
 PROFESSION_PREFIX =  'Professional Role - '
@@ -99,6 +101,41 @@ class Alumni(commands.GroupCog, name="professional"):
             company_options.append(SelectOption(label=role_name, emoji=PartialEmoji(name=emoji_codepoint, animated=False), value=index % DROPDOWN_OPTION_LIMIT))
         company_sorted_combined_options_and_roles = [{'option': option, 'role': role} for option, role in zip(company_options, sorted_company_roles)]
         return company_sorted_combined_options_and_roles
+
+    @commands.Cog.listener()
+    async def on_thread_create(self, thread):
+        """Event listener for when a new thread is created in the resume review forum"""
+        if thread.parent_id != RESUME_FORUM_CHANNEL_ID:
+            return
+
+        title = "# Welcome to the INIT Resume Review Forum!"
+        body = f"""### Hey there {thread.owner.mention}! 
+
+        Resumes are living documents, and can always be fine-tuned. A great resume is the key to getting your foot in the door for life-changing opportunities. 
+        
+        ### Reminders:
+        • Format your title as: `[Target Position] - Your Name`
+        • Upload resume as high-quality screenshots (no PDFs or external links)
+        • Remove all personal information (phone, address, email)
+        
+        ### Review Process:
+        • Be specific about your target role and industry
+        • Mention any specific areas you'd like feedback on
+        • Expect feedback within 24-48 hours
+        • Ask clarifying questions about the feedback received
+        • Consider multiple iterations for best results"""
+        footnote = "Remember to maintain a positive attitude and be open to constructive feedback. We're here to help you succeed! 🎯"
+        response_message = f"{title}\n{body}\n\n{footnote}"
+
+        embed = discord.Embed(
+            description=response_message,
+            color=YELLOW_COLOR
+        )
+
+        await thread.send(
+            content=f"<@&{RESUME_REVIEWER_ROLE_ID}>",
+            embed=embed
+        )
 
 async def setup(bot):
     await bot.add_cog(Alumni(bot)) 
