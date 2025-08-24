@@ -94,3 +94,7 @@ async def sync(ctx: commands.Context):
 
 if __name__ == "__main__":
     bot.run(secret_key)
+
+
+    # make sure to ask afterwards if the question was answered
+    #add ability to close a ticket 
