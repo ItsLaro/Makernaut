@@ -44,6 +44,8 @@ class Gui(commands.Bot):
                 if filename.endswith('.py'):
                     await bot.load_extension(f'cogs.{filename[:-3]}')
                     print(f'- {(filename[:-3]).title()} functionality loaded ✅')
+            except commands.ExtensionAlreadyLoaded:
+                print(f'- {(filename[:-3]).title()} was already loaded. ⚠️')
             except Exception:
                     tb = traceback.format_exc()
                     print(f'- {(filename[:-3]).title()} failed to load ❌ due to "{tb}""')
