@@ -44,6 +44,8 @@ class Gui(commands.Bot):
                 if filename.endswith('.py'):
                     await bot.load_extension(f'cogs.{filename[:-3]}')
                     print(f'- {(filename[:-3]).title()} functionality loaded ✅')
+            except commands.ExtensionAlreadyLoaded:
+                print(f'- {(filename[:-3]).title()} was already loaded. ⚠️')
             except Exception:
                     tb = traceback.format_exc()
                     print(f'- {(filename[:-3]).title()} failed to load ❌ due to "{tb}""')
@@ -94,3 +96,7 @@ async def sync(ctx: commands.Context):
 
 if __name__ == "__main__":
     bot.run(secret_key)
+
+
+    # make sure to ask afterwards if the question was answered
+    #add ability to close a ticket 
