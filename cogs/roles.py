@@ -33,6 +33,11 @@ class Roles(commands.GroupCog, name="roles"):
         self.GREEN_HEX = 0x238823
         self.YELLOW_HEX = 0xFFBF00
         self.RED_HEX = 0xD2222D
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        for guild in self.bot.guilds:
+            await guild.fetch_members().flatten()
 
     @app_commands.command(name="see",
                           description="Used to inquire about a role.")
