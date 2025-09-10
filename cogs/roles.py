@@ -363,11 +363,12 @@ class Roles(commands.GroupCog, name="roles"):
                         member = await interaction.guild.fetch_member(int(member_name_parts[0].strip()))
                     else:  # assume it's a username
                         if len(member_name_parts) <= 1:
-                            raise commands.BadArgument
-                        member = discord.utils.get(
-                            interaction.guild.members,
-                            name=member_name_parts[0].strip(),
-                            discriminator=member_name_parts[1].strip())
+                            member = interaction.guild.get_member_named(member_name)
+                        else:
+                            member = discord.utils.get(
+                                interaction.guild.members,
+                                name=member_name_parts[0].strip(),
+                                discriminator=member_name_parts[1].strip())
                 except (commands.BadArgument, commands.MemberNotFound, discord.errors.NotFound) as error:
                     failed_users.append(member_name)
                 else:
