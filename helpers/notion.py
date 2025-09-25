@@ -1,120 +1,219 @@
 import os
+import re
+from datetime import datetime, timedelta
 from notion_client import Client
-from sentence_transformers import SentenceTransformer, util
+import pytz
+from .notion_properties import extract_property_value
 
 class NotionDB:
 
     def __init__(self):
-        self.notion = Client(auth=str({os.environ["NOTION_CLIENT_ID"]}))
-        # id for notion page with database containing FAQs
-        self.faq_db_id = os.environ["NOTION_FAQ_DB_ID"]
-
-        self.anc_cache = {}
-        self.faq_cache = {}
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
-    
-    # extracts text from notion db cell (supporting various text types)
-    def extract_text(self, val):
-        if val["type"] == "title":
-            title_list = val.get("title", [])
-            return title_list[0].get("plain_text", "") if title_list else ""
         
-        elif val["type"] == "rich_text":
-            rt_list = val.get("rich_text", [])
-            return rt_list[0].get("plain_text", "") if rt_list else ""
-        
-        elif val["type"] == "text":
-            return val.get("text", {}).get("content", "")
-        
-        else:
-            return ""
+        self.notion = Client(auth= str({os.getenv("NOTION_ANC_API_KEY")}))
 
-    # internal "private" (i hate python) method used to retrieve all rows of the db
-    def get_db_rows(self, db_name: str):
+        self.faq_db_id = "2649f4e8-ae4e-802e-b6dc-e54e30078892"
+        self.anc_db_id = "2649f4e8-ae4e-8060-8768-c397e8230f5f"
 
-        # Map db_name to database_id
-        db_map = {
-            "qa_db": self.faq_db_id,
-            "anc_db": "YOUR_ANC_DB_ID_HERE"
+        self.db_config = {
+            "qa_db": {
+                "id": self.faq_db_id,
+                "display_name": "FAQ Database"
+            },
+            "anc_db": {
+                "id": self.anc_db_id,
+                "display_name": "Announcements Database"
+            }
         }
+    
+    # retrieve all rows from a notion db as list of dictionaries and filter by specified arguments if provided
 
-        database_id = db_map.get(db_name.lower())
-
-        if not database_id:
-            print(f"Unknown database name: {db_name}")
+    # currently only filters for one column and value, will update later to allow for multiple filters using dictionary
+    def get_db_rows(self, db_name: str, filter_column: str = None, filter_value: str = None, return_format: str = "unified"):
+        
+        db_config = self.db_config.get(db_name.lower())
+        if not db_config:
             return []
 
+        database_id = db_config["id"]
+
         try:
-            res = self.notion.databases.query(database_id=database_id)
+
+            query_params = {"database_id": database_id}
+            
+            if filter_column and filter_value:
+                query_params["filter"] = {
+                    "property": filter_column,
+                    "text": {
+                        "equals": filter_value
+                    }
+                }
+            
+            res = self.notion.databases.query(**query_params)
             rows = res.get("results", [])
-            extracted_text = []
+            extracted_data = []
 
-            if not rows:
-                print(f"No rows found in the {db_name} database.")
-
-            else:
+            if rows:
                 for row in rows:
                     props = row.get("properties", {})
-                    # Get the first two columns by insertion order
-                    col_items = list(props.items())
+                    row_data = {}
+                    
+                    row_data['id'] = row.get('id')
+                    
+                    for col_name, col_val in props.items():
+                        row_data[col_name] = extract_property_value(col_val)
+                    
+                    extracted_data.append(row_data)
 
-                    first_col_name, first_col_val = col_items[0]
-                    second_col_name, second_col_val = col_items[1]
-
-                    first_val = self.extract_text(first_col_val)
-                    second_val = self.extract_text(second_col_val)
-
-                    extracted_text.append({
-                        first_col_name: first_val,
-                        second_col_name: second_val
-                    })
-
-                # print(f"\nAll rows from {db_name} as JSON:")
-                # print(json.dumps(extracted_text, indent=2, ensure_ascii=False))
-
+        # returns empty list - will prevent bot from crashing if 
+        # polling a db that doesn't exist
         except Exception as e:
-            print(f"Failed to read {db_name} database:", e)
-            extracted_text = []
+            extracted_data = []
 
-        return extracted_text
+        """
+        Example return with announcement database
+        {
+            {
+            'id': 'page-123',
+            'Announcement': {'value': 'Hello world!', 'type': 'text', 'formatted': 'Hello world!'},
+            'Time': {'value': '2025-09-23T21:00:00', 'type': 'date', 'formatted': '2025-09-23T21:00:00'},
+            'Announcement Sent': {'value': 'Not Sent', 'type': 'status', 'formatted': 'Not Sent'}
+            },
+            {
+            'id': 'page-456',
+            'Announcement': {'value': 'Init rocks!', 'type': 'text', 'formatted': 'Init rocks!'},
+            'Time': {'value': '2025-09-23T21:00:00', 'type': 'date', 'formatted': '2025-09-23T21:00:00'},
+            'Announcement Sent': {'value': 'Done', 'type': 'status', 'formatted': 'Done'}
+            }
+        } 
+        """
+        return extracted_data
     
+    # get announcements that are scheduled to be 
+    # sent within 7 minutes (ellie's choice) and have status "Not Sent"
+    def get_pending_announcements(self):
 
-    # add functionality for user to accept answer as right, if it is then add the question and answer to the cache
-    def search_faq(self, user_question):
+        try:
 
-        if user_question not in self.faq_cache:
+            all_announcements = self.get_db_rows("anc_db", return_format = "unified")
+            if not all_announcements:
+                return []
+            
+            # current time in EDT
+            edt = pytz.timezone('US/Eastern')
+            now = datetime.now(edt)
+            cutoff_time = now + timedelta(minutes = 7)
+            
+            pending = []
+            
+            for announcement in all_announcements:
+                
+                if announcement.get("Announcement Sent", {}).get("value") != "Not Sent":
+                    continue
+                
+                # get announcement time
+                time_str = announcement.get("Time", {}).get("value")
+                if not time_str:
+                    continue
+                
+                try:
+                    # parse time -> convert to EDT
+                    announcement_time = self._parse_notion_datetime(time_str)
+                    if announcement_time.tzinfo is None:
+                        announcement_time = edt.localize(announcement_time)
+                    
+                    # check is annc is within 7 min OR past due
+                    if announcement_time <= cutoff_time:
+                        # Strip ``` markers from announcement text
+                        announcement_text = announcement.get("Announcement", {}).get("formatted", "")
+                        if announcement_text.startswith("```") and announcement_text.endswith("```"):
+                            # Remove ``` from beginning and end
+                            cleaned_text = announcement_text[3:-3].strip()
+                        else:
+                            cleaned_text = announcement_text
+                        
+                        # process hyperlinks: convert [text]&(link) to [text](link)
+                        cleaned_text = self.process_hyperlinks(cleaned_text)
+                        
+                        # update announcement with cleaned text
+                        announcement["Announcement"]["formatted"] = cleaned_text
+                        announcement["Announcement"]["value"] = cleaned_text
+                        
+                        pending.append(announcement)
+                        
+                except Exception as e:
+                    continue
+            
+            return pending
+            
+        except Exception as e:
+            return []
+    
+    # parse Notion datetime string into Python datetime object
+    def _parse_notion_datetime(self, datetime_str: str):
+
+        # handles timezone-aware strings (ex: 2025-09-23T21:00:00.000-04:00)
+        if re.search(r'[+-]\d{2}:\d{2}$', datetime_str):
+            tz_match = re.search(r'([+-]\d{2}):(\d{2})$', datetime_str)
+            if tz_match:
+                tz_hours = int(tz_match.group(1))
+                tz_minutes = int(tz_match.group(2))
+                
+                # remove timezone and parse
+                clean_str = re.sub(r'[+-]\d{2}:\d{2}$', '', datetime_str)
+                
+                for fmt in ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"]:
+                    try:
+                        naive_dt = datetime.strptime(clean_str, fmt)
+                        return naive_dt.replace(tzinfo=pytz.FixedOffset(tz_hours * 60 + tz_minutes))
+                    except ValueError:
+                        continue
+        
+        clean_str = re.sub(r'[+-]\d{2}:\d{2}$', '', datetime_str)
+        formats = ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]
+        
+        for fmt in formats:
             try:
-                db_rows = self.get_db_rows("qa_db")
-                highest_match_score = 0
-                ans = None
-
-                for qa in db_rows:
-                    # get the keys for question and answer
-                    keys = list(qa.keys())
-                    db_question = qa[keys[1]]
-                    db_answer = qa[keys[0]]
-
-                    question_match_score = self.questions_match(user_question, db_question)
-
-                    # if question is >= 70% match compare it to the highest
-                    # match so far, return the answer of the question w/ the 
-                    # highest similarity  
-                    if question_match_score >= 70 and question_match_score > highest_match_score:
-                        ans = db_answer
-                        highest_match_score = question_match_score
-
-                return ans
-
-            except Exception as e:
-                print(e)
-                return None
-        else:
-            return self.faq_cache[user_question]
+                return datetime.strptime(clean_str, fmt)
+            except ValueError:
+                continue
+        
+        raise ValueError(f"Unable to parse datetime: {datetime_str}")
     
+    # process hyperlinks in announcement text by 
+    # converting [text]&(link) to [text](link)
+    def process_hyperlinks(self, text):
 
-    def questions_match(self, user_question: str, db_question: str):
-        # cosine similarity to compare closeness of two strings
-        emb1 = self.model.encode(user_question, convert_to_tensor=True)
-        emb2 = self.model.encode(db_question, convert_to_tensor=True)
-        similarity = util.cos_sim(emb1, emb2).item()
-        return similarity * 100 
+        import re
+        
+        pattern = r'\[([^\]]+)\]&\(([^)]+)\)'
+        
+        processed_text = re.sub(pattern, r'[\1](\2)', text)
+        
+        return processed_text
+    
+    # marks an announcement as sent by updating its status to 'Done'
+    def mark_announcement_sent(self, announcement_row: dict):
+        
+        try:
+
+            page_id = announcement_row.get('id')
+            
+            if not page_id:
+                return False
+            
+            update_data = {
+                "properties": {
+                    "Announcement Sent": {
+                        "status": {
+                            "name": "Done"
+                        }
+                    }
+                }
+            }
+            
+            self.notion.pages.update(page_id=page_id, **update_data)
+            
+            return True
+            
+        except Exception as e:
+            return False 
