@@ -9,8 +9,9 @@ class NotionDB:
 
     def __init__(self):
         
-        self.notion = Client(auth= str({os.getenv("NOTION_ANC_CLIENT_ID")}))
+        env_key = os.getenv['NOTION_ANC_CLIENT_ID']
 
+        self.notion = Client(auth = env_key)
         self.faq_db_id = "2649f4e8-ae4e-802e-b6dc-e54e30078892"
         self.anc_db_id = "2649f4e8-ae4e-8060-8768-c397e8230f5f"
 
