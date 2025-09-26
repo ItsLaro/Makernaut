@@ -8,6 +8,7 @@ import config
 from cogs.alumni_verification import InitiateControls as AlumniVerificationInitiateControls
 # from cogs.shellhacks import InitiateControls as ShellhacksVerificationInitiateControls
 from vaulted_cogs.shellhacks import TicketControls as ShellHacksTicketControls
+from cogs.ticketing import TicketControls as TicketingControls
 # from cogs.guilds import InitiateControls as PartyInitiateControls
 from cogs.alumni import SelectView, COMPANY_PREFIX, PROFESSION_PREFIX
 from cogs.campus import CampusRoleSelectControls
@@ -27,6 +28,7 @@ class Gui(commands.Bot):
         # self.add_view(ShellhacksVerificationInitiateControls())
         # self.add_view(PartyInitiateControls())
         self.add_view(ShellHacksTicketControls())
+        self.add_view(TicketingControls())
         company_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix(COMPANY_PREFIX)
         self.add_view(SelectView(company_sorted_combined_options_and_roles))
         profession_sorted_combined_options_and_roles = await self.fetch_combined_options_and_roles_via_role_prefix(PROFESSION_PREFIX)
