@@ -33,6 +33,11 @@ class Roles(commands.GroupCog, name="roles"):
         self.GREEN_HEX = 0x238823
         self.YELLOW_HEX = 0xFFBF00
         self.RED_HEX = 0xD2222D
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        for guild in self.bot.guilds:
+            await guild.fetch_members().flatten()
 
     @app_commands.command(name="see",
                           description="Used to inquire about a role.")
@@ -363,11 +368,12 @@ class Roles(commands.GroupCog, name="roles"):
                         member = await interaction.guild.fetch_member(int(member_name_parts[0].strip()))
                     else:  # assume it's a username
                         if len(member_name_parts) <= 1:
-                            raise commands.BadArgument
-                        member = discord.utils.get(
-                            interaction.guild.members,
-                            name=member_name_parts[0].strip(),
-                            discriminator=member_name_parts[1].strip())
+                            member = interaction.guild.get_member_named(member_name)
+                        else:
+                            member = discord.utils.get(
+                                interaction.guild.members,
+                                name=member_name_parts[0].strip(),
+                                discriminator=member_name_parts[1].strip())
                 except (commands.BadArgument, commands.MemberNotFound, discord.errors.NotFound) as error:
                     failed_users.append(member_name)
                 else:
