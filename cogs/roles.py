@@ -368,7 +368,10 @@ class Roles(commands.GroupCog, name="roles"):
                         member = await interaction.guild.fetch_member(int(member_name_parts[0].strip()))
                     else:  # assume it's a username
                         if len(member_name_parts) <= 1:
-                            member = interaction.guild.get_member_named(member_name)
+                            if member_name.isnumeric():
+                                member = interaction.guild.get_member(int(member_name))
+                            else:
+                                member = interaction.guild.get_member_named(member_name)
                         else:
                             member = discord.utils.get(
                                 interaction.guild.members,
