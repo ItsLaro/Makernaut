@@ -9,7 +9,7 @@ class ShellAnnouncements(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.notion_db = NotionDB()
-        self.preview_channel_id = 1418734017322418216  # channel for previews
+        self.preview_channel_id = 1421163780523688066  # channel for previews
         self.announcement_channel_id = 1420250410308079648  # channel for actual announcements
         self.announcement_data = {}
         print(f"ShellAnnouncements cog loaded!")
