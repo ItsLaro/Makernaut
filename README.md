@@ -5,7 +5,7 @@ Discord bot to assist in the <a href=https://discord.com/invite/upefiu/> Officia
   <p align="center"> Gui, the official UPE Mascot, is the face of this bot. </p>
 </p>
   
-## Gettting started
+## Getting started
 
 ### Requirements 
 * [Discord Developer Portal: Registered Application](https://discord.com/developers/applications) - Get Bot Account registered and note down client key on a .env file as: `BOT_KEY = <key here>`
